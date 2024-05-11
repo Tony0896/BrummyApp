@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.brummy.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Brummy</name>
+    <description>Brummy App</description>
+    <author email="bektor@live.com" href="#">
+        Jose Antonio Cruz Romero
+    </author>
+
+    <content src="index.html" />
+    
+    <access origin="*" />
+    <access origin="cdvfile://*" />
+
+    <allow-navigation href="*" />
+
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+
+    <platform name="android">
+        <preference name="StatusBarBackgroundColor" value="#124F90" />
+        <preference name="orientation" value="portrait" />
+        <preference name="iosExtraFilesystems" value="library,library-nosync,documents,documents-nosync,cache,bundle,root" />
+        <preference name="AndroidExtraFilesystems" value="files,files-external,documents,sdcard,cache,cache-external,assets,root" />
+        <preference name="AndroidPersistentFileLocation" value="Internal" />
+        <preference name="AndroidPersistentFileLocation" value="Compatibility" />
+        <preference name="AndroidInsecureFileModeEnabled" value="true" />
+        <preference name="StatusBarOverlaysWebView" value="false" />
+        <preference name="android-minSdkVersion" value="25" />
+        <preference name="android-targetSdkVersion" value="33" />
+        <preference name="android-compileSdkVersion" value="33" />
+        <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/icon/android/playstore.png"/>
+        <preference name="AndroidWindowSplashScreenBackground" value="#155169" />
+        <icon src="www/img/logo.png"/>
+    </platform>
+
+    <preference name="SplashMaintainAspectRatio" value="false"/>
+    <preference name="SplashScreen" value="screen"/>
+    <preference name="AutoHideSplashScreen" value="true" />  
+    <preference name="ShowSplashScreen" value="true"/>
+    <preference name="SplashShowOnlyFirstTime" value="true"/>
+
+    <platform name="android">
+        <preference name="ShowSplashScreenSpinner" value="false" />
+    </platform>
+
+</widget>
