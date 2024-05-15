@@ -157,14 +157,14 @@ select:focus {
 }
 
 h2 {
-    color: #005d99;
+    color: #009071;
     font-size: 20px;
     margin-top: 35px;
 }
 
 .tabla-levantamiento- {
     text-align: center;
-    background-color: #005d99;
+    background-color: #009071;
 }
 
 .global-dates {
@@ -183,7 +183,7 @@ h2 {
     padding-bottom: 13px;
     padding-left: 83px;
     padding-right: 81px;
-    background-color: #005d99;
+    background-color: #009071;
     border-width: 3px;
     border-style: solid;
     border-radius: 8px;
@@ -271,7 +271,7 @@ input[type="checkbox"] {
 }
 
 .timeline-item-date {
-    background-color: #005d99 !important;
+    background-color: #009071 !important;
     color: #fff !important;
     font-weight: bold;
 }
@@ -378,7 +378,7 @@ input[type="checkbox"] {
     display: block;
     margin-left: 20px;
     font-weight: bold;
-    color: #005d99;
+    color: #009071;
 }
 
 .notas_container {

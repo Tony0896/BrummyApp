@@ -115,13 +115,7 @@ hr {
 .body {
     position: relative;
 }
-.top-left {
-    width: 101%;
-    display: flex;
-    height: 45px;
-    background-color: #1e9fb4;
-    margin-left: -2px;
-}
+
 .footer-nav {
     position: fixed;
     width: 100%;
@@ -298,14 +292,14 @@ p:nth-of-type(2) {
     border-radius: 20px;
     width: 147.76px;
     height: 147.76px;
-    border: solid 3px #005d99;
+    border: solid 3px #009071;
 }
 .border-capture-item {
     background-color: white;
     border-radius: 20px;
     width: 118.76px;
     height: 118.76px;
-    border: solid 3px #005d99;
+    border: solid 3px #009071;
 }
 .FWM-photo {
     position: absolute;
@@ -353,11 +347,11 @@ p:nth-of-type(2) {
     padding-bottom: 15px;
     padding-left: 30px;
     padding-right: 30px;
-    background-color: #005d99;
+    background-color: #009071;
     border-radius: 15px;
 }
 .FWN-titulo-2 {
-    color: #005d99;
+    color: #009071;
     font-size: 20px;
 
     margin-top: 35px;
@@ -432,7 +426,7 @@ p:nth-of-type(2) {
     margin-top: 50px;
     width: 200px;
     height: 30px;
-    background-color: #005d99;
+    background-color: #009071;
     color: white;
     text-align: center;
     border-radius: 15px;
@@ -492,7 +486,7 @@ p:nth-of-type(2) {
 
 .inputfile-1 + label {
     color: white;
-    background-color: #005d99;
+    background-color: #009071;
 }
 .select-moji-fwm {
     width: 30px;
@@ -521,7 +515,7 @@ p:nth-of-type(2) {
     margin-top: 10px;
     border: 0.5px solid #000;
     box-sizing: border-box;
-    background: linear-gradient(to right, #005d99, #2d72c2, #0039b5);
+    background: linear-gradient(to right, #009071, #2d72c2, #0039b5);
 }
 .nring input {
     display: none;
@@ -665,7 +659,7 @@ p:nth-of-type(2) {
     text-align: center;
 }
 .fwm-boton-setenta {
-    background-color: #005d99;
+    background-color: #009071;
     color: white;
     width: 75%;
     margin-top: 27px;
@@ -714,11 +708,12 @@ p:nth-of-type(2) {
 }
 .tab-link-active > i {
     color: #fff;
-    font-weight: 900 !important;
+    border-radius: 50%;
+    padding: 2px 10px;
+    background-color: #ffffff38;
 }
 .tab-link-active > span {
     color: #fff;
-    font-weight: 900 !important;
 }
 .tabbar a,
 .tabbar-labels a {
@@ -729,12 +724,6 @@ p:nth-of-type(2) {
     border: 1px solid #ff0037;
     border-radius: 10px;
 }
-.page-content {
-    border-radius: 25px;
-    padding-left: 2px;
-    padding-right: 2px;
-    background-color: #ffffff;
-}
 .page-current {
     background-color: #1e9fb4;
 }
@@ -744,7 +733,7 @@ p:nth-of-type(2) {
     width: auto;
 }
 .radios.checked {
-    color: #005d99;
+    color: #009071;
     background-color: #c4e8ff;
 
     width: fit-content;
@@ -777,7 +766,7 @@ p:nth-of-type(2) {
     border: 1px solid #e2e1e1;
 }
 #imya th {
-    background-color: #005d99;
+    background-color: #009071;
     width: 30%;
 }
 h2.titulo,
@@ -853,7 +842,7 @@ table th {
     font-size: 14px !important;
 }
 .th_boleta {
-    background-color: #005d99;
+    background-color: #009071;
     font-family: auto;
     color: #fff !important;
     font-weight: bold;
