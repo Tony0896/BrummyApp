@@ -4,12 +4,16 @@ function onDeviceReady() {
     document.addEventListener("offline", onOffline, false);
     document.addEventListener("online", onOnline, false);
 
+    document.addEventListener("backbutton", function (e) {
+        app.views.main.router.back();
+    });
+
     // console.log("Running cordova-" + cordova.platformId + "@" + cordova.version);
     // document.getElementById("deviceready").classList.add("ready");
     StatusBar.styleLightContent();
     let Usuario = localStorage.getItem("Usuario");
     localStorage.setItem("version", "1.0.0");
-    let url = "http://tmshmo.ci-sa.com.mx/www.CISAAPP.com/HMOFiles_dev/App";
+    let url = "http://192.168.100.5:8080/";
     localStorage.setItem("url", url);
     if (Usuario) {
         pintaMenu();
@@ -79,51 +83,51 @@ function pintaMenu() {
                     </div>
                 </div>
                 
-                <div class="page-content tab tab-active grid-demo" id="tab-1">
+                <div class="page-content grid-demo">
                     <div class="block">
                         <div class="row">
-                            <div class="col card" style="margin-left: 0;margin-right: 0;">
+                            <div class="col card" style="margin-left: 0;margin-right: 0;" id="dashboard_menu" onclick="moveMenu(this.id)">
                                 <i class="icon material-icons md-only" style="color: #009071;font-size: 50px;"> dashboard </i>
                                 <p style="margin: 8px;"> Métricas </p>
                             </div>
-                            <div class="col card" style="margin-left: 0;margin-right: 0;">
+                            <div class="col card" style="margin-left: 0;margin-right: 0;" id="apps_menu" onclick="moveMenu(this.id)">
                                 <i class="icon material-icons md-only" style="color: #009071;font-size: 50px;"> apps </i>
                                 <p style="margin: 8px;"> Catálogos </p>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col card" style="margin-left: 0;margin-right: 0;">
+                            <div class="col card" style="margin-left: 0;margin-right: 0;" id="paid_menu" onclick="moveMenu(this.id)">
                                 <i class="icon material-icons md-only" style="color: #009071;font-size: 50px;"> paid </i>
                                 <p style="margin: 8px;"> Venta </p>
                             </div>
-                            <div class="col card" style="margin-left: 0;margin-right: 0;">
+                            <div class="col card" style="margin-left: 0;margin-right: 0;" id="people_menu" onclick="moveMenu(this.id)">
                                 <i class="icon material-icons md-only" style="color: #009071;font-size: 50px;"> people </i>
                                 <p style="margin: 8px;"> Clientes </p>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col card" style="margin-left: 0;margin-right: 0;">
+                            <div class="col card" style="margin-left: 0;margin-right: 0;" id="pets_menu" onclick="moveMenu(this.id)">
                                 <i class="icon material-icons md-only" style="color: #009071;font-size: 50px;"> pets </i>
                                 <p style="margin: 8px;"> Mascotas </p>
                             </div>
-                            <div class="col card" style="margin-left: 0;margin-right: 0;">
+                            <div class="col card" style="margin-left: 0;margin-right: 0;" id="event_menu" onclick="moveMenu(this.id)">
                                 <i class="icon material-icons md-only" style="color: #009071;font-size: 50px;"> event </i>
                                 <p style="margin: 8px;"> Citas </p>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col card" style="margin-left: 0;margin-right: 0;">
+                            <div class="col card" style="margin-left: 0;margin-right: 0;" id="inventory_2_menu" onclick="moveMenu(this.id)">
                                 <i class="icon material-icons md-only" style="color: #009071;font-size: 50px;"> inventory_2 </i>
                                 <p style="margin: 8px;"> Inventario </p>
                             </div>
-                            <div class="col card" style="margin-left: 0;margin-right: 0;">
+                            <div class="col card" style="margin-left: 0;margin-right: 0;" id="travel_explore_menu" onclick="moveMenu(this.id)">
                                 <i class="icon material-icons md-only" style="color: #009071;font-size: 50px;"> travel_explore </i>
                                 <p style="margin: 8px;"> Portal </p>
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col card" style="margin-left: 0;margin-right: 0;">
+                            <div class="col card" style="margin-left: 0;margin-right: 0;" id="settings_menu" onclick="moveMenu(this.id)">
                                 <i class="icon material-icons md-only" style="color: #009071;font-size: 50px;"> settings </i>
                                 <p style="margin: 8px;"> Configuración </p>
                             </div>
@@ -180,4 +184,80 @@ function pintaLogin() {
 function iniciaSesion() {
     localStorage.setItem("Usuario", "Usuario");
     window.location.href = "index.html";
+}
+
+function moveMenu(id) {
+    let name = String(id).replace("_menu", "");
+    app.views.main.router.navigate({ name: name });
+}
+
+function dataTableCreate() {
+    $(".datatable")
+        .DataTable({
+            responsive: true,
+            language: {
+                lengthMenu: "_MENU_ registros por pagina",
+                zeroRecords: "No hay resultados",
+                info: "Pagina _PAGE_ de _PAGES_",
+                infoEmpty: "No hay registros disponibles",
+                infoFiltered: "(Mostrar _MAX_ registros)",
+                paginate: {
+                    previous: "‹-",
+                    next: "-›",
+                },
+                aria: {
+                    paginate: {
+                        previous: "Previous",
+                        next: "Next",
+                    },
+                },
+                search: "Buscar",
+            },
+            order: [[0, "asc"]],
+        })
+        .draw();
+
+    $(".paginate_button.current").attr("style", "color: #FFF ! important");
+}
+
+function dataTableDestroy() {
+    $(".datatable").DataTable().destroy();
+}
+
+function get_datos_completos(form) {
+    let campos;
+    let trae_los_campos_sin_llennar = [];
+    campos = document.querySelectorAll("#" + form + " .obligatorio");
+    let valido = true;
+
+    [].slice.call(campos).forEach(function (campo) {
+        if ($(campo).get(0).tagName == "SELECT") {
+            if (campo.value.trim() == 0 || campo.value.trim() == "") {
+                valido = false;
+                trae_los_campos_sin_llennar = [...trae_los_campos_sin_llennar, $(campo).attr("name")];
+            }
+        } else if ($(campo).get(0).tagName == "TEXTAREA") {
+            if (campo.value.trim() === "") {
+                valido = false;
+                trae_los_campos_sin_llennar = [...trae_los_campos_sin_llennar, $(campo).attr("name")];
+            }
+        } else {
+            if (campo.value.trim() === "") {
+                valido = false;
+                trae_los_campos_sin_llennar = [...trae_los_campos_sin_llennar, $(campo).attr("name")];
+            }
+        }
+    });
+
+    if (valido) {
+        return {
+            valido: valido,
+            reponse: 1,
+        };
+    } else {
+        return {
+            valido: valido,
+            response: trae_los_campos_sin_llennar,
+        };
+    }
 }

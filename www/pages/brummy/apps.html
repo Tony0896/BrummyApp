@@ -1,0 +1,264 @@
+<template>
+    <div class="page" id="panel-page">
+        <div class="navbar" style="height: 5px">
+            <div class="left top-left" style="justify-content: center; background-color: #009071">
+                <div class="title" style="font-size: 18px; margin-left: 15px">Catálogos</div>
+            </div>
+        </div>
+
+        <div class="page-content" style="margin-top: 16px">
+            <div style="width: 75%; margin: auto">
+                <div class="toolbar toolbar-bottom tabbar" style="border-radius: 50px">
+                    <div class="toolbar-inner" style="border-top-left-radius: 50px; border-bottom-left-radius: 50px">
+                        <a href="#tab-1" class="tab-link tab-link-active">Especies</a>
+                        <a href="#tab-2" class="tab-link">Razas</a>
+                        <a href="#tab-3" class="tab-link">Motivos</a>
+                        <span class="tab-link-highlight" style="width: 33.3333%; transform: translate3d(0%, 0px, 0px); display: none"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="tabs-animated-wrap" style="height: auto">
+                <div class="tabs">
+                    <div id="tab-1" class="page-content tab tab-active" style="padding-top: 0px">
+                        <div class="block">
+                            <div class="divButton">
+                                <button class="button button-outline button-round" onclick="crearNuevaEspecie()">
+                                    Agregar<span class="material-icons iconBtn"> add_circle_outline </span>
+                                </button>
+                            </div>
+                            <div class="card" style="border-radius: 10px; padding: 10px">
+                                <input class="FWM-input" type="text" id="especieBuscador" placeholder="Buscar especie" />
+                                <table class="mdl-data-table table responsive table-bordered table-striped datatable" id="especiesBodyDT">
+                                    <thead>
+                                        <tr>
+                                            <th class="thDataTable">#</th>
+                                            <th class="thDataTable">Especie</th>
+                                            <th class="thDataTable">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="especiesBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-2" class="page-content tab" style="padding-top: 0px">
+                        <div class="block">
+                            <div class="divButton">
+                                <button class="button button-outline button-round">
+                                    Agregar<span class="material-icons iconBtn"> add_circle_outline </span>
+                                </button>
+                            </div>
+                            <div class="card" style="border-radius: 10px; padding: 10px">
+                                <input class="FWM-input" type="text" id="razasBuscador" placeholder="Buscar razas" />
+                                <table class="mdl-data-table table responsive table-bordered table-striped datatable" id="razasBodyDT">
+                                    <thead>
+                                        <tr>
+                                            <th class="thDataTable">#</th>
+                                            <th class="thDataTable">Especie</th>
+                                            <th class="thDataTable">Raza</th>
+                                            <th class="thDataTable">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="razasBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-3" class="page-content tab" style="padding-top: 0px">
+                        <div class="block">
+                            <div class="divButton">
+                                <button class="button button-outline button-round">
+                                    Agregar<span class="material-icons iconBtn"> add_circle_outline </span>
+                                </button>
+                            </div>
+                            <div class="card" style="border-radius: 10px; padding: 10px">
+                                <input class="FWM-input" type="text" id="motivosCitaBuscador" placeholder="Buscar motivos cita" />
+                                <table class="mdl-data-table table responsive table-bordered table-striped datatable" id="motivosCitaBodyDT">
+                                    <thead>
+                                        <tr>
+                                            <th class="thDataTable">#</th>
+                                            <th class="thDataTable">Motivo</th>
+                                            <th class="thDataTable">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="motivosCitaBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        on: {
+            pageInit: function () {
+                let url = localStorage.getItem("url");
+
+                app.dialog.progress("Cargando...", "#009071");
+
+                $.ajax({
+                    method: "POST",
+                    dataType: "JSON",
+                    url: url + "Brummy/views/catalogos/obtenerEspecies.php",
+                    data: {},
+                })
+                    .done(function (results) {
+                        let success = results.success;
+                        let result = results.result;
+                        let html = "";
+                        switch (success) {
+                            case true:
+                                if (result == "Sin Datos") {
+                                    dataTableDestroy();
+                                    $("#especiesBody").html(html);
+                                    dataTableCreate();
+                                } else {
+                                    dataTableDestroy();
+                                    result.forEach((data, index) => {
+                                        html += `<tr>
+                                            <td>${index + 1}</td>
+                                            <td class="capitalize">${data.nombreEspecie}</td>
+                                            <td>
+                                                <button class="button button-outline button-round btnEliminar" onclick="deleteEspecie(${data.ID})">
+                                                    <span class="material-icons iconBtn"> delete </span>
+                                                </button>
+                                            </td>
+                                        </tr>`;
+                                    });
+                                    $("#especiesBody").html(html);
+                                    dataTableCreate();
+                                }
+
+                                $.ajax({
+                                    method: "POST",
+                                    dataType: "JSON",
+                                    url: url + "Brummy/views/catalogos/obtenerRazas.php",
+                                    data: {},
+                                })
+                                    .done(function (results) {
+                                        let success = results.success;
+                                        let result = results.result;
+                                        let html = "";
+                                        switch (success) {
+                                            case true:
+                                                if (result == "Sin Datos") {
+                                                    dataTableDestroy();
+                                                    $("#razasBody").html(html);
+                                                    dataTableCreate();
+                                                } else {
+                                                    dataTableDestroy();
+                                                    let html;
+                                                    result.forEach((data, index) => {
+                                                        html += `<tr>
+                                                            <td>${index + 1}</td>
+                                                            <td class="capitalize">${data.nombreRaza}</td>
+                                                            <td class="capitalize">${data.especie}</td>
+                                                            <td>
+                                                                <button class="button button-outline button-round btnEliminar" onclick="deleteRaza(${
+                                                                    data.ID
+                                                                })">
+                                                                    <span class="material-icons iconBtn"> delete </span>
+                                                                </button>
+                                                            </td>
+                                                        </tr>`;
+                                                    });
+                                                    $("#razasBody").html(html);
+                                                    dataTableCreate();
+                                                }
+
+                                                $.ajax({
+                                                    method: "POST",
+                                                    dataType: "JSON",
+                                                    url: url + "Brummy/views/catalogos/obtenerMotivos.php",
+                                                    data: {},
+                                                })
+                                                    .done(function (results) {
+                                                        let success = results.success;
+                                                        let result = results.result;
+                                                        let html = "";
+                                                        switch (success) {
+                                                            case true:
+                                                                if (result == "Sin Datos") {
+                                                                    dataTableDestroy();
+                                                                    $("#motivosCitaBody").html(html);
+                                                                    dataTableCreate();
+                                                                } else {
+                                                                    dataTableDestroy();
+                                                                    result.forEach((data, index) => {
+                                                                        html += `<tr>
+                                                                            <td>${index + 1}</td>
+                                                                            <td class="capitalize">${data.motivoCita}</td>
+                                                                            <td>
+                                                                                <button class="button button-outline button-round btnEliminar" onclick="deleteMotivoCita(${
+                                                                                    data.ID
+                                                                                })">
+                                                                                    <span class="material-icons iconBtn"> delete </span>
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>`;
+                                                                    });
+                                                                    $("#motivosCitaBody").html(html);
+                                                                    dataTableCreate();
+                                                                }
+                                                                break;
+                                                            case false:
+                                                                break;
+                                                        }
+                                                    })
+                                                    .fail(function (jqXHR, textStatus, errorThrown) {});
+
+                                                app.dialog.close();
+                                                break;
+                                            case false:
+                                                break;
+                                        }
+                                    })
+                                    .fail(function (jqXHR, textStatus, errorThrown) {});
+
+                                break;
+                            case false:
+                                break;
+                        }
+                    })
+                    .fail(function (jqXHR, textStatus, errorThrown) {});
+
+                $("#especieBuscador").on("input", function () {
+                    let table = $("#especiesBodyDT").DataTable();
+                    table.search($(this).val()).draw();
+                });
+
+                $("#razasBuscador").on("input", function () {
+                    let table = $("#razasBodyDT").DataTable();
+                    table.search($(this).val()).draw();
+                });
+
+                $("#motivosCitaBuscador").on("input", function () {
+                    let table = $("#motivosCitaBodyDT").DataTable();
+                    table.search($(this).val()).draw();
+                });
+            },
+        },
+    };
+</script>
+
+<style>
+    .paginate_button.current {
+        border: none !important;
+        background: #009071 !important;
+        border-radius: 8px !important;
+        font-weight: bold;
+        color: #fff !important;
+    }
+
+    .list ul:before {
+        display: none !important;
+    }
+
+    .list ul:after {
+        display: none !important;
+    }
+</style>

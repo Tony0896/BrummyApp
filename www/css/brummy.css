@@ -32,3 +32,127 @@ button {
     background-color: var(--f7-button-bg-color);
     box-shadow: var(--f7-button-box-shadow);
 }
+
+.tab-link.tab-link-active {
+    background-color: #009071 !important;
+    color: #fff !important;
+    font-weight: bold !important;
+}
+
+.dataTables_filter {
+    display: none;
+}
+.dataTables_length {
+    display: none;
+}
+
+.dataTables_info {
+    display: none;
+}
+
+.dataTables_paginate.paging_simple_numbers {
+    width: 100%;
+    text-align: center !important;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    color: #fff !important;
+}
+.thDataTable {
+    text-align: left;
+    background-color: #009071 !important;
+    color: #fff !important;
+    font-weight: bold !important;
+}
+
+.divButton {
+    display: flex;
+    justify-content: end;
+    padding: 10px;
+}
+
+.button.button-outline.button-round {
+    width: fit-content;
+    --f7-button-border-color: #009071;
+    color: #009071;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    height: auto;
+}
+.iconBtn {
+    margin-left: 11px;
+    vertical-align: middle;
+}
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: rgb(0 0 0 / 3%);
+    color: #212529;
+}
+.btnEliminar {
+    padding-left: 5px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    --f7-button-border-color: #ff0037 !important;
+    color: #ff0037 !important;
+}
+
+.datatable {
+    width: 100%;
+}
+
+input.FWM-input.capitalize {
+    text-transform: capitalize;
+}
+
+.capitalize {
+    text-transform: capitalize;
+}
+
+.floating {
+    background-color: white;
+    font-size: 16px !important;
+    border: 1px solid gray !important;
+    color: #5d5d5d !important;
+    padding: 10px !important;
+    width: 100%;
+    border-radius: 8px !important;
+}
+
+input-outline:after,
+.item-input-outline .item-input-wrap:after {
+    border-radius: 8px !important;
+}
+
+.item-input-outline.item-input-focused .item-input-wrap:after {
+    border: 2px solid #009071 !important;
+    border-radius: 8px !important;
+}
+
+.item-input-outline input {
+    border-radius: 8px !important;
+}
+
+.md .item-input-focused .item-floating-label {
+    color: #009071 !important;
+}
+
+li.item-input-with-value > div > div.item-title.item-floating-label {
+    color: #009071 !important;
+}
+
+.item-input-wrap > input.floating.input-with-value {
+    border: 2px solid #009071 !important;
+    border-radius: 8px !important;
+}
+
+.progressbar-infinite:before {
+    background-color: #009071 !important;
+}
+
+.progressbar-infinite::after {
+    background-color: #009071 !important;
+}
+
+.progressbar-infinite {
+    background-color: #9bf0de !important;
+}

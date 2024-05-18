@@ -248,6 +248,9 @@ i.icon {
     border: 1px solid gray !important;
     border-radius: 8px !important;
     color: #5d5d5d !important;
+    margin: 15px auto !important;
+    padding: 10px !important;
+    width: 100%;
 }
 
 .FWM-input:focus {
