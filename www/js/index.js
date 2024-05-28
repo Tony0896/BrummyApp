@@ -13,7 +13,7 @@ function onDeviceReady() {
     StatusBar.styleLightContent();
     let Usuario = localStorage.getItem("Usuario");
     localStorage.setItem("version", "1.0.0");
-    let url = "http://192.168.100.5:8080/";
+    let url = "http://192.168.100.3:8080/";
     localStorage.setItem("url", url);
     if (Usuario) {
         pintaMenu();
@@ -52,6 +52,12 @@ function onDeviceReady() {
     setTimeout(() => {
         StatusBar.styleLightContent();
     }, 800);
+
+    if (typeof String.prototype.replaceAll === "undefined") {
+        String.prototype.replaceAll = function (match, replace) {
+            return this.replace(new RegExp(match, "g"), () => replace);
+        };
+    }
 }
 
 function cerrarSesion() {
@@ -241,6 +247,7 @@ function get_datos_completos(form) {
                 valido = false;
                 trae_los_campos_sin_llennar = [...trae_los_campos_sin_llennar, $(campo).attr("name")];
             }
+        } else if ($(campo).get(0).tagName == "DIV") {
         } else {
             if (campo.value.trim() === "") {
                 valido = false;

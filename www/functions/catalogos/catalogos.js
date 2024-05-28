@@ -1,8 +1,6 @@
 let url = localStorage.getItem("url");
 
 function crearNuevaEspecie() {
-    // $("#labelModal").html(`Crear Nueva Especie`);
-
     let modalTemplate = app.popup.create({
         content: `<div class="sheet-modal demo-sheet">
             <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;"> 
@@ -14,11 +12,11 @@ function crearNuevaEspecie() {
                         <div id="formEspecies" style=" width: 100%; ">
                             <div class="list list-strong-ios list-dividers-ios inset-ios">
                                 <ul>
-                                    <li class="item-content item-input item-input-outline item-input-focused item-input-with-value">
+                                    <li class="item-content item-input item-input-outline">
                                         <div class="item-inner">
                                             <div class="item-title item-floating-label">Nombre Especie</div>
                                             <div class="item-input-wrap">
-                                                <input class="floating obligatorio input-focused input-with-value" type="text" placeholder="Nombre Especie" id="nombreEspecie" name="Nombre Especie">
+                                                <input class="floating obligatorio input-focused " type="text" placeholder="Nombre Especie" id="nombreEspecie" name="Nombre Especie">
                                                 <span class="input-clear-button"></span>
                                             </div>
                                         </div>
@@ -58,29 +56,21 @@ function guardarEspecie() {
 
         // app.dialog.progress("Cargando...", "#009071");
 
-        $.ajax({
-            method: "POST",
-            dataType: "JSON",
-            url: url + "Brummy/views/catalogos/guardarEspecie.php",
-            data: { nombreEspecie },
-        })
-            .done(function (results) {
-                let success = results.success;
-                let result = results.result;
-                switch (success) {
-                    case true:
-                        $(".sheet-close").trigger("click");
-                        app.dialog.alert("Guardado correctamente", "Aviso");
-                        obtenerEspecies();
-                        break;
-                    case false:
-                        app.dialog.alert("Algo salió mal", "Aviso");
-                        break;
+        axios
+            .post(url + "Brummy/views/catalogos/guardarEspecie.php", {
+                nombreEspecie,
+            })
+            .then(function (response) {
+                console.log(response);
+                if (response.status === 200) {
+                    $(".sheet-close").trigger("click");
+                    app.dialog.alert("Guardado correctamente", "Aviso");
+                    obtenerEspecies();
                 }
             })
-            .fail(function (jqXHR, textStatus, errorThrown) {
+            .catch(function (error) {
                 app.dialog.alert("Algo salió mal", "Aviso");
-                console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+                console.log(error);
             });
     } else {
         let html =
@@ -94,671 +84,446 @@ function guardarEspecie() {
 }
 
 function obtenerEspecies() {
-    // app.dialog.progress("Cargando...", "#009071");
-    $.ajax({
-        method: "POST",
-        dataType: "JSON",
-        url: url + "Brummy/views/catalogos/obtenerEspecies.php",
-        data: {},
-    })
-        .done(function (results) {
-            let success = results.success;
-            let result = results.result;
-            let html = "";
-            switch (success) {
-                case true:
-                    if (result == "Sin Datos") {
-                        dataTableDestroy();
-                        $("#especiesBody").html(html);
-                        dataTableCreate();
-                    } else {
-                        dataTableDestroy();
-                        result.forEach((data, index) => {
-                            html += `<tr>
-                                <td>${index + 1}</td>
-                                <td class="capitalize">${data.nombreEspecie}</td>
-                                <td>
-                                    <button class="button button-outline button-round btnEliminar" onclick="deleteEspecie(${data.ID})">
-                                        <span class="material-icons iconBtn"> delete </span>
-                                    </button>
-                                </td>
-                            </tr>`;
-                        });
-                        $("#especiesBody").html(html);
-                        dataTableCreate();
-                    }
-
-                    break;
-                case false:
-                    app.dialog.alert("Algo salió mal", "Aviso");
-                    break;
+    axios
+        .get(url + "Brummy/views/catalogos/obtenerEspecies.php", {})
+        .then(function (response) {
+            console.log(response);
+            if (response.status === 200) {
+                let result = response.data.result;
+                let html = "";
+                if (result == "Sin Datos") {
+                    dataTableDestroy();
+                    $("#especiesBody").html(html);
+                    dataTableCreate();
+                } else {
+                    dataTableDestroy();
+                    result.forEach((data, index) => {
+                        html += `<tr>
+                            <td>${index + 1}</td>
+                            <td class="capitalize">${data.nombreEspecie}</td>
+                            <td>
+                                <button class="button button-outline button-round btnEliminar" onclick="deleteEspecie(${data.ID})">
+                                    <span class="material-icons iconBtn"> delete </span>
+                                </button>
+                            </td>
+                        </tr>`;
+                    });
+                    $("#especiesBody").html(html);
+                    dataTableCreate();
+                }
             }
         })
-        .fail(function (jqXHR, textStatus, errorThrown) {
+        .catch(function (error) {
+            console.log(error);
+            app.dialog.close();
             app.dialog.alert("Algo salió mal", "Aviso");
-            console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+        })
+        .finally(function () {
+            // siempre sera ejecutado
         });
 }
 
-// function obtenerRazas() {
-//     $.ajax({
-//         method: "POST",
-//         dataType: "JSON",
-//         url: "./views/catalogos/obtenerRazas.php",
-//         data: {},
-//     })
-//         .done(function (results) {
-//             let success = results.success;
-//             let result = results.result;
-//             let html = "";
-//             switch (success) {
-//                 case true:
-//                     if (result == "Sin Datos") {
-//                         dataTableDestroy();
-//                         $("#razasBody").html(html);
-//                         dataTableCreate();
-//                         app.dialog.close();
-//                     } else {
-//                         dataTableDestroy();
-//                         let html;
-//                         result.forEach((data, index) => {
-//                             html += `<tr>
-//                                 <td>${index + 1}</td>
-//                                 <td class="capitalize">${data.nombreRaza}</td>
-//                                 <td class="capitalize">${data.especie}</td>
-//                                 <td>
-//                                     <div style="display: flex; flex-direction: row;">
-//                                         <div class="buttom-red buttom button-sinText mx-1" title="Eliminar" onclick="deleteRaza(${data.ID})">
-//                                             <span class="text-sm mb-0"><i class="material-icons"> delete </i></span>
-//                                         </div>
-//                                     </div>
-//                                 </td>
-//                             </tr>`;
-//                         });
-//                         $("#razasBody").html(html);
-//                         dataTableCreate();
-//                     }
-//                     break;
-//                 case false:
-//                     app.dialog.close();
-//                     app.dialog.alert("Algo salió mal", "Aviso");
-//                     break;
-//             }
-//         })
-//         .fail(function (jqXHR, textStatus, errorThrown) {
-//             app.dialog.close();
-//             app.dialog.alert("Algo salió mal", "Aviso");
-//             console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
-//         });
-// }
+function obtenerRazas() {
+    axios
+        .get(url + "Brummy/views/catalogos/obtenerRazas.php", {})
+        .then(function (response) {
+            console.log(response);
+            if (response.status === 200) {
+                let result = response.data.result;
+                let html = "";
+                if (result == "Sin Datos") {
+                    dataTableDestroy();
+                    $("#razasBody").html(html);
+                    dataTableCreate();
+                } else {
+                    dataTableDestroy();
+                    result.forEach((data, index) => {
+                        html += `<tr>
+                            <td>${index + 1}</td>
+                            <td class="capitalize">${data.nombreRaza}</td>
+                            <td class="capitalize">${data.especie}</td>
+                            <td>
+                                <button class="button button-outline button-round btnEliminar" onclick="deleteRaza(${data.ID})">
+                                    <span class="material-icons iconBtn"> delete </span>
+                                </button>
+                            </td>
+                        </tr>`;
+                    });
+                    $("#razasBody").html(html);
+                    dataTableCreate();
+                }
+            }
+        })
+        .catch(function (error) {
+            console.log(error);
+            app.dialog.close();
+            app.dialog.alert("Algo salió mal", "Aviso");
+        })
+        .finally(function () {
+            // siempre sera ejecutado
+        });
+}
 
-// function crearNuevaRaza() {
-//     preloader.show();
+function crearNuevaRaza() {
+    axios
+        .get(url + "Brummy/views/catalogos/obtenerEspecies.php", {})
+        .then(function (response) {
+            console.log(response);
+            if (response.status === 200) {
+                let result = response.data.result;
+                let html = "";
+                if (result == "Sin Datos") {
+                    app.dialog.alert("No se logró obtener especies.", "Aviso");
+                } else {
+                    result.forEach((data, index) => {
+                        html += `<option value="${data.ID}">${data.nombreEspecie}</option>`;
+                    });
 
-//     $.ajax({
-//         method: "POST",
-//         dataType: "JSON",
-//         url: "./views/catalogos/obtenerEspecies.php",
-//         data: {},
-//     })
-//         .done(function (results) {
-//             let success = results.success;
-//             let result = results.result;
-//             switch (success) {
-//                 case true:
-//                     if (result == "Sin Datos") {
-//                     } else {
-//                         let html = "";
-//                         result.forEach((data, index) => {
-//                             html += `<option value="${data.ID}">${data.nombreEspecie}</option>`;
-//                         });
+                    let modalTemplate = app.popup.create({
+                        content: `<div class="sheet-modal demo-sheet" id="sheetModal">
+                                <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;"> 
+                                    <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
+                                </div>
+                                <div class="sheet-modal-inner">
+                                    <div class="page-content">
+                                        <div class="block" style="margin-top: 60px;align-items: center;display: flex;flex-direction: column;">
+                                            <div id="formRazas" style=" width: 100%; ">
+                                                <div class="list list-strong-ios list-dividers-ios inset-ios">
+                                                    <ul>
+                                                        <li class="item-content item-input item-input-outline">
+                                                            <div class="item-inner">
+                                                                <div class="item-title item-floating-label">Nombre Raza</div>
+                                                                <div class="item-input-wrap">
+                                                                    <input class="floating obligatorio input-focused " type="text" placeholder="Nombre Raza" id="nombreRaza" name="Nombre Raza">
+                                                                    <span class="input-clear-button"></span>
+                                                                </div>
+                                                            </div>
+                                                        </li>
 
-//                         $("#labelModal").html(`Crear Nueva Raza`);
+                                                        <li class="item-content item-input item-input-outline">
+                                                            <div class="item-inner">
+                                                                <div class="item-title item-floating-label">Relación Especie</div>
+                                                                <div class="item-input-wrap">
+                                                                    <select class="floating obligatorio input-focused " type="text" placeholder="Relación Especie" id="relacionEspecie" name="Relación Especie">
+                                                                        <option value="">Selecciona una opción</option>
+                                                                        ${html}
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                    
+                                            <button class="button button-outline button-round" onclick="guardarRaza()">
+                                                Guardar <span class="material-icons iconBtn"> save </span>
+                                            </button>
+                    
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`,
+                        swipeToClose: false,
+                        closeByOutsideClick: false,
+                        closeByBackdropClick: false,
+                        closeOnEscape: false,
+                        on: {
+                            open: function (popup) {
+                                new TomSelect("#relacionEspecie", {
+                                    create: false,
+                                    sortField: {
+                                        field: "text",
+                                    },
+                                });
+                                $("#relacionEspecie").on("keydown", (e) => {
+                                    console.log("ekeydow");
+                                    if (e.keyCode == 13) {
+                                        console.log("ekey");
+                                        $("#relacionEspecie").blur();
+                                    }
+                                });
+                            },
+                        },
+                    });
 
-//                         $("#body_modal").html(`<br>
-//                             <div id="formRazas">
-//                                 <div class="coolinput">
-//                                     <label name="Nombre Raza" for="nombreRaza" class="text">Nombre Raza</label>
-//                                     <input name="Nombre Raza" type="text" class="input capitalize obligatorio" id="nombreRaza" autocomplete="off" maxlength"50"/>
-//                                 </div>
+                    modalTemplate.open();
+                }
+            }
+        })
+        .catch(function (error) {
+            console.log(error);
+            app.dialog.close();
+            app.dialog.alert("Algo salió mal", "Aviso");
+        })
+        .finally(function () {
+            // siempre sera ejecutado
+        });
+}
 
-//                                 <div class="coolinput">
-//                                     <label for="relacionEspecie" class="text">Relación Especie</label>
-//                                     <select class="input capitalize obligatorio" name="Relación Especie" id="relacionEspecie" style="background-color: rgb(255, 255, 255);width:100%;">
-//                                         <option value="">Selecciona una opción</option>
-//                                         ${html}
-//                                     </select>
-//                                 </div>
-//                             </div>
+function guardarRaza() {
+    let values = get_datos_completos("formRazas");
+    let response = values.response;
+    let valido = values.valido;
+    if (valido) {
+        let nombreRaza = String($("#nombreRaza").val()).trim();
+        let FK_especie = $("#relacionEspecie").val();
+        let especie = $("#relacionEspecie").find("option:selected").text();
 
-//                             <div class="center-fitcomponent" style="width: 100%;">
-//                                 <div class="buttom-blue buttom" style="margin-left: auto;margin-right: auto;" onclick="guardarRaza();">
-//                                     <span class="text-sm mb-0 span-buttom">
-//                                         Guardar
-//                                         <i class="material-icons"> save </i>
-//                                     </span>
-//                                 </div>
-//                             </div>
-//                         `);
+        nombreRaza.replaceAll("'", '"');
 
-//                         $("#modalTemplate").modal({
-//                             backdrop: "static",
-//                             keyboard: false,
-//                         });
+        axios
+            .post(url + "Brummy/views/catalogos/guardarRaza.php", {
+                nombreRaza,
+                FK_especie,
+                especie,
+            })
+            .then(function (response) {
+                console.log(response);
+                if (response.status === 200) {
+                    $(".sheet-close").trigger("click");
+                    app.dialog.alert("Guardado correctamente", "Aviso");
+                    obtenerRazas();
+                }
+            })
+            .catch(function (error) {
+                app.dialog.alert("Algo salió mal", "Aviso");
+                console.log(error);
+            });
+    } else {
+        let html =
+            '<span style="font-weight: 900;">Debes llenar estos campos para poder guardar:</span> <br> <ul style="text-align: left; margin-left: 15px; font-style: italic;"> ';
+        response.forEach((data) => {
+            html += `<li style="list-style: disc;">${data}.</li> `;
+        });
+        html += `</ul>`;
+        Swal.fire({ icon: "warning", title: "", html: html });
+    }
+}
 
-//                         $("#modalTemplate").modal("show");
+function deleteEspecie(ID) {
+    app.dialog
+        .create({
+            title: "¿Estás seguro de querer eliminar el registro?",
+            buttons: [
+                {
+                    text: "Cancelar",
+                    onClick: function () {
+                        console.log("Cancelar");
+                    },
+                },
+                {
+                    text: "OK",
+                    onClick: function () {
+                        axios
+                            .post(url + "Brummy/views/catalogos/deleteEspecie.php", {
+                                ID,
+                            })
+                            .then(function (response) {
+                                console.log(response);
+                                if (response.status === 200) {
+                                    app.dialog.alert("Eliminado correctamente", "Aviso");
+                                    obtenerEspecies();
+                                }
+                            })
+                            .catch(function (error) {
+                                app.dialog.alert("Algo salió mal", "Aviso");
+                                console.log(error);
+                            });
+                    },
+                },
+            ],
+        })
+        .open();
+}
 
-//                         $("#btnClose").on("click", () => {
-//                             $("#modalTemplate").modal("hide");
-//                             $("#btnClose").off("click");
-//                         });
+function deleteRaza(ID) {
+    app.dialog
+        .create({
+            title: "¿Estás seguro de querer eliminar el registro?",
+            buttons: [
+                {
+                    text: "Cancelar",
+                    onClick: function () {
+                        console.log("Cancelar");
+                    },
+                },
+                {
+                    text: "OK",
+                    onClick: function () {
+                        axios
+                            .post(url + "Brummy/views/catalogos/deleteRaza.php", {
+                                ID,
+                            })
+                            .then(function (response) {
+                                console.log(response);
+                                if (response.status === 200) {
+                                    app.dialog.alert("Eliminado correctamente", "Aviso");
+                                    obtenerRazas();
+                                }
+                            })
+                            .catch(function (error) {
+                                app.dialog.alert("Algo salió mal", "Aviso");
+                                console.log(error);
+                            });
+                    },
+                },
+            ],
+        })
+        .open();
+}
 
-//                         $("#relacionEspecie").select2({
-//                             dropdownParent: $("#modalTemplate"),
-//                         });
+function obtenerMotivos() {
+    axios
+        .get(url + "Brummy/views/catalogos/obtenerMotivos.php", {})
+        .then(function (response) {
+            console.log(response);
+            if (response.status === 200) {
+                let result = response.data.result;
+                let html = "";
+                if (result == "Sin Datos") {
+                    dataTableDestroy();
+                    $("#motivosCitaBody").html(html);
+                    dataTableCreate();
+                } else {
+                    dataTableDestroy();
+                    result.forEach((data, index) => {
+                        html += `<tr>
+                            <td>${index + 1}</td>
+                            <td class="capitalize">${data.motivoCita}</td>
+                            <td>
+                                <button class="button button-outline button-round btnEliminar" onclick="deleteMotivoCita(${data.ID})">
+                                    <span class="material-icons iconBtn"> delete </span>
+                                </button>
+                            </td>
+                        </tr>`;
+                    });
+                    $("#motivosCitaBody").html(html);
+                    dataTableCreate();
+                }
+            }
+        })
+        .catch(function (error) {
+            console.log(error);
+            app.dialog.alert("Algo salió mal", "Aviso");
+        })
+        .finally(function () {
+            // siempre sera ejecutado
+        });
+}
 
-//                         app.dialog.close();
-//                     }
-//                     break;
-//                 case false:
-//                     app.dialog.close();
-//                     app.dialog.alert("Algo salió mal", "Aviso");
-//                     break;
-//             }
-//         })
-//         .fail(function (jqXHR, textStatus, errorThrown) {
-//             app.dialog.close();
-//             app.dialog.alert("Algo salió mal", "Aviso");
-//             console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
-//         });
-// }
+function crearNuevoMotivo() {
+    let modalTemplate = app.popup.create({
+        content: `<div class="sheet-modal demo-sheet">
+            <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;"> 
+                <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
+            </div>
+            <div class="sheet-modal-inner">
+                <div class="page-content">
+                    <div class="block" style="margin-top: 60px;align-items: center;display: flex;flex-direction: column;">
+                        <div id="formMotivoCita" style=" width: 100%; ">
+                            <div class="list list-strong-ios list-dividers-ios inset-ios">
+                                <ul>
+                                    <li class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-title item-floating-label">Motivo</div>
+                                            <div class="item-input-wrap">
+                                                <input class="floating obligatorio input-focused " type="text" placeholder="Motivo" id="motivo" name="Motivo">
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                
+                        <button class="button button-outline button-round" onclick="guardarMotivoCita()">
+                            Guardar <span class="material-icons iconBtn"> save </span>
+                        </button>
 
-// function guardarRaza() {
-//     let values = get_datos_completos("formRazas");
-//     let response = values.response;
-//     let valido = values.valido;
-//     if (valido) {
-//         let nombreRaza = String($("#nombreRaza").val()).trim();
-//         let FK_especie = $("#relacionEspecie").val();
-//         let especie = $("#relacionEspecie").find("option:selected").text();
+                    </div>
+                </div>
+            </div>
+        </div>`,
+        swipeToClose: false,
+        closeByOutsideClick: false,
+        closeByBackdropClick: false,
+        closeOnEscape: false,
+        on: {
+            open: function (popup) {},
+        },
+    });
 
-//         nombreRaza.replaceAll("'", '"');
-//         preloader.show();
+    modalTemplate.open();
+}
 
-//         $.ajax({
-//             method: "POST",
-//             dataType: "JSON",
-//             url: "./views/catalogos/guardarRaza.php",
-//             data: { nombreRaza, FK_especie, especie },
-//         })
-//             .done(function (results) {
-//                 let success = results.success;
-//                 let result = results.result;
-//                 switch (success) {
-//                     case true:
-//                         $("#modalTemplate").modal("hide");
-//                         $("#btnClose").off("click");
-//                         msj.show("Aviso", "Guardado correctamente", [{ text1: "OK" }]);
-//                         obtenerRazas();
-//                         break;
-//                     case false:
-//                         app.dialog.close();
-//                         app.dialog.alert("Algo salió mal", "Aviso");
-//                         break;
-//                 }
-//             })
-//             .fail(function (jqXHR, textStatus, errorThrown) {
-//                 app.dialog.close();
-//                 app.dialog.alert("Algo salió mal", "Aviso");
-//                 console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
-//             });
-//     } else {
-//         let html =
-//             '<span style="font-weight: 900;">Debes llenar estos campos para poder guardar:</span> <br> <ul style="text-align: left; margin-left: 15px; font-style: italic;"> ';
-//         response.forEach((data) => {
-//             html += `<li style="list-style: disc;">${data}.</li> `;
-//         });
-//         html += `</ul>`;
-//         Swal.fire({ icon: "warning", title: "", html: html });
-//     }
-// }
+function guardarMotivoCita() {
+    let values = get_datos_completos("formMotivoCita");
+    let response = values.response;
+    let valido = values.valido;
+    if (valido) {
+        let motivoCita = String($("#motivo").val()).trim();
 
-// function deleteEspecie(ID) {
-//     Swal.fire({
-//         title: "",
-//         text: "¿Estás seguro de querer eliminar el registro?",
-//         icon: "question",
-//         showCancelButton: true,
-//         confirmButtonColor: "#7066e0",
-//         cancelButtonColor: "#FF0037",
-//         confirmButtonText: "OK",
-//         cancelButtonText: "Cancelar",
-//     }).then((result) => {
-//         if (result.isConfirmed) {
-//             preloader.show();
-//             $.ajax({
-//                 method: "POST",
-//                 dataType: "JSON",
-//                 url: "./views/catalogos/deleteEspecie.php",
-//                 data: { ID },
-//             })
-//                 .done(function (results) {
-//                     let success = results.success;
-//                     let result = results.result;
-//                     switch (success) {
-//                         case true:
-//                             $("#modalTemplate").modal("hide");
-//                             $("#btnClose").off("click");
-//                             obtenerEspecies();
-//                             break;
-//                         case false:
-//                             app.dialog.close();
-//                             app.dialog.alert("Algo salió mal", "Aviso");
-//                             break;
-//                     }
-//                 })
-//                 .fail(function (jqXHR, textStatus, errorThrown) {
-//                     app.dialog.close();
-//                     app.dialog.alert("Algo salió mal", "Aviso");
-//                     console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
-//                 });
-//         }
-//     });
-// }
+        motivoCita.replaceAll("'", '"');
 
-// function deleteRaza(ID) {
-//     Swal.fire({
-//         title: "",
-//         text: "¿Estás seguro de querer eliminar el registro?",
-//         icon: "question",
-//         showCancelButton: true,
-//         confirmButtonColor: "#7066e0",
-//         cancelButtonColor: "#FF0037",
-//         confirmButtonText: "OK",
-//         cancelButtonText: "Cancelar",
-//     }).then((result) => {
-//         if (result.isConfirmed) {
-//             preloader.show();
-//             $.ajax({
-//                 method: "POST",
-//                 dataType: "JSON",
-//                 url: "./views/catalogos/deleteRaza.php",
-//                 data: { ID },
-//             })
-//                 .done(function (results) {
-//                     let success = results.success;
-//                     let result = results.result;
-//                     switch (success) {
-//                         case true:
-//                             $("#modalTemplate").modal("hide");
-//                             $("#btnClose").off("click");
-//                             obtenerRazas();
-//                             break;
-//                         case false:
-//                             app.dialog.close();
-//                             app.dialog.alert("Algo salió mal", "Aviso");
-//                             break;
-//                     }
-//                 })
-//                 .fail(function (jqXHR, textStatus, errorThrown) {
-//                     app.dialog.close();
-//                     app.dialog.alert("Algo salió mal", "Aviso");
-//                     console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
-//                 });
-//         }
-//     });
-// }
+        axios
+            .post(url + "Brummy/views/catalogos/guardarMotivoCita.php", {
+                motivoCita,
+            })
+            .then(function (response) {
+                console.log(response);
+                if (response.status === 200) {
+                    $(".sheet-close").trigger("click");
+                    app.dialog.alert("Guardado correctamente", "Aviso");
+                    obtenerMotivos();
+                }
+            })
+            .catch(function (error) {
+                app.dialog.alert("Algo salió mal", "Aviso");
+                console.log(error);
+            });
+    } else {
+        let html =
+            '<span style="font-weight: 900;">Debes llenar estos campos para poder guardar:</span> <br> <ul style="text-align: left; margin-left: 15px; font-style: italic;"> ';
+        response.forEach((data) => {
+            html += `<li style="list-style: disc;">${data}.</li> `;
+        });
+        html += `</ul>`;
+        Swal.fire({ icon: "warning", title: "", html: html });
+    }
+}
 
-// function obtenerMotivos() {
-//     $.ajax({
-//         method: "POST",
-//         dataType: "JSON",
-//         url: "./views/catalogos/obtenerMotivos.php",
-//         data: {},
-//     })
-//         .done(function (results) {
-//             let success = results.success;
-//             let result = results.result;
-//             let html = "";
-//             switch (success) {
-//                 case true:
-//                     if (result == "Sin Datos") {
-//                         dataTableDestroy();
-//                         $("#motivosCitaBody").html(html);
-//                         dataTableCreate();
-//                         app.dialog.close();
-//                     } else {
-//                         dataTableDestroy();
-//                         let html;
-//                         result.forEach((data, index) => {
-//                             html += `<tr>
-//                                 <td>${index + 1}</td>
-//                                 <td class="capitalize">${data.motivoCita}</td>
-//                                 <td>
-//                                     <div style="display: flex; flex-direction: row;">
-//                                         <div class="buttom-red buttom button-sinText mx-1" title="Eliminar" onclick="deleteMotivoCita(${data.ID})">
-//                                             <span class="text-sm mb-0"><i class="material-icons"> delete </i></span>
-//                                         </div>
-//                                     </div>
-//                                 </td>
-//                             </tr>`;
-//                         });
-//                         $("#motivosCitaBody").html(html);
-//                         dataTableCreate();
-//                     }
-//                     break;
-//                 case false:
-//                     app.dialog.close();
-//                     app.dialog.alert("Algo salió mal", "Aviso");
-//                     break;
-//             }
-//         })
-//         .fail(function (jqXHR, textStatus, errorThrown) {
-//             app.dialog.close();
-//             app.dialog.alert("Algo salió mal", "Aviso");
-//             console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
-//         });
-// }
-
-// function crearNuevoMotivo() {
-//     $("#labelModal").html(`Crear Nuevo Motivo de Cita`);
-
-//     $("#body_modal").html(`<br>
-//         <div id="formMotivoCita">
-//             <div class="coolinput">
-//                 <label name="Motivo" for="motivo" class="text">Motivo</label>
-//                 <input name="Motivo" type="text" class="capitalize obligatorio input" id="motivo" autocomplete="off" maxlength"50"/>
-//             </div>
-//         </div>
-
-//         <div class="center-fitcomponent" style="width: 100%;">
-//             <div class="buttom-blue buttom" style="margin-left: auto;margin-right: auto;" onclick="guardarMotivoCita();">
-//                 <span class="text-sm mb-0 span-buttom">
-//                     Guardar
-//                     <i class="material-icons"> save </i>
-//                 </span>
-//             </div>
-//         </div>
-//     `);
-
-//     $("#modalTemplate").modal({
-//         backdrop: "static",
-//         keyboard: false,
-//     });
-
-//     $("#modalTemplate").modal("show");
-
-//     $("#btnClose").on("click", () => {
-//         $("#modalTemplate").modal("hide");
-//         $("#btnClose").off("click");
-//     });
-// }
-
-// function guardarMotivoCita() {
-//     let values = get_datos_completos("formMotivoCita");
-//     let response = values.response;
-//     let valido = values.valido;
-//     if (valido) {
-//         let motivoCita = String($("#motivo").val()).trim();
-
-//         motivoCita.replaceAll("'", '"');
-
-//         preloader.show();
-
-//         $.ajax({
-//             method: "POST",
-//             dataType: "JSON",
-//             url: "./views/catalogos/guardarMotivoCita.php",
-//             data: { motivoCita },
-//         })
-//             .done(function (results) {
-//                 let success = results.success;
-//                 let result = results.result;
-//                 switch (success) {
-//                     case true:
-//                         $("#modalTemplate").modal("hide");
-//                         $("#btnClose").off("click");
-//                         msj.show("Aviso", "Guardado correctamente", [{ text1: "OK" }]);
-//                         obtenerMotivos();
-//                         break;
-//                     case false:
-//                         app.dialog.close();
-//                         app.dialog.alert("Algo salió mal", "Aviso");
-//                         break;
-//                 }
-//             })
-//             .fail(function (jqXHR, textStatus, errorThrown) {
-//                 app.dialog.close();
-//                 app.dialog.alert("Algo salió mal", "Aviso");
-//                 console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
-//             });
-//     } else {
-//         let html =
-//             '<span style="font-weight: 900;">Debes llenar estos campos para poder guardar:</span> <br> <ul style="text-align: left; margin-left: 15px; font-style: italic;"> ';
-//         response.forEach((data) => {
-//             html += `<li style="list-style: disc;">${data}.</li> `;
-//         });
-//         html += `</ul>`;
-//         Swal.fire({ icon: "warning", title: "", html: html });
-//     }
-// }
-
-// function deleteMotivoCita(ID) {
-//     Swal.fire({
-//         title: "",
-//         text: "¿Estás seguro de querer eliminar el registro?",
-//         icon: "question",
-//         showCancelButton: true,
-//         confirmButtonColor: "#7066e0",
-//         cancelButtonColor: "#FF0037",
-//         confirmButtonText: "OK",
-//         cancelButtonText: "Cancelar",
-//     }).then((result) => {
-//         if (result.isConfirmed) {
-//             preloader.show();
-//             $.ajax({
-//                 method: "POST",
-//                 dataType: "JSON",
-//                 url: "./views/catalogos/deleteMotivoCita.php",
-//                 data: { ID },
-//             })
-//                 .done(function (results) {
-//                     let success = results.success;
-//                     let result = results.result;
-//                     switch (success) {
-//                         case true:
-//                             $("#modalTemplate").modal("hide");
-//                             $("#btnClose").off("click");
-//                             obtenerMotivos();
-//                             break;
-//                         case false:
-//                             app.dialog.close();
-//                             app.dialog.alert("Algo salió mal", "Aviso");
-//                             break;
-//                     }
-//                 })
-//                 .fail(function (jqXHR, textStatus, errorThrown) {
-//                     app.dialog.close();
-//                     app.dialog.alert("Algo salió mal", "Aviso");
-//                     console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
-//                 });
-//         }
-//     });
-// }
-
-// function obtenerMotivosRechazo() {
-//     $.ajax({
-//         method: "POST",
-//         dataType: "JSON",
-//         url: "./views/catalogos/obtenerMotivosRechazo.php",
-//         data: {},
-//     })
-//         .done(function (results) {
-//             let success = results.success;
-//             let result = results.result;
-//             let html = "";
-//             switch (success) {
-//                 case true:
-//                     if (result == "Sin Datos") {
-//                         dataTableDestroy();
-//                         $("#rechazosCitaBody").html(html);
-//                         dataTableCreate();
-//                         app.dialog.close();
-//                     } else {
-//                         dataTableDestroy();
-//                         let html;
-//                         result.forEach((data, index) => {
-//                             html += `<tr>
-//                                 <td>${index + 1}</td>
-//                                 <td class="capitalize">${data.motivoRechazo}</td>
-//                                 <td>
-//                                     <div style="display: flex; flex-direction: row;">
-//                                         <div class="buttom-red buttom button-sinText mx-1" title="Eliminar" onclick="deleteMotivoRechazo(${data.ID})">
-//                                             <span class="text-sm mb-0"><i class="material-icons"> delete </i></span>
-//                                         </div>
-//                                     </div>
-//                                 </td>
-//                             </tr>`;
-//                         });
-//                         $("#rechazosCitaBody").html(html);
-//                         dataTableCreate();
-//                     }
-//                     break;
-//                 case false:
-//                     app.dialog.close();
-//                     app.dialog.alert("Algo salió mal", "Aviso");
-//                     break;
-//             }
-//         })
-//         .fail(function (jqXHR, textStatus, errorThrown) {
-//             app.dialog.close();
-//             app.dialog.alert("Algo salió mal", "Aviso");
-//             console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
-//         });
-// }
-
-// function crearNuevoMotivoRechazo() {
-//     $("#labelModal").html(`Crear Nuevo Motivo de Rechazo`);
-
-//     $("#body_modal").html(`<br>
-//         <div id="formMotivoCitaRechazo">
-//             <div class="coolinput">
-//                 <label name="MotivoRechazo" for="motivoRechazo" class="text">Motivo Rechazo</label>
-//                 <input name="Motivo Rechazo" type="text" class="capitalize obligatorio input" id="motivoRechazo" autocomplete="off" maxlength"50"/>
-//             </div>
-//         </div>
-
-//         <div class="center-fitcomponent" style="width: 100%;">
-//             <div class="buttom-blue buttom" style="margin-left: auto;margin-right: auto;" onclick="guardarMotivoRechazo();">
-//                 <span class="text-sm mb-0 span-buttom">
-//                     Guardar
-//                     <i class="material-icons"> save </i>
-//                 </span>
-//             </div>
-//         </div>
-//     `);
-
-//     $("#modalTemplate").modal({
-//         backdrop: "static",
-//         keyboard: false,
-//     });
-
-//     $("#modalTemplate").modal("show");
-
-//     $("#btnClose").on("click", () => {
-//         $("#modalTemplate").modal("hide");
-//         $("#btnClose").off("click");
-//     });
-// }
-
-// function guardarMotivoRechazo() {
-//     let values = get_datos_completos("formMotivoCitaRechazo");
-//     let response = values.response;
-//     let valido = values.valido;
-//     if (valido) {
-//         let motivoRechazo = String($("#motivoRechazo").val()).trim();
-
-//         motivoRechazo.replaceAll("'", '"');
-
-//         preloader.show();
-
-//         $.ajax({
-//             method: "POST",
-//             dataType: "JSON",
-//             url: "./views/catalogos/guardarMotivoRechazo.php",
-//             data: { motivoRechazo },
-//         })
-//             .done(function (results) {
-//                 let success = results.success;
-//                 let result = results.result;
-//                 switch (success) {
-//                     case true:
-//                         $("#modalTemplate").modal("hide");
-//                         $("#btnClose").off("click");
-//                         msj.show("Aviso", "Guardado correctamente", [{ text1: "OK" }]);
-//                         obtenerMotivosRechazo();
-//                         break;
-//                     case false:
-//                         app.dialog.close();
-//                         app.dialog.alert("Algo salió mal", "Aviso");
-//                         break;
-//                 }
-//             })
-//             .fail(function (jqXHR, textStatus, errorThrown) {
-//                 app.dialog.close();
-//                 app.dialog.alert("Algo salió mal", "Aviso");
-//                 console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
-//             });
-//     } else {
-//         let html =
-//             '<span style="font-weight: 900;">Debes llenar estos campos para poder guardar:</span> <br> <ul style="text-align: left; margin-left: 15px; font-style: italic;"> ';
-//         response.forEach((data) => {
-//             html += `<li style="list-style: disc;">${data}.</li> `;
-//         });
-//         html += `</ul>`;
-//         Swal.fire({ icon: "warning", title: "", html: html });
-//     }
-// }
-
-// function deleteMotivoRechazo(ID) {
-//     Swal.fire({
-//         title: "",
-//         text: "¿Estás seguro de querer eliminar el registro?",
-//         icon: "question",
-//         showCancelButton: true,
-//         confirmButtonColor: "#7066e0",
-//         cancelButtonColor: "#FF0037",
-//         confirmButtonText: "OK",
-//         cancelButtonText: "Cancelar",
-//     }).then((result) => {
-//         if (result.isConfirmed) {
-//             preloader.show();
-//             $.ajax({
-//                 method: "POST",
-//                 dataType: "JSON",
-//                 url: "./views/catalogos/deleteMotivoRechazo.php",
-//                 data: { ID },
-//             })
-//                 .done(function (results) {
-//                     let success = results.success;
-//                     let result = results.result;
-//                     switch (success) {
-//                         case true:
-//                             $("#modalTemplate").modal("hide");
-//                             $("#btnClose").off("click");
-//                             obtenerMotivosRechazo();
-//                             break;
-//                         case false:
-//                             app.dialog.close();
-//                             app.dialog.alert("Algo salió mal", "Aviso");
-//                             break;
-//                     }
-//                 })
-//                 .fail(function (jqXHR, textStatus, errorThrown) {
-//                     app.dialog.close();
-//                     app.dialog.alert("Algo salió mal", "Aviso");
-//                     console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
-//                 });
-//         }
-//     });
-// }
+function deleteMotivoCita(ID) {
+    app.dialog
+        .create({
+            title: "¿Estás seguro de querer eliminar el registro?",
+            buttons: [
+                {
+                    text: "Cancelar",
+                    onClick: function () {
+                        console.log("Cancelar");
+                    },
+                },
+                {
+                    text: "OK",
+                    onClick: function () {
+                        axios
+                            .post(url + "Brummy/views/catalogos/deleteMotivoCita.php", {
+                                ID,
+                            })
+                            .then(function (response) {
+                                console.log(response);
+                                if (response.status === 200) {
+                                    app.dialog.alert("Eliminado correctamente", "Aviso");
+                                    obtenerMotivos();
+                                }
+                            })
+                            .catch(function (error) {
+                                app.dialog.alert("Algo salió mal", "Aviso");
+                                console.log(error);
+                            });
+                    },
+                },
+            ],
+        })
+        .open();
+}
