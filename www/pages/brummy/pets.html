@@ -1,0 +1,144 @@
+<template>
+    <div class="page" id="panel-page">
+        <div class="navbar" style="height: 5px">
+            <div class="left top-left" style="justify-content: center; background-color: #009071">
+                <div class="title" style="font-size: 18px; margin-left: 15px">Mascotas</div>
+            </div>
+        </div>
+
+        <div class="page-content" style="margin-top: 16px">
+            <div class="block">
+                <div class="divButton">
+                    <button class="button button-outline button-round" onclick="crearMascota()">
+                        Agregar<span class="material-icons iconBtn"> add_circle_outline </span>
+                    </button>
+                </div>
+                <div class="card" style="border-radius: 10px; padding: 10px">
+                    <input class="FWM-input" type="text" id="mascotasBuscador" placeholder="Buscar Mascota" />
+
+                    <table class="mdl-data-table table responsive table-bordered table-striped datatable" style="width: 100%" id="mascotasBodyDT">
+                        <thead>
+                            <tr>
+                                <th class="thDataTable">#</th>
+                                <th class="thDataTable">Mascota</th>
+                                <th class="thDataTable">Dueño</th>
+                                <th class="thDataTable">Fecha N.</th>
+                                <th class="thDataTable">Sexo</th>
+                                <th class="thDataTable">Color</th>
+                                <th class="thDataTable">Última actividad</th>
+                                <th class="thDataTable">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mascotasBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        on: {
+            pageInit: function () {
+                let url = localStorage.getItem("url");
+
+                app.dialog.progress("Cargando...", "#009071");
+
+                axios
+                    .get(url + "Brummy/views/mascotas/obtenerMascotas.php", {})
+                    .then(function (response) {
+                        console.log(response);
+                        if (response.status === 200) {
+                            let result = response.data.result;
+                            let html = "";
+                            if (result == "Sin Datos") {
+                                dataTableDestroy();
+                                $("#mascotasBody").html(html);
+                                dataTableCreate();
+                            } else {
+                                dataTableDestroy();
+                                let html;
+                                let tdSinData = `<span class='material-icons'> remove </span> &nbsp; <span class='material-icons'> remove </span>`;
+                                result.forEach((data, index) => {
+                                    html += `<tr>
+                                        <td>${index + 1}</td>
+                                        <td class="capitalize"> 
+                                            <div> 
+                                                <div><span>${data.nombre}</span></div> 
+                                                <div><span>${data.especie} - ${data.raza}</span></div> 
+                                            </div> 
+                                        </td>
+                                        <td class="capitalize">${data.NombreCliente}</td>
+                                        <td class="capitalize">${data.fechaNacimiento}</td>
+                                        <td class="capitalize">${data.sexo}</td>
+                                        <td>${data.color ? data.color : tdSinData}</td>
+                                        <td class="capitalize"><div> <div>${volteaFecha(String(data.fechaUlmitoMovimiento).split(" ")[0], 1)} ${
+                                        String(String(data.fechaUlmitoMovimiento).split(" ")[1]).split(":")[0]
+                                    }:${String(String(data.fechaUlmitoMovimiento).split(" ")[1]).split(":")[1]}</div> <div>${
+                                        data.motivoMovimiento
+                                    }</div> </div></td>
+                                        <td>
+                                            <div style="display: flex; flex-direction: row;">
+                                                <button class="button button-outline button-round btnGreen" onclick="verMascota(${data.ID})">
+                                                    <span class="material-icons iconBtn" style="margin: auto;vertical-align: middle;"> pets </span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>`;
+                                });
+                                $("#mascotasBody").html(html);
+                                dataTableCreate();
+                            }
+                            app.dialog.close();
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        app.dialog.close();
+                        app.dialog.alert("Algo salió mal", "Aviso");
+                    })
+                    .finally(function () {
+                        // siempre sera ejecutado
+                    });
+
+                $("#mascotasBuscador").on("input", function () {
+                    let table = $("#mascotasBodyDT").DataTable();
+                    table.search($(this).val()).draw();
+                });
+            },
+        },
+    };
+</script>
+
+<style>
+    .paginate_button.current {
+        border: none !important;
+        background: #009071 !important;
+        border-radius: 8px !important;
+        font-weight: bold;
+        color: #fff !important;
+    }
+
+    .list ul:before {
+        display: none !important;
+    }
+
+    .list ul:after {
+        display: none !important;
+    }
+    .ts-control {
+        border: 0;
+        padding: 0;
+    }
+    .ts-control > input {
+        height: auto !important;
+    }
+    .ts-wrapper.floating.obligatorio.full.has-items {
+        border: 2px solid #009071 !important;
+        border-radius: 8px !important;
+    }
+    .grid {
+        display: flex;
+    }
+</style>

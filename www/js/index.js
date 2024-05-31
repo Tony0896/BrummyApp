@@ -268,3 +268,43 @@ function get_datos_completos(form) {
         };
     }
 }
+
+function capitalizeLetras(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function genRandom() {
+    const digitHundreds = Math.floor(Math.random() * 900) + 1;
+    let digitTens = Math.floor(Math.random() * 9);
+    if (digitTens >= digitHundreds) digitTens++;
+    let digitUnits = Math.floor(Math.random() * 8);
+    if (digitUnits >= digitHundreds || digitUnits >= digitTens) digitUnits++;
+    if (digitUnits >= digitHundreds && digitUnits >= digitTens) digitUnits++;
+    return digitHundreds * 100 + digitTens * 10 + digitUnits;
+}
+
+function FormatDate(fecha) {
+    let n = new Date(fecha);
+    n = String(n.toLocaleString("es-CL")).split(",")[0];
+    return n;
+}
+
+function volteaFecha(fecha, tipo) {
+    if (tipo == 1) {
+        //? recibe 2024-04-27 => 27-04-2024
+        let anio = fecha.split("-")[0];
+        let mes = fecha.split("-")[1];
+        let day = fecha.split("-")[2];
+
+        let nuevaFecha = day + "-" + mes + "-" + anio;
+        return nuevaFecha;
+    } else if (tipo == 2) {
+        //? recibe 27-04-2024 => 2024-04-27
+        let anio = fecha.split("-")[2];
+        let mes = fecha.split("-")[1];
+        let day = fecha.split("-")[0];
+
+        let nuevaFecha = anio + "-" + mes + "-" + day;
+        return nuevaFecha;
+    }
+}

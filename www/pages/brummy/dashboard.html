@@ -1,0 +1,307 @@
+<template>
+    <div class="page" id="panel-page">
+        <div class="navbar" style="height: 5px">
+            <div class="left top-left" style="justify-content: center; background-color: #009071">
+                <div class="title" style="font-size: 18px; margin-left: 15px">Métricas</div>
+            </div>
+        </div>
+
+        <div class="page-content" style="margin-top: 16px">
+            <div class="block">
+                <div class="card">
+                    <div class="card-content card-content-padding">Ganancias del día</div>
+                    <div class="card-header" id="gananciasDia"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content card-content-padding">Citas agendadas(HOY)</div>
+                    <div class="card-header" id="citasAgendadasCita"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content card-content-padding">Citas atendidas(HOY)</div>
+                    <div class="card-header" id="citasAtendidasDia"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Próximas Citas (5)</div>
+                    <div class="card-content">
+                        <table class="mdl-data-table table responsive table-bordered table-striped datatable" style="width: 100%">
+                            <thead>
+                                <tr>
+                                    <th class="thDataTable">#</th>
+                                    <th class="thDataTable">Cliente</th>
+                                    <th class="thDataTable">Mascota</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bodyCitasDashbora"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Últimas ventas (5)</div>
+                    <div class="card-content">
+                        <table class="mdl-data-table table responsive table-bordered table-striped datatable" style="width: 100%">
+                            <thead>
+                                <tr>
+                                    <th class="thDataTable">#</th>
+                                    <th class="thDataTable">Nombre</th>
+                                    <th class="thDataTable">Costo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bodyVentasDashbora"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">TOP 5 Productos más vendidos</div>
+                    <div class="card-content">
+                        <canvas id="bar-chart2" width="800" height="450"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Satisfacción cliente</div>
+                    <div class="card-content">
+                        <canvas id="bar-chart" width="800" height="450"></canvas>
+                    </div>
+                </div>
+
+                <!-- <div class="row">
+                    <div class="col-33"></div>
+                    <div class="col-33"></div>
+                    <div class="col-33"></div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        on: {
+            pageInit: function () {
+                let url = localStorage.getItem("url");
+
+                app.dialog.progress("Cargando...", "#009071");
+
+                axios
+                    .get(url + "Brummy/views/login/dataHeader.php", {})
+                    .then(function (response) {
+                        // console.log(response);
+                        if (response.status === 200) {
+                            let result = response.data.result;
+                            result.forEach((data, index) => {
+                                $("#gananciasDia").html(`$${Number(data.cuenta).toFixed(2)}`);
+                                $("#citasAgendadasCita").html(`${Number(data.cuentaAgenda)}`);
+                                $("#citasAtendidasDia").html(`${Number(data.cuentaAtendidas)}`);
+                            });
+                            app.dialog.close();
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        app.dialog.close();
+                        app.dialog.alert("Algo salió mal", "Aviso");
+                    })
+                    .finally(function () {
+                        // siempre sera ejecutado
+                    });
+
+                axios
+                    .get(url + "Brummy/views/login/getProximasCitas.php", {})
+                    .then(function (response) {
+                        // console.log(response);
+                        if (response.status === 200) {
+                            let result = response.data.result;
+                            let html = "";
+                            if (result == "Sin Datos") {
+                                dataTableDestroy();
+                                $("#bodyCitasDashbora").html(html);
+                                dataTableCreate();
+                            } else {
+                                dataTableDestroy();
+                                let html;
+                                result.forEach((data, index) => {
+                                    html += `<tr>
+                                        <td>${index + 1}</td>
+                                        <td class="capitalize">${data.nombreRaza}</td>
+                                        <td class="capitalize">${data.especie}</td>
+                                        <td>
+                                            <button class="button button-outline button-round btnEliminar" onclick="deleteRaza(${data.ID})">
+                                                <span class="material-icons iconBtn"> delete </span>
+                                            </button>
+                                        </td>
+                                    </tr>`;
+                                });
+                                $("#bodyCitasDashbora").html(html);
+                                dataTableCreate();
+                            }
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        app.dialog.close();
+                        app.dialog.alert("Algo salió mal", "Aviso");
+                    })
+                    .finally(function () {
+                        // siempre sera ejecutado
+                    });
+
+                axios
+                    .get(url + "Brummy/views/login/getLastVentas.php", {})
+                    .then(function (response) {
+                        // console.log(response);
+                        if (response.status === 200) {
+                            let result = response.data.result;
+                            let html = "";
+                            if (result == "Sin Datos") {
+                                dataTableDestroy();
+                                $("#bodyVentasDashbora").html(html);
+                                dataTableCreate();
+                            } else {
+                                dataTableDestroy();
+                                let html;
+                                result.forEach((data, index) => {
+                                    html += `
+                                        <tr>
+                                            <td>${Number(index + 1)}</td>
+                                            <td>${data.FlagProducto}</td>
+                                            <td>$${Number(data.total).toFixed(2)}</td>
+                                        </tr>
+                                     `;
+                                });
+                                $("#bodyVentasDashbora").html(html);
+                                dataTableCreate();
+                            }
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        app.dialog.close();
+                        app.dialog.alert("Algo salió mal", "Aviso");
+                    })
+                    .finally(function () {
+                        // siempre sera ejecutado
+                    });
+
+                axios
+                    .get(url + "Brummy/views/login/topProductos.php", {})
+                    .then(function (response) {
+                        // console.log(response);
+                        if (response.status === 200) {
+                            let result = response.data.result;
+                            let html = "";
+                            let success = result.success;
+
+                            let colores = [];
+                            let sumasProductos = [];
+                            let productos = [];
+
+                            if (result == "Sin Datos") {
+                            } else {
+                                result.forEach((data, index) => {
+                                    colores = [...colores, "#009071"];
+                                    productos = [...productos, data.FlagProducto];
+                                    sumasProductos = [...sumasProductos, Number(data.suma)];
+                                });
+
+                                new Chart(document.getElementById("bar-chart2"), {
+                                    type: "horizontalBar",
+                                    data: {
+                                        labels: productos,
+                                        datasets: [
+                                            {
+                                                label: "Vendidos",
+                                                backgroundColor: colores,
+                                                data: sumasProductos,
+                                            },
+                                        ],
+                                    },
+                                    options: {
+                                        legend: { display: false },
+                                        title: {
+                                            display: true,
+                                            text: "",
+                                        },
+                                        scales: {
+                                            xAxes: [
+                                                {
+                                                    ticks: {
+                                                        beginAtZero: true,
+                                                    },
+                                                },
+                                            ],
+                                        },
+                                    },
+                                });
+                            }
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        app.dialog.close();
+                        app.dialog.alert("Algo salió mal", "Aviso");
+                    })
+                    .finally(function () {
+                        // siempre sera ejecutado
+                    });
+
+                new Chart(document.getElementById("bar-chart"), {
+                    type: "bar",
+                    data: {
+                        labels: ["1 estrellas", "2 estrellas", "3 estrellas", "4 estrellas", "5 estrellas"],
+                        datasets: [
+                            {
+                                label: "Calificaciones",
+                                backgroundColor: ["#009071", "#009071", "#009071", "#009071", "#009071"],
+                                data: [0, 0, 0, 2, 3, 5],
+                            },
+                        ],
+                    },
+                    options: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: "",
+                        },
+                    },
+                });
+            },
+        },
+    };
+</script>
+
+<style>
+    .paginate_button.current {
+        border: none !important;
+        background: #009071 !important;
+        border-radius: 8px !important;
+        font-weight: bold;
+        color: #fff !important;
+    }
+
+    .list ul:before {
+        display: none !important;
+    }
+
+    .list ul:after {
+        display: none !important;
+    }
+    .ts-control {
+        border: 0;
+        padding: 0;
+    }
+    .ts-control > input {
+        height: auto !important;
+    }
+    .ts-wrapper.floating.obligatorio.full.has-items {
+        border: 2px solid #009071 !important;
+        border-radius: 8px !important;
+    }
+    .grid {
+        display: flex;
+    }
+</style>

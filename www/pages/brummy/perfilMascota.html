@@ -1,0 +1,225 @@
+<template>
+    <div class="page" id="panel-page">
+        <div class="navbar" style="height: 5px">
+            <div class="left top-left" style="justify-content: center; background-color: #009071">
+                <div class="title" style="font-size: 18px; margin-left: 15px">Clientes</div>
+            </div>
+        </div>
+
+        <div class="page-content" style="margin-top: 16px">
+            <div class="block">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="item-title" style="font-weight: bold">Datos de la Mascota</div>
+                    </div>
+                    <div class="card-content" style="padding: 10px">
+                        <div class="row">
+                            <div class="col-50">
+                                <div class="item-subtitle">Nombre:</div>
+                                <div><strong id="nombreMascota"> </strong></div>
+                            </div>
+                            <div class="col-50">
+                                <div class="item-subtitle">Fecha Nacimiento:</div>
+                                <div><strong id="fechaMascota"> </strong></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-50">
+                                <div class="item-subtitle">Relación Especie:</div>
+                                <div><strong id="relacionEspecie"> </strong></div>
+                            </div>
+                            <div class="col-50">
+                                <div class="item-subtitle">Sexo:</div>
+                                <div><stron id="sexoMascota"> </stron></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-50">
+                                <div class="item-subtitle">Color:</div>
+                                <div><strong id="colorMascota"> </strong></div>
+                            </div>
+                            <div class="col-50">
+                                <div class="item-subtitle">Rasgos Particulares:</div>
+                                <div><strong id="rasgosMascota"> </strong></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-50">
+                                <div class="item-subtitle">Dueño:</div>
+                                <div><strong id="FK_dueno"> </strong></div>
+                            </div>
+                            <div class="col-50">
+                                <button
+                                    class="button button-outline button-round btnRed"
+                                    onclick="eliminarMascota(localStorage.getItem('IDMascota'))"
+                                >
+                                    Eliminar <span class="material-icons iconBtn"> delete </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="item-title" style="font-weight: bold">Notas</div>
+                    </div>
+                    <div class="card-content" style="padding: 10px; display: flex; justify-content: center; max-height: 500px; overflow-y: scroll">
+                        <div class="item-subtitle">Sin notas</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="item-title" style="font-weight: bold">Historial</div>
+                    </div>
+                    <div class="card-content" style="padding: 10px; display: flex; justify-content: center; max-height: 500px; overflow-y: scroll">
+                        <div class="timeline" id="historialMascotaSpace"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        on: {
+            pageInit: function () {
+                let url = localStorage.getItem("url");
+                let ID = localStorage.getItem("IDMascota");
+
+                axios
+                    .post(url + "Brummy/views/mascotas/obtenerMascota.php", { ID })
+                    .then(function (response) {
+                        console.log(response);
+                        if (response.status === 200) {
+                            let result = response.data.result;
+                            let html = "";
+                            let tdSinData = `<span class='material-icons'> remove </span> &nbsp; <span class='material-icons'> remove </span>`;
+                            let nombreMascota, fechaMascota, relacionEspecie, sexoMascota, colorMascota, rasgosMascota, FK_dueno;
+                            if (result == "Sin Datos") {
+                                Swal.fire({ icon: "warning", title: "Sin datos.", text: "" });
+                            } else {
+                                result.forEach((data, index) => {
+                                    // console.table(data);
+                                    nombreMascota = data.nombre;
+                                    fechaMascota = data.fechaNacimiento;
+                                    relacionEspecie = `${data.especie} - ${data.raza}`;
+                                    sexoMascota = data.sexo;
+                                    colorMascota = data.color ? data.color : tdSinData;
+                                    rasgosMascota = data.rasgosParticulares ? data.rasgosParticulares : tdSinData;
+                                    FK_dueno = data.NombreCliente;
+                                });
+                                // traerHistorialMascota(ID);
+                                $("#nombreMascota").html(nombreMascota);
+                                $("#fechaMascota").html(fechaMascota);
+                                $("#relacionEspecie").html(relacionEspecie);
+                                $("#sexoMascota").html(sexoMascota);
+                                $("#colorMascota").html(colorMascota);
+                                $("#rasgosMascota").html(rasgosMascota);
+                                $("#FK_dueno").html(FK_dueno);
+                            }
+                            app.dialog.close();
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        app.dialog.close();
+                        app.dialog.alert("Algo salió mal", "Aviso");
+                    })
+                    .finally(function () {
+                        // siempre sera ejecutado
+                    });
+
+                axios
+                    .post(url + "Brummy/views/mascotas/traerHistorialMascota.php", { ID })
+                    .then(function (response) {
+                        console.log(response);
+                        if (response.status === 200) {
+                            let result = response.data.result;
+                            let html = "";
+                            if (result == "Sin Datos") {
+                                html += `
+                                <div class="timeline-item">
+                                        <div class="timeline-item-divider"></div>
+                                        <div class="timeline-item-content">
+                                            <div class="timeline-item-inner">
+                                                <strong style="color: #009071;font-weight: bold;font-size: 1rem;">
+                                                    Sin Historial
+                                                </strong>
+                                            </div>
+                                        </div>
+                                    </div>`;
+
+                                $("#historialMascotaSpace").html(html);
+                            } else {
+                                result.forEach((data, index) => {
+                                    html += `<div class="timeline-item">
+                                        <div class="timeline-item-divider"></div>
+                                        <div class="timeline-item-content">
+                                            <div class="timeline-item-inner">
+                                                <strong style="color: #5f5f5f;position: relative;font-size: 14px;font-weight: bold;font-style: italic;margin-left: 20px;">
+                                                    ${volteaFecha(data.fecha, 1)} </strong> <br>
+                                                <strong style="color: #009071;font-weight: bold;font-size: 1rem;">
+                                                    ${data.motivo_movimiento}
+                                                </strong>
+                                            </div>
+                                        </div>
+                                    </div>`;
+                                });
+
+                                $("#historialMascotaSpace").html(html);
+                            }
+                            app.dialog.close();
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        app.dialog.close();
+                        app.dialog.alert("Algo salió mal", "Aviso");
+                    })
+                    .finally(function () {
+                        // siempre sera ejecutado
+                    });
+
+                // app.dialog.progress("Cargando...", "#009071");
+            },
+        },
+    };
+</script>
+
+<style>
+    .paginate_button.current {
+        border: none !important;
+        background: #009071 !important;
+        border-radius: 8px !important;
+        font-weight: bold;
+        color: #fff !important;
+    }
+
+    .list ul:before {
+        display: none !important;
+    }
+
+    .list ul:after {
+        display: none !important;
+    }
+    .ts-control {
+        border: 0;
+        padding: 0;
+    }
+    .ts-control > input {
+        height: auto !important;
+    }
+    .ts-wrapper.floating.obligatorio.full.has-items {
+        border: 2px solid #009071 !important;
+        border-radius: 8px !important;
+    }
+    .grid {
+        display: flex;
+    }
+</style>

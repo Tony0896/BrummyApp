@@ -58,7 +58,11 @@ var routes = [
         path: "/settings/",
         componentUrl: "./pages/brummy/settings.html",
     },
-
+    {
+        name: "perfilMascota",
+        path: "/perfilMascota/",
+        componentUrl: "./pages/brummy/perfilMascota.html",
+    },
     //?Fin tecnologiasHmo
     {
         path: "(.*)",
