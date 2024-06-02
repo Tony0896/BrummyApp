@@ -13,7 +13,7 @@ function onDeviceReady() {
     StatusBar.styleLightContent();
     let Usuario = localStorage.getItem("Usuario");
     localStorage.setItem("version", "1.0.0");
-    let url = "http://192.168.100.3:8080/";
+    let url = "http://192.168.100.10:8080/";
     localStorage.setItem("url", url);
     if (Usuario) {
         pintaMenu();
@@ -197,31 +197,60 @@ function moveMenu(id) {
     app.views.main.router.navigate({ name: name });
 }
 
-function dataTableCreate() {
-    $(".datatable")
-        .DataTable({
-            responsive: true,
-            language: {
-                lengthMenu: "_MENU_ registros por pagina",
-                zeroRecords: "No hay resultados",
-                info: "Pagina _PAGE_ de _PAGES_",
-                infoEmpty: "No hay registros disponibles",
-                infoFiltered: "(Mostrar _MAX_ registros)",
-                paginate: {
-                    previous: "‹-",
-                    next: "-›",
-                },
-                aria: {
-                    paginate: {
-                        previous: "Previous",
-                        next: "Next",
+function dataTableCreate(flag) {
+    if (flag) {
+        if (flag == 1) {
+            $(".datatable")
+                .DataTable({
+                    responsive: true,
+                    language: {
+                        lengthMenu: "_MENU_ registros por pagina",
+                        zeroRecords: "No hay resultados",
+                        info: "Pagina _PAGE_ de _PAGES_",
+                        infoEmpty: "No hay registros disponibles",
+                        infoFiltered: "(Mostrar _MAX_ registros)",
+                        paginate: {
+                            previous: "‹-",
+                            next: "-›",
+                        },
+                        aria: {
+                            paginate: {
+                                previous: "Previous",
+                                next: "Next",
+                            },
+                        },
+                        search: "Buscar",
                     },
+                    order: [[0, "desc"]],
+                })
+                .draw();
+        }
+    } else {
+        $(".datatable")
+            .DataTable({
+                responsive: true,
+                language: {
+                    lengthMenu: "_MENU_ registros por pagina",
+                    zeroRecords: "No hay resultados",
+                    info: "Pagina _PAGE_ de _PAGES_",
+                    infoEmpty: "No hay registros disponibles",
+                    infoFiltered: "(Mostrar _MAX_ registros)",
+                    paginate: {
+                        previous: "‹-",
+                        next: "-›",
+                    },
+                    aria: {
+                        paginate: {
+                            previous: "Previous",
+                            next: "Next",
+                        },
+                    },
+                    search: "Buscar",
                 },
-                search: "Buscar",
-            },
-            order: [[0, "asc"]],
-        })
-        .draw();
+                order: [[0, "asc"]],
+            })
+            .draw();
+    }
 
     $(".paginate_button.current").attr("style", "color: #FFF ! important");
 }

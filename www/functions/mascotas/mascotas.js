@@ -1,4 +1,5 @@
 function obtenerMascotas() {
+    let url = localStorage.getItem("url");
     axios
         .get(url + "Brummy/views/mascotas/obtenerMascotas.php", {})
         .then(function (response) {
@@ -58,6 +59,7 @@ function obtenerMascotas() {
 }
 
 function crearMascota() {
+    let url = localStorage.getItem("url");
     axios
         .get(url + "Brummy/views/catalogos/obtenerRazas.php", {})
         .then(function (response) {
@@ -85,7 +87,7 @@ function crearMascota() {
 
                                     let modalTemplate = app.popup.create({
                                         content: `<div class="sheet-modal demo-sheet">
-                                            <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;"> 
+                                            <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;width: fit-content;left: 94%;"> 
                                                 <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
                                             </div>
                                             <div class="sheet-modal-inner">
@@ -266,7 +268,7 @@ function guardarMascota() {
         color.replaceAll("'", '"');
         rasgosParticulares.replaceAll("'", '"');
         FK_dueno.replaceAll("'", '"');
-
+        let url = localStorage.getItem("url");
         axios
             .post(url + "Brummy/views/mascotas/guardarMascota.php", {
                 nombre,
@@ -333,6 +335,7 @@ function eliminarMascota(ID) {
                 {
                     text: "OK",
                     onClick: function () {
+                        let url = localStorage.getItem("url");
                         axios
                             .post(url + "Brummy/views/mascotas/eliminarMascota.php", {
                                 ID,

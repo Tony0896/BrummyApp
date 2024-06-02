@@ -1,4 +1,5 @@
 function obtenerClientes() {
+    let url = localStorage.getItem("url");
     axios
         .get(url + "Brummy/views/clientes/obtenerClientes.php", {})
         .then(function (response) {
@@ -59,7 +60,7 @@ function obtenerClientes() {
 function crearCliente() {
     let modalTemplate = app.popup.create({
         content: `<div class="sheet-modal demo-sheet">
-            <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;"> 
+            <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;width: fit-content;left: 94%;"> 
                 <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
             </div>
             <div class="sheet-modal-inner">
@@ -142,6 +143,7 @@ function crearCliente() {
 }
 
 function verPerfilCliente(ID) {
+    let url = localStorage.getItem("url");
     axios
         .post(url + "Brummy/views/clientes/obtenerCliente.php", {
             ID,
@@ -180,7 +182,7 @@ function verPerfilCliente(ID) {
 
                     let modalTemplate = app.popup.create({
                         content: `<div class="sheet-modal demo-sheet">
-                            <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;"> 
+                            <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;width: fit-content;left: 94%;"> 
                                 <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
                             </div>
                             <div class="sheet-modal-inner">
@@ -319,7 +321,7 @@ function guardarCliente() {
         apellidoM.replaceAll("'", '"');
         telefono.replaceAll("'", '"');
         correo.replaceAll("'", '"');
-
+        let url = localStorage.getItem("url");
         axios
             .post(url + "Brummy/views/clientes/guardaCliente.php", {
                 nombre,
@@ -373,7 +375,7 @@ function actualizarCliente(ID) {
         apellidoM.replaceAll("'", '"');
         telefono.replaceAll("'", '"');
         correo.replaceAll("'", '"');
-
+        let url = localStorage.getItem("url");
         axios
             .post(url + "Brummy/views/clientes/actualizaCliente.php", {
                 nombre,
@@ -427,6 +429,7 @@ function eliminarCliente(ID) {
         },
         function (isConfirm) {
             if (isConfirm) {
+                let url = localStorage.getItem("url");
                 axios
                     .post(url + "Brummy/views/clientes/eliminarCliente.php", {
                         ID,
@@ -449,6 +452,7 @@ function eliminarCliente(ID) {
 }
 
 function HistorialCliente(ID) {
+    let url = localStorage.getItem("url");
     axios
         .post(url + "Brummy/views/clientes/traerHistorialCliente.php", {
             ID,

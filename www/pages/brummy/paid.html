@@ -1,0 +1,199 @@
+<template>
+    <div class="page" id="panel-page">
+        <div class="navbar" style="height: 5px">
+            <div class="left top-left" style="justify-content: center; background-color: #009071">
+                <div class="title" style="font-size: 18px; margin-left: 15px">Ventas</div>
+            </div>
+        </div>
+
+        <div class="page-content" style="margin-top: 16px">
+            <div class="block">
+                <div class="divButton">
+                    <button class="button button-outline button-round" onclick="irNuevaVenta()">
+                        Nueva<span class="material-icons iconBtn"> add_circle_outline </span>
+                    </button>
+                </div>
+
+                <div class="row">
+                    <div class="col-50">
+                        <div class="list list-strong-ios list-dividers-ios inset-ios">
+                            <ul>
+                                <li class="item-content item-input item-input-outline" id="LImesVentas">
+                                    <div class="item-inner">
+                                        <div class="item-title item-floating-label">Mes:</div>
+                                        <div class="item-input-wrap">
+                                            <select
+                                                class="floating obligatorio input-focused"
+                                                type="text"
+                                                placeholder="Mes"
+                                                id="mesVentas"
+                                                name="Mes"
+                                                style="padding-top: 0px !important; height: auto; padding-bottom: 0px !important"
+                                            ></select>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-50">
+                        <div class="list list-strong-ios list-dividers-ios inset-ios">
+                            <ul>
+                                <li class="item-content item-input item-input-outline" id="LIanioVentas">
+                                    <div class="item-inner">
+                                        <div class="item-title item-floating-label">Año:</div>
+                                        <div class="item-input-wrap">
+                                            <select
+                                                class="floating obligatorio input-focused"
+                                                type="text"
+                                                placeholder="Año"
+                                                id="anioVentas"
+                                                name="Año"
+                                                style="padding-top: 0px !important; height: auto; padding-bottom: 0px !important"
+                                            ></select>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="border-radius: 10px; padding: 10px">
+                    <input class="FWM-input" type="text" id="ventasBuscador" placeholder="Buscar Venta" />
+
+                    <table class="mdl-data-table table responsive table-bordered table-striped datatable" style="width: 100%" id="ventasBodyDT">
+                        <thead>
+                            <tr>
+                                <th class="thDataTable">#</th>
+                                <th class="thDataTable">Cliente</th>
+                                <th class="thDataTable">Productos</th>
+                                <th class="thDataTable">Fecha</th>
+                                <th class="thDataTable">Total</th>
+                                <th class="thDataTable">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ventasBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        on: {
+            pageInit: function () {
+                let url = localStorage.getItem("url");
+
+                let fechaNow = new Date().toLocaleString("sv-SE").split(" ")[0];
+                let mes = fechaNow.split("-")[1];
+                let anio = fechaNow.split("-")[0];
+
+                const months = [
+                    "Enero",
+                    "Febrero",
+                    "Marzo",
+                    "Abril",
+                    "Mayo",
+                    "Junio",
+                    "Julio",
+                    "Agosto",
+                    "Septiembre",
+                    "Octubre",
+                    "Noviembre",
+                    "Diciembre",
+                ];
+                for (let i = 0; i < months.length; i++) {
+                    let m = i;
+                    m++;
+                    if (mes == m) {
+                        $("#mesVentas").append(`<option value="${m}" selected>${months[i]}</option>`);
+                    } else {
+                        $("#mesVentas").append(`<option value="${m}">${months[i]}</option>`);
+                    }
+                }
+
+                for (let i = 3; i > 0; i--) {
+                    let new_anio = Number(anio) - i;
+                    $("#anioVentas").append(`<option value="${new_anio}">${new_anio}</option>`);
+                }
+                $("#anioVentas").append(`<option value="${anio}" selected>${anio}</option>`);
+
+                for (let i = 1; i < 4; i++) {
+                    let new_anio = Number(anio) + i;
+                    $("#anioVentas").append(`<option value="${new_anio}">${new_anio}</option>`);
+                }
+
+                obtenerVentas(mes, anio);
+
+                $("#mesVentas").change(() => {
+                    obtenerVentas($("#mesVentas").val(), $("#anioVentas").val());
+                });
+                $("#anioVentas").change(() => {
+                    obtenerVentas($("#mesVentas").val(), $("#anioVentas").val());
+                });
+
+                // app.dialog.progress("Cargando...", "#009071");
+
+                $("#ventasBuscador").on("input", function () {
+                    let table = $("#ventasBodyDT").DataTable();
+                    table.search($(this).val()).draw();
+                });
+
+                // new TomSelect("#mesVentas", {
+                //     create: false,
+                //     sortField: {
+                //         field: "text",
+                //     },
+                // });
+
+                $("#LImesVentas").addClass("item-input-focused");
+                $("#mesVentas").addClass("input-with-value input-focused item-input-outline");
+
+                // new TomSelect("#anioVentas", {
+                //     create: false,
+                //     sortField: {
+                //         field: "text",
+                //     },
+                // });
+
+                $("#LIanioVentas").addClass("item-input-focused");
+                $("#anioVentas").addClass("input-with-value input-focused item-input-outline");
+            },
+        },
+    };
+</script>
+
+<style>
+    .paginate_button.current {
+        border: none !important;
+        background: #009071 !important;
+        border-radius: 8px !important;
+        font-weight: bold;
+        color: #fff !important;
+    }
+
+    .list ul:before {
+        display: none !important;
+    }
+
+    .list ul:after {
+        display: none !important;
+    }
+    .ts-control {
+        border: 0;
+        padding: 0;
+    }
+    .ts-control > input {
+        height: auto !important;
+    }
+    .ts-wrapper.floating.obligatorio.full.has-items {
+        border: 2px solid #009071 !important;
+        border-radius: 8px !important;
+    }
+    .grid {
+        display: flex;
+    }
+</style>

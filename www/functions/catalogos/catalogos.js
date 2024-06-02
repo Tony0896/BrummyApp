@@ -1,9 +1,7 @@
-let url = localStorage.getItem("url");
-
 function crearNuevaEspecie() {
     let modalTemplate = app.popup.create({
         content: `<div class="sheet-modal demo-sheet">
-            <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;"> 
+            <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;width: fit-content;left: 94%;"> 
                 <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
             </div>
             <div class="sheet-modal-inner">
@@ -55,7 +53,7 @@ function guardarEspecie() {
         nombreEspecie.replaceAll("'", '"');
 
         // app.dialog.progress("Cargando...", "#009071");
-
+        let url = localStorage.getItem("url");
         axios
             .post(url + "Brummy/views/catalogos/guardarEspecie.php", {
                 nombreEspecie,
@@ -90,6 +88,7 @@ function guardarEspecie() {
 }
 
 function obtenerEspecies() {
+    let url = localStorage.getItem("url");
     axios
         .get(url + "Brummy/views/catalogos/obtenerEspecies.php", {})
         .then(function (response) {
@@ -130,6 +129,7 @@ function obtenerEspecies() {
 }
 
 function obtenerRazas() {
+    let url = localStorage.getItem("url");
     axios
         .get(url + "Brummy/views/catalogos/obtenerRazas.php", {})
         .then(function (response) {
@@ -171,6 +171,7 @@ function obtenerRazas() {
 }
 
 function crearNuevaRaza() {
+    let url = localStorage.getItem("url");
     axios
         .get(url + "Brummy/views/catalogos/obtenerEspecies.php", {})
         .then(function (response) {
@@ -187,7 +188,7 @@ function crearNuevaRaza() {
 
                     let modalTemplate = app.popup.create({
                         content: `<div class="sheet-modal demo-sheet" id="sheetModal">
-                                <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;"> 
+                                <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;width: fit-content;left: 94%;"> 
                                     <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
                                 </div>
                                 <div class="sheet-modal-inner">
@@ -276,7 +277,7 @@ function guardarRaza() {
         let especie = $("#relacionEspecie").find("option:selected").text();
 
         nombreRaza.replaceAll("'", '"');
-
+        let url = localStorage.getItem("url");
         axios
             .post(url + "Brummy/views/catalogos/guardarRaza.php", {
                 nombreRaza,
@@ -326,6 +327,7 @@ function deleteEspecie(ID) {
                 {
                     text: "OK",
                     onClick: function () {
+                        let url = localStorage.getItem("url");
                         axios
                             .post(url + "Brummy/views/catalogos/deleteEspecie.php", {
                                 ID,
@@ -362,6 +364,7 @@ function deleteRaza(ID) {
                 {
                     text: "OK",
                     onClick: function () {
+                        let url = localStorage.getItem("url");
                         axios
                             .post(url + "Brummy/views/catalogos/deleteRaza.php", {
                                 ID,
@@ -385,6 +388,7 @@ function deleteRaza(ID) {
 }
 
 function obtenerMotivos() {
+    let url = localStorage.getItem("url");
     axios
         .get(url + "Brummy/views/catalogos/obtenerMotivos.php", {})
         .then(function (response) {
@@ -426,7 +430,7 @@ function obtenerMotivos() {
 function crearNuevoMotivo() {
     let modalTemplate = app.popup.create({
         content: `<div class="sheet-modal demo-sheet">
-            <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;"> 
+            <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;width: fit-content;left: 94%;"> 
                 <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
             </div>
             <div class="sheet-modal-inner">
@@ -476,7 +480,7 @@ function guardarMotivoCita() {
         let motivoCita = String($("#motivo").val()).trim();
 
         motivoCita.replaceAll("'", '"');
-
+        let url = localStorage.getItem("url");
         axios
             .post(url + "Brummy/views/catalogos/guardarMotivoCita.php", {
                 motivoCita,
@@ -524,6 +528,7 @@ function deleteMotivoCita(ID) {
                 {
                     text: "OK",
                     onClick: function () {
+                        let url = localStorage.getItem("url");
                         axios
                             .post(url + "Brummy/views/catalogos/deleteMotivoCita.php", {
                                 ID,
