@@ -1,0 +1,138 @@
+<template>
+    <div class="page" id="panel-page">
+        <div class="navbar" style="height: 5px">
+            <div class="left top-left" style="justify-content: center; background-color: #009071">
+                <div class="title" style="font-size: 18px; margin-left: 15px">Inventario</div>
+            </div>
+        </div>
+
+        <div class="page-content" style="margin-top: 16px">
+            <div class="block">
+                <div class="divButton">
+                    <button class="button button-outline button-round" onclick="nuevoProducto()">
+                        Nuevo<span class="material-icons iconBtn"> add_circle_outline </span>
+                    </button>
+                </div>
+                <div class="card" style="border-radius: 10px; padding: 10px">
+                    <input class="FWM-input" type="text" id="productosBuscador" placeholder="Buscar producto" />
+
+                    <table class="mdl-data-table table responsive table-bordered table-striped datatable" style="width: 100%" id="productosBodyDT">
+                        <thead>
+                            <tr>
+                                <th class="thDataTable">#</th>
+                                <th class="thDataTable">Codigo</th>
+                                <th class="thDataTable">Nombre</th>
+                                <th class="thDataTable">Tipo</th>
+                                <th class="thDataTable">Precio</th>
+                                <th class="thDataTable">Stock</th>
+                                <th class="thDataTable">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productosBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        on: {
+            pageInit: function () {
+                let url = localStorage.getItem("url");
+
+                app.dialog.progress("Cargando...", "#009071");
+
+                axios
+                    .get(url + "Brummy/views/inventario/obtenerInventario.php", {})
+                    .then(function (response) {
+                        console.log(response);
+                        if (response.status === 200) {
+                            let result = response.data.result;
+                            let html = "";
+                            if (result == "Sin Datos") {
+                                dataTableDestroy();
+                                $("#productosBody").html(html);
+                                dataTableCreate();
+                            } else {
+                                dataTableDestroy();
+                                let html, codigo, stock;
+                                result.forEach((data, index) => {
+                                    codigo = data.codigo;
+                                    stock = data.stockReal;
+                                    if (data.Flagtipo == "Servicio") {
+                                        codigo = String(codigo) + String(data.ID);
+                                        stock = "N/A";
+                                    }
+                                    html += `<tr>
+                                        <td>${index + 1}</td>
+                                        <td>${codigo}</td>
+                                        <td>${data.nombre}</td>
+                                        <td>${data.Flagtipo}</td>
+                                        <td>${data.precioVenta}</td>
+                                        <td>${stock}</td>
+                                        <td>
+                                            <div style="display: flex; flex-direction: row;">
+                                                <button class="button button-outline button-round btnGreen" onclick="verProducto(${data.ID})">
+                                                    <span class="material-icons iconBtn" style="margin: auto;vertical-align: middle;"> inventory_2 </span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>`;
+                                });
+                                $("#productosBody").html(html);
+                                dataTableCreate();
+                            }
+                            app.dialog.close();
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        app.dialog.close();
+                        app.dialog.alert("Algo salió mal", "Aviso");
+                    })
+                    .finally(function () {
+                        // siempre sera ejecutado
+                    });
+
+                $("#productosBuscador").on("input", function () {
+                    let table = $("#productosBodyDT").DataTable();
+                    table.search($(this).val()).draw();
+                });
+            },
+        },
+    };
+</script>
+
+<style>
+    .paginate_button.current {
+        border: none !important;
+        background: #009071 !important;
+        border-radius: 8px !important;
+        font-weight: bold;
+        color: #fff !important;
+    }
+
+    .list ul:before {
+        display: none !important;
+    }
+
+    .list ul:after {
+        display: none !important;
+    }
+    .ts-control {
+        border: 0;
+        padding: 0;
+    }
+    .ts-control > input {
+        height: auto !important;
+    }
+    .ts-wrapper.floating.obligatorio.full.has-items {
+        border: 2px solid #009071 !important;
+        border-radius: 8px !important;
+    }
+    .grid {
+        display: flex;
+    }
+</style>
