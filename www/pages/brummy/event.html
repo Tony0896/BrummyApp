@@ -8,31 +8,46 @@
 
         <div class="page-content" style="margin-top: 16px">
             <div class="block">
-                <div class="divButton">
-                    <button class="button button-outline button-round" onclick="crearMascota()">
+                <div
+                    class="card"
+                    style="border-radius: 10px; padding: 10px; border-radius: 10px; padding-top: 0px; padding-left: 0px; padding-right: 0px"
+                >
+                    <input type="hidden" id="fechaActual" />
+                    <div class="list accordion-list">
+                        <ul>
+                            <li class="accordion-item accordion-item-opened">
+                                <a
+                                    href="#"
+                                    class="item-content item-link"
+                                    style="background-color: #009071 !important; color: #fff; font-weight: bold; border-radius: 10px"
+                                >
+                                    <div class="item-inner">
+                                        <div class="item-title" id="tnAcordionCalendar"></div>
+                                    </div>
+                                </a>
+                                <div class="accordion-item-content">
+                                    <div class="block">
+                                        <div class="card" style="border-radius: 10px; margin-top: 20px">
+                                            <div id="demo-calendar-inline-container"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: row; justify-content: space-between">
+                <div class="item-title" style="font-weight: bold; margin-inline-start: 40px; margin-top: auto; margin-bottom: auto">
+                    Citas Agendadas
+                </div>
+                <div class="divButton" style="margin-right: 20px">
+                    <button class="button button-outline button-round" onclick="nuevaCita()">
                         Agregar<span class="material-icons iconBtn"> add_circle_outline </span>
                     </button>
                 </div>
-                <div class="card" style="border-radius: 10px; padding: 10px">
-                    <input class="FWM-input" type="text" id="mascotasBuscador" placeholder="Buscar Mascota" />
-
-                    <table class="mdl-data-table table responsive table-bordered table-striped datatable" style="width: 100%" id="mascotasBodyDT">
-                        <thead>
-                            <tr>
-                                <th class="thDataTable">#</th>
-                                <th class="thDataTable">Mascota</th>
-                                <th class="thDataTable">Dueño</th>
-                                <th class="thDataTable">Fecha N.</th>
-                                <th class="thDataTable">Sexo</th>
-                                <th class="thDataTable">Color</th>
-                                <th class="thDataTable">Última actividad</th>
-                                <th class="thDataTable">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="mascotasBody"></tbody>
-                    </table>
-                </div>
             </div>
+            <div id="divEventos" style="padding-left: 15px; margin-bottom: 130px"></div>
         </div>
     </div>
 </template>
@@ -42,7 +57,236 @@
         on: {
             pageInit: function () {
                 let url = localStorage.getItem("url");
+                let calendar;
+                let eventItems = [];
+                let events = [];
 
+                let nuevaFecha = new Date();
+                const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+                let fechaText = nuevaFecha.toLocaleDateString("es-MX", options);
+
+                $("#tnAcordionCalendar").html(fechaText);
+
+                let $$ = Dom7;
+                let monthNames = [
+                    "Enero",
+                    "Febrero",
+                    "Marzo",
+                    "Abril",
+                    "Mayo",
+                    "Junio",
+                    "Julio",
+                    "Agosto",
+                    "Septiembre",
+                    "Octubre",
+                    "Noviembre",
+                    "Diciembre",
+                ];
+
+                let dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+                let dayNamesShort = ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sá"];
+
+                calendar = app.calendar.create({
+                    containerEl: "#demo-calendar-inline-container",
+                    value: [new Date()],
+                    weekHeader: true,
+                    touchMove: false,
+                    firstDay: 0,
+                    dayNames: dayNames,
+                    dayNamesShort: dayNamesShort,
+                    renderToolbar: function () {
+                        return (
+                            '<div class="toolbar calendar-custom-toolbar no-shadow">' +
+                            '<div class="toolbar-inner">' +
+                            '<div class="left">' +
+                            '<a href="#" class="link icon-only"><i class="icon icon-back ' +
+                            (app.theme === "md" ? "color-white" : "") +
+                            '"></i></a>' +
+                            "</div>" +
+                            '<div class="center"></div>' +
+                            '<div class="right">' +
+                            '<a href="#" class="link icon-only"><i class="icon icon-forward ' +
+                            (app.theme === "md" ? "color-white" : "") +
+                            '"></i></a>' +
+                            "</div>" +
+                            "</div>" +
+                            "</div>"
+                        );
+                    },
+                    events: events,
+                    on: {
+                        init: function (c) {
+                            $$(".calendar-custom-toolbar .center").text(monthNames[c.currentMonth] + ", " + c.currentYear);
+                            $$(".calendar-custom-toolbar .left .link").on("click", function () {
+                                calendar.prevMonth();
+                                renderMonthEvents(calendar, calendar.currentMonth + 1, calendar.currentYear);
+                            });
+                            $$(".calendar-custom-toolbar .right .link").on("click", function () {
+                                calendar.nextMonth();
+                                renderMonthEvents(calendar, calendar.currentMonth + 1, calendar.currentYear);
+                            });
+                            cargaEventosMes(c, new Date());
+                        },
+                        monthYearChangeStart: function (c) {
+                            $$(".calendar-custom-toolbar .center").text(monthNames[c.currentMonth] + ", " + c.currentYear);
+                        },
+                        calendarChange: function (calendar) {
+                            recargaEventosDay(calendar, calendar.currentMonth + 1, calendar.currentYear);
+                        },
+                    },
+                });
+
+                function renderMonthEvents(calendar, month, year) {
+                    // app.dialog.preloader("Cargando...", "blue");
+                    console.log(month, year);
+                    calendar.setValue(new Date(year, month, 1));
+                    events = [];
+                    for (i = 0; i <= 2; i++) {
+                        var now = new Date("2024-06-10 09:00:00");
+                        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                        let currentEvent = events.push({
+                            date: today,
+                            color: "#00A7B5",
+                        });
+                    }
+                    calendar.update();
+                    console.log("u=>", events);
+                }
+
+                function cargaEventosMes(calendar, date) {
+                    let dateSelected;
+                    let month = new Date(date).toLocaleDateString("es-MX", {
+                        month: "2-digit",
+                    });
+
+                    // dateSelected = day + "-" + month + "-" + year;
+
+                    for (i = 0; i <= 2; i++) {
+                        var now = new Date("2024-06-10 09:00:00");
+                        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                        let currentEvent = events.push({
+                            date: today,
+                            color: "#00A7B5",
+                        });
+                    }
+                    calendar.update();
+                    console.log("a=>", events);
+                }
+
+                function recargaEventosDay(calendar, months, years) {
+                    let currentFecha = new Date(calendar.value[0]);
+
+                    const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+                    let fechaText = currentFecha.toLocaleDateString("es-MX", options);
+
+                    $("#tnAcordionCalendar").html(fechaText);
+
+                    let year = new Date(currentFecha).toLocaleDateString("es-MX", { year: "numeric" });
+                    let month = new Date(currentFecha).toLocaleDateString("es-MX", {
+                        month: "2-digit",
+                    });
+                    let day = new Date(currentFecha).toLocaleDateString("es-MX", { day: "2-digit" });
+
+                    let fecha = year + "-" + month + "-" + day;
+
+                    let url = localStorage.getItem("url");
+                    // axios
+                    //     .post(url + "Brummy/views/mascotas/guardarMascota.php", {
+
+                    $.ajax({
+                        method: "POST",
+                        dataType: "JSON",
+                        url: url + "Brummy/views/citas/obtenerEventos.php",
+                        data: { fecha },
+                    })
+                        .done(function (results) {
+                            let success = results.success;
+                            let result = results.result;
+                            switch (success) {
+                                case true:
+                                    if (result == "Sin Datos") {
+                                        $("#divEventos").html(`<div class="row mt-3">
+                                            <div class="col-md-12 mb-0" style="padding: 0;padding-right: 15px;">
+                                                <div class="card2">
+                                                    <div class="card-body" style="border-left: 10px solid #009071;border-radius: 10px;">
+                                                        <div>
+                                                            <h4 class="mb-0" style="font-weight: normal;"><small class="text-muted" style="margin-bottom: 0px;"> No hay citas agendadas para este día </small></h4>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>`);
+                                    } else {
+                                        let html = "",
+                                            colorText = "",
+                                            TextEstatus = "";
+                                        result.forEach((data, index) => {
+                                            TextEstatus = "";
+                                            if (data.estatus == 1) {
+                                                TextEstatus = `<h4 class="card-title text-success" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
+                                                colorText = "#009071";
+                                            } else if (data.estatus == 2) {
+                                                TextEstatus = `<h4 class="card-title text-primary" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
+                                                colorText = "#0277BD";
+                                            } else if (data.estatus == 3) {
+                                                TextEstatus = `<h4 class="card-title text-danger" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
+                                                colorText = "#F95F53";
+                                            } else if (data.estatus == 4) {
+                                                TextEstatus = `<h4 class="card-title text-warning" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
+                                                colorText = "#FFAF00";
+                                            }
+
+                                            html += `
+                                                <div class="row mt-3">
+                                                    <div class="col-md-12 mb-0" style="padding: 0;">
+                                                        <div class="card2">
+                                                            <div class="card-body" style="border-left: 10px solid ${colorText};border-radius: 10px; padding: 1rem 1.5rem;">
+                                                                <div class="row">
+                                                                    <div class="col-60">
+                                                                        <div class="row">
+                                                                            <div class="col-md-12 my-2"> <h4 class="card-title">
+                                                                            ${data.nombreCita} Y ${
+                                                data.nombreMascota
+                                            } </h4> <div> ${TextEstatus} </div></div>
+                                                                            <div class="col-md-12 my-2"> <span class="capitalize"> ${
+                                                                                String(data.comentariosCita).trim()
+                                                                                    ? String(data.comentariosCita).trim()
+                                                                                    : "Sin comentarios adicionales"
+                                                                            } </span></div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-40" style="display: flex;flex-direction: column;">
+                                                                        <div style="display: flex;margin-bottom: 12px;"> <span class="material-icons" style="margin-right: 15px;color: #0277bd;"> schedule </span> <strong class="capitalize" style="font-weight: 500;"> ${
+                                                                            String(data.horaCita).split(":")[0]
+                                                                        }:${String(data.horaCita).split(":")[1]} </strong></div>
+                                                                        <div style="display: flex;margin-bottom: 12px;"> <span class="material-icons" style="margin-right: 15px;color: #0277bd;"> checklist </span> <strong class="capitalize" style="font-weight: 500;"> ${String(
+                                                                            data.motivoCita
+                                                                        ).trim()} </strong> </div>
+                                                                        <div class="col-md-4 my-0">
+                                                                            <div class="buttom-blue buttom" onclick="marcarCita(${data.ID})">
+                                                                                <span class="text-sm mb-0">Acciones <i class="material-icons"> date_range </i></span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>`;
+                                        });
+                                        $("#divEventos").html(html);
+                                    }
+                                    break;
+                                case false:
+                                    msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                    break;
+                            }
+                        })
+                        .fail(function (jqXHR, textStatus, errorThrown) {
+                            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                            console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+                        });
+                }
                 // app.dialog.progress("Cargando...", "#009071");
 
                 // axios
@@ -107,6 +351,69 @@
                 //     let table = $("#mascotasBodyDT").DataTable();
                 //     table.search($(this).val()).draw();
                 // });
+
+                // return {
+                //     on: {
+                //         pageInit: function (e, page) {
+                //             const date = new Date();
+                //             const year = date.getFullYear();
+                //             const month = date.getMonth();
+                //             const day = date.getDate();
+                //             const id_usuario = localStorage.getItem("id_usuario");
+                //             const id_empresa = localStorage.getItem("id_empresa");
+                //             const division = localStorage.getItem("division");
+                //             let calendar;
+                //             let eventItems = [];
+                //             var events = [];
+                //             var detalle = 2;
+                //             var visitas_kepler = 0;
+
+                //             if (id_empresa == 3) {
+                //                 $("#acotacionSMC").css("display", "block");
+                //                 $("#buscador").css("display", "block");
+                //             } else if (id_empresa == 21) {
+                //                 $("#registosBennetts2").css("display", "flex");
+                //             } else if (id_empresa == 8) {
+                //                 $("#visitas_text").html("Visitas por realizar");
+                //             } else if (id_empresa == 12) {
+                //                 if (division == 1) {
+                //                     $("#ruta_ci").css("display", "flex");
+                //                     app.request.get(
+                //                         "http://www.fwm.com.mx/app/RutaCarnes.php",
+                //                         { IdUsuario: id_usuario, id_empresa: id_empresa, detalle: detalle },
+                //                         function (data) {
+                //                             if (data) {
+                //                                 localStorage.setItem("ruta", data);
+                //                             }
+                //                         },
+                //                         function (xhr) {}
+                //                     );
+                //                 }
+                //             }
+
+                //             app.request.get(
+                //                 "http://www.fwm.com.mx/app/RutasField.php",
+                //                 { IdUsuario: id_usuario, id_empresa: id_empresa, detalle: detalle },
+                //                 function (data) {
+                //                     var content = JSON.parse(data);
+                //                     if (content == null) {
+                //                         $("#TotalC").text("0");
+                //                         $("#RelizadasC").text("0");
+                //                         $("#FaltantesC").text("0");
+                //                     } else {
+                //                         var totalReg = content.length - 1;
+                //                         for (i = 0; i <= totalReg; i++) {
+                //                             let currentEvent = events.push({ date: new Date("'" + content[i].fechaVisita + "'"), color: "#00A7B5" });
+                //                         }
+                //                         calendar.update();
+                //                     }
+                //                 },
+                //                 function (xhr) {
+                //                     $(".preloader").remove();
+                //                     $("#content-page").css("display", "none");
+                //                     $("#nointernet-page").css("display", "block");
+                //                 }
+                //             );
             },
         },
     };
@@ -141,5 +448,77 @@
     }
     .grid {
         display: flex;
+    }
+
+    .toolbar.calendar-custom-toolbar {
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        background-color: #009071;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .left > a > i.icon.icon-back {
+        color: #fff;
+    }
+    .right > a > i.icon.icon-forward {
+        color: #fff;
+    }
+    .calendar-day.calendar-day-selected .calendar-day-number {
+        background-color: #009071;
+    }
+    .calendar-day .calendar-day-event {
+        background-color: rgb(70, 196, 243);
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-top: -4px;
+    }
+    .card-body {
+        padding: 1.5rem 1.5rem;
+    }
+    .text-warning {
+        color: #ffaf00 !important;
+    }
+    /* rtl:end:remove */
+    .text-primary {
+        color: #1f3bb3 !important;
+    }
+
+    .text-secondary {
+        color: #f1f1f1 !important;
+    }
+
+    .text-success {
+        color: #34b1aa !important;
+    }
+
+    .text-info {
+        color: #52cdff !important;
+    }
+
+    .text-danger {
+        color: #f95f53 !important;
+    }
+
+    .text-light {
+        color: #fbfbfb !important;
+    }
+
+    .text-dark {
+        color: #1e283d !important;
+    }
+
+    .text-white {
+        color: #ffffff !important;
+    }
+
+    .text-body {
+        color: #1f1f1f !important;
+    }
+    .calendar-week-header {
+        background: #009071 !important;
+        color: #fff !important;
+        font-weight: bold;
     }
 </style>
