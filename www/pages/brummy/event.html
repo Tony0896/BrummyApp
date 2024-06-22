@@ -1,424 +1,3 @@
-<template>
-    <div class="page" id="panel-page">
-        <div class="navbar" style="height: 5px">
-            <div class="left top-left" style="justify-content: center; background-color: #009071">
-                <div class="title" style="font-size: 18px; margin-left: 15px">Citas</div>
-            </div>
-        </div>
-
-        <div class="page-content" style="margin-top: 16px">
-            <div class="block">
-                <div
-                    class="card"
-                    style="border-radius: 10px; padding: 10px; border-radius: 10px; padding-top: 0px; padding-left: 0px; padding-right: 0px"
-                >
-                    <input type="hidden" id="fechaActual" />
-                    <div class="list accordion-list">
-                        <ul>
-                            <li class="accordion-item accordion-item-opened">
-                                <a
-                                    href="#"
-                                    class="item-content item-link"
-                                    style="background-color: #009071 !important; color: #fff; font-weight: bold; border-radius: 10px"
-                                >
-                                    <div class="item-inner">
-                                        <div class="item-title" id="tnAcordionCalendar"></div>
-                                    </div>
-                                </a>
-                                <div class="accordion-item-content">
-                                    <div class="block">
-                                        <div class="card" style="border-radius: 10px; margin-top: 20px">
-                                            <div id="demo-calendar-inline-container"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div style="display: flex; flex-direction: row; justify-content: space-between">
-                <div class="item-title" style="font-weight: bold; margin-inline-start: 40px; margin-top: auto; margin-bottom: auto">
-                    Citas Agendadas
-                </div>
-                <div class="divButton" style="margin-right: 20px">
-                    <button class="button button-outline button-round" onclick="nuevaCita()">
-                        Agregar<span class="material-icons iconBtn"> add_circle_outline </span>
-                    </button>
-                </div>
-            </div>
-            <div id="divEventos" style="padding-left: 15px; margin-bottom: 130px"></div>
-        </div>
-    </div>
-</template>
-
-<script>
-    return {
-        on: {
-            pageInit: function () {
-                let url = localStorage.getItem("url");
-                let calendar;
-                let eventItems = [];
-                let events = [];
-
-                let nuevaFecha = new Date();
-                const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
-                let fechaText = nuevaFecha.toLocaleDateString("es-MX", options);
-
-                $("#tnAcordionCalendar").html(fechaText);
-
-                let $$ = Dom7;
-                let monthNames = [
-                    "Enero",
-                    "Febrero",
-                    "Marzo",
-                    "Abril",
-                    "Mayo",
-                    "Junio",
-                    "Julio",
-                    "Agosto",
-                    "Septiembre",
-                    "Octubre",
-                    "Noviembre",
-                    "Diciembre",
-                ];
-
-                let dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-                let dayNamesShort = ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sá"];
-
-                calendar = app.calendar.create({
-                    containerEl: "#demo-calendar-inline-container",
-                    value: [new Date()],
-                    weekHeader: true,
-                    touchMove: false,
-                    firstDay: 0,
-                    dayNames: dayNames,
-                    dayNamesShort: dayNamesShort,
-                    renderToolbar: function () {
-                        return (
-                            '<div class="toolbar calendar-custom-toolbar no-shadow">' +
-                            '<div class="toolbar-inner">' +
-                            '<div class="left">' +
-                            '<a href="#" class="link icon-only"><i class="icon icon-back ' +
-                            (app.theme === "md" ? "color-white" : "") +
-                            '"></i></a>' +
-                            "</div>" +
-                            '<div class="center"></div>' +
-                            '<div class="right">' +
-                            '<a href="#" class="link icon-only"><i class="icon icon-forward ' +
-                            (app.theme === "md" ? "color-white" : "") +
-                            '"></i></a>' +
-                            "</div>" +
-                            "</div>" +
-                            "</div>"
-                        );
-                    },
-                    events: events,
-                    on: {
-                        init: function (c) {
-                            $$(".calendar-custom-toolbar .center").text(monthNames[c.currentMonth] + ", " + c.currentYear);
-                            $$(".calendar-custom-toolbar .left .link").on("click", function () {
-                                calendar.prevMonth();
-                                renderMonthEvents(calendar, calendar.currentMonth + 1, calendar.currentYear);
-                            });
-                            $$(".calendar-custom-toolbar .right .link").on("click", function () {
-                                calendar.nextMonth();
-                                renderMonthEvents(calendar, calendar.currentMonth + 1, calendar.currentYear);
-                            });
-                            cargaEventosMes(c, new Date());
-                        },
-                        monthYearChangeStart: function (c) {
-                            $$(".calendar-custom-toolbar .center").text(monthNames[c.currentMonth] + ", " + c.currentYear);
-                        },
-                        calendarChange: function (calendar) {
-                            recargaEventosDay(calendar, calendar.currentMonth + 1, calendar.currentYear);
-                        },
-                    },
-                });
-
-                function renderMonthEvents(calendar, month, year) {
-                    // app.dialog.preloader("Cargando...", "blue");
-                    console.log(month, year);
-                    calendar.setValue(new Date(year, month, 1));
-                    events = [];
-                    for (i = 0; i <= 2; i++) {
-                        var now = new Date("2024-06-10 09:00:00");
-                        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                        let currentEvent = events.push({
-                            date: today,
-                            color: "#00A7B5",
-                        });
-                    }
-                    calendar.update();
-                    console.log("u=>", events);
-                }
-
-                function cargaEventosMes(calendar, date) {
-                    let dateSelected;
-                    let month = new Date(date).toLocaleDateString("es-MX", {
-                        month: "2-digit",
-                    });
-
-                    // dateSelected = day + "-" + month + "-" + year;
-
-                    for (i = 0; i <= 2; i++) {
-                        var now = new Date("2024-06-10 09:00:00");
-                        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                        let currentEvent = events.push({
-                            date: today,
-                            color: "#00A7B5",
-                        });
-                    }
-                    calendar.update();
-                    console.log("a=>", events);
-                }
-
-                function recargaEventosDay(calendar, months, years) {
-                    let currentFecha = new Date(calendar.value[0]);
-
-                    const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
-                    let fechaText = currentFecha.toLocaleDateString("es-MX", options);
-
-                    $("#tnAcordionCalendar").html(fechaText);
-
-                    let year = new Date(currentFecha).toLocaleDateString("es-MX", { year: "numeric" });
-                    let month = new Date(currentFecha).toLocaleDateString("es-MX", {
-                        month: "2-digit",
-                    });
-                    let day = new Date(currentFecha).toLocaleDateString("es-MX", { day: "2-digit" });
-
-                    let fecha = year + "-" + month + "-" + day;
-
-                    let url = localStorage.getItem("url");
-                    // axios
-                    //     .post(url + "Brummy/views/mascotas/guardarMascota.php", {
-
-                    $.ajax({
-                        method: "POST",
-                        dataType: "JSON",
-                        url: url + "Brummy/views/citas/obtenerEventos.php",
-                        data: { fecha },
-                    })
-                        .done(function (results) {
-                            let success = results.success;
-                            let result = results.result;
-                            switch (success) {
-                                case true:
-                                    if (result == "Sin Datos") {
-                                        $("#divEventos").html(`<div class="row mt-3">
-                                            <div class="col-md-12 mb-0" style="padding: 0;padding-right: 15px;">
-                                                <div class="card2">
-                                                    <div class="card-body" style="border-left: 10px solid #009071;border-radius: 10px;">
-                                                        <div>
-                                                            <h4 class="mb-0" style="font-weight: normal;"><small class="text-muted" style="margin-bottom: 0px;"> No hay citas agendadas para este día </small></h4>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>`);
-                                    } else {
-                                        let html = "",
-                                            colorText = "",
-                                            TextEstatus = "";
-                                        result.forEach((data, index) => {
-                                            TextEstatus = "";
-                                            if (data.estatus == 1) {
-                                                TextEstatus = `<h4 class="card-title text-success" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
-                                                colorText = "#009071";
-                                            } else if (data.estatus == 2) {
-                                                TextEstatus = `<h4 class="card-title text-primary" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
-                                                colorText = "#0277BD";
-                                            } else if (data.estatus == 3) {
-                                                TextEstatus = `<h4 class="card-title text-danger" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
-                                                colorText = "#F95F53";
-                                            } else if (data.estatus == 4) {
-                                                TextEstatus = `<h4 class="card-title text-warning" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
-                                                colorText = "#FFAF00";
-                                            }
-
-                                            html += `
-                                                <div class="row mt-3">
-                                                    <div class="col-md-12 mb-0" style="padding: 0;">
-                                                        <div class="card2">
-                                                            <div class="card-body" style="border-left: 10px solid ${colorText};border-radius: 10px; padding: 1rem 1.5rem;">
-                                                                <div class="row">
-                                                                    <div class="col-60">
-                                                                        <div class="row">
-                                                                            <div class="col-md-12 my-2"> <h4 class="card-title">
-                                                                            ${data.nombreCita} Y ${
-                                                data.nombreMascota
-                                            } </h4> <div> ${TextEstatus} </div></div>
-                                                                            <div class="col-md-12 my-2"> <span class="capitalize"> ${
-                                                                                String(data.comentariosCita).trim()
-                                                                                    ? String(data.comentariosCita).trim()
-                                                                                    : "Sin comentarios adicionales"
-                                                                            } </span></div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-40" style="display: flex;flex-direction: column;">
-                                                                        <div style="display: flex;margin-bottom: 12px;"> <span class="material-icons" style="margin-right: 15px;color: #0277bd;"> schedule </span> <strong class="capitalize" style="font-weight: 500;"> ${
-                                                                            String(data.horaCita).split(":")[0]
-                                                                        }:${String(data.horaCita).split(":")[1]} </strong></div>
-                                                                        <div style="display: flex;margin-bottom: 12px;"> <span class="material-icons" style="margin-right: 15px;color: #0277bd;"> checklist </span> <strong class="capitalize" style="font-weight: 500;"> ${String(
-                                                                            data.motivoCita
-                                                                        ).trim()} </strong> </div>
-                                                                        <div class="col-md-4 my-0">
-                                                                            <div class="buttom-blue buttom" onclick="marcarCita(${data.ID})">
-                                                                                <span class="text-sm mb-0">Acciones <i class="material-icons"> date_range </i></span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>`;
-                                        });
-                                        $("#divEventos").html(html);
-                                    }
-                                    break;
-                                case false:
-                                    msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
-                                    break;
-                            }
-                        })
-                        .fail(function (jqXHR, textStatus, errorThrown) {
-                            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
-                            console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
-                        });
-                }
-                // app.dialog.progress("Cargando...", "#009071");
-
-                // axios
-                //     .get(url + "Brummy/views/mascotas/obtenerMascotas.php", {})
-                //     .then(function (response) {
-                //         console.log(response);
-                //         if (response.status === 200) {
-                //             let result = response.data.result;
-                //             let html = "";
-                //             if (result == "Sin Datos") {
-                //                 dataTableDestroy();
-                //                 $("#mascotasBody").html(html);
-                //                 dataTableCreate();
-                //             } else {
-                //                 dataTableDestroy();
-                //                 let html;
-                //                 let tdSinData = `<span class='material-icons'> remove </span> &nbsp; <span class='material-icons'> remove </span>`;
-                //                 result.forEach((data, index) => {
-                //                     html += `<tr>
-                //                         <td>${index + 1}</td>
-                //                         <td class="capitalize">
-                //                             <div>
-                //                                 <div><span>${data.nombre}</span></div>
-                //                                 <div><span>${data.especie} - ${data.raza}</span></div>
-                //                             </div>
-                //                         </td>
-                //                         <td class="capitalize">${data.NombreCliente}</td>
-                //                         <td class="capitalize">${data.fechaNacimiento}</td>
-                //                         <td class="capitalize">${data.sexo}</td>
-                //                         <td>${data.color ? data.color : tdSinData}</td>
-                //                         <td class="capitalize"><div> <div>${volteaFecha(String(data.fechaUlmitoMovimiento).split(" ")[0], 1)} ${
-                //                         String(String(data.fechaUlmitoMovimiento).split(" ")[1]).split(":")[0]
-                //                     }:${String(String(data.fechaUlmitoMovimiento).split(" ")[1]).split(":")[1]}</div> <div>${
-                //                         data.motivoMovimiento
-                //                     }</div> </div>
-                //                         </td>
-                //                         <td>
-                //                             <div style="display: flex; flex-direction: row;">
-                //                                 <button class="button button-outline button-round btnGreen" onclick="verMascota(${data.ID})">
-                //                                     <span class="material-icons iconBtn" style="margin: auto;vertical-align: middle;"> pets </span>
-                //                                 </button>
-                //                             </div>
-                //                         </td>
-                //                     </tr>`;
-                //                 });
-                //                 $("#mascotasBody").html(html);
-                //                 dataTableCreate();
-                //             }
-                //             app.dialog.close();
-                //         }
-                //     })
-                //     .catch(function (error) {
-                //         console.log(error);
-                //         app.dialog.close();
-                //         app.dialog.alert("Algo salió mal", "Aviso");
-                //     })
-                //     .finally(function () {
-                //         // siempre sera ejecutado
-                //     });
-
-                // $("#mascotasBuscador").on("input", function () {
-                //     let table = $("#mascotasBodyDT").DataTable();
-                //     table.search($(this).val()).draw();
-                // });
-
-                // return {
-                //     on: {
-                //         pageInit: function (e, page) {
-                //             const date = new Date();
-                //             const year = date.getFullYear();
-                //             const month = date.getMonth();
-                //             const day = date.getDate();
-                //             const id_usuario = localStorage.getItem("id_usuario");
-                //             const id_empresa = localStorage.getItem("id_empresa");
-                //             const division = localStorage.getItem("division");
-                //             let calendar;
-                //             let eventItems = [];
-                //             var events = [];
-                //             var detalle = 2;
-                //             var visitas_kepler = 0;
-
-                //             if (id_empresa == 3) {
-                //                 $("#acotacionSMC").css("display", "block");
-                //                 $("#buscador").css("display", "block");
-                //             } else if (id_empresa == 21) {
-                //                 $("#registosBennetts2").css("display", "flex");
-                //             } else if (id_empresa == 8) {
-                //                 $("#visitas_text").html("Visitas por realizar");
-                //             } else if (id_empresa == 12) {
-                //                 if (division == 1) {
-                //                     $("#ruta_ci").css("display", "flex");
-                //                     app.request.get(
-                //                         "http://www.fwm.com.mx/app/RutaCarnes.php",
-                //                         { IdUsuario: id_usuario, id_empresa: id_empresa, detalle: detalle },
-                //                         function (data) {
-                //                             if (data) {
-                //                                 localStorage.setItem("ruta", data);
-                //                             }
-                //                         },
-                //                         function (xhr) {}
-                //                     );
-                //                 }
-                //             }
-
-                //             app.request.get(
-                //                 "http://www.fwm.com.mx/app/RutasField.php",
-                //                 { IdUsuario: id_usuario, id_empresa: id_empresa, detalle: detalle },
-                //                 function (data) {
-                //                     var content = JSON.parse(data);
-                //                     if (content == null) {
-                //                         $("#TotalC").text("0");
-                //                         $("#RelizadasC").text("0");
-                //                         $("#FaltantesC").text("0");
-                //                     } else {
-                //                         var totalReg = content.length - 1;
-                //                         for (i = 0; i <= totalReg; i++) {
-                //                             let currentEvent = events.push({ date: new Date("'" + content[i].fechaVisita + "'"), color: "#00A7B5" });
-                //                         }
-                //                         calendar.update();
-                //                     }
-                //                 },
-                //                 function (xhr) {
-                //                     $(".preloader").remove();
-                //                     $("#content-page").css("display", "none");
-                //                     $("#nointernet-page").css("display", "block");
-                //                 }
-                //             );
-            },
-        },
-    };
-</script>
-
 <style>
     .paginate_button.current {
         border: none !important;
@@ -522,3 +101,685 @@
         font-weight: bold;
     }
 </style>
+
+<template>
+    <div class="page" id="panel-page">
+        <div class="navbar" style="height: 5px">
+            <div class="left top-left" style="justify-content: center; background-color: #009071">
+                <div class="title" style="font-size: 18px; margin-left: 15px">Citas</div>
+            </div>
+        </div>
+
+        <div class="page-content" style="margin-top: 16px">
+            <div class="block">
+                <div
+                    class="card"
+                    style="border-radius: 10px; padding: 10px; border-radius: 10px; padding-top: 0px; padding-left: 0px; padding-right: 0px"
+                >
+                    <input type="hidden" id="fechaActual" />
+                    <div class="list accordion-list">
+                        <ul>
+                            <li class="accordion-item accordion-item-opened">
+                                <a
+                                    href="#"
+                                    class="item-content item-link"
+                                    style="background-color: #009071 !important; color: #fff; font-weight: bold; border-radius: 10px"
+                                >
+                                    <div class="item-inner">
+                                        <div class="item-title" id="tnAcordionCalendar"></div>
+                                    </div>
+                                </a>
+                                <div class="accordion-item-content">
+                                    <div class="block">
+                                        <div class="card" style="border-radius: 10px; margin-top: 20px">
+                                            <div id="demo-calendar-inline-container"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: row; justify-content: space-between">
+                <div class="item-title" style="font-weight: bold; margin-inline-start: 40px; margin-top: auto; margin-bottom: auto">
+                    Citas Agendadas
+                </div>
+                <div class="divButton" style="margin-right: 20px">
+                    <button class="button button-outline button-round" id="btnNuevaCita">
+                        Agregar<span class="material-icons iconBtn"> add_circle_outline </span>
+                    </button>
+                </div>
+            </div>
+            <div id="divEventos" style="padding-left: 15px; margin-bottom: 130px"></div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        on: {
+            pageInit: function () {
+                let url = localStorage.getItem("url");
+                let calendar;
+                let eventItems = [];
+                let events = [];
+
+                let nuevaFecha = new Date();
+                const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+                let fechaText = nuevaFecha.toLocaleDateString("es-MX", options);
+
+                $("#tnAcordionCalendar").html(fechaText);
+
+                let $$ = Dom7;
+                let monthNames = [
+                    "Enero",
+                    "Febrero",
+                    "Marzo",
+                    "Abril",
+                    "Mayo",
+                    "Junio",
+                    "Julio",
+                    "Agosto",
+                    "Septiembre",
+                    "Octubre",
+                    "Noviembre",
+                    "Diciembre",
+                ];
+
+                let dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+                let dayNamesShort = ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sá"];
+
+                calendar = app.calendar.create({
+                    containerEl: "#demo-calendar-inline-container",
+                    value: [new Date()],
+                    weekHeader: true,
+                    touchMove: false,
+                    firstDay: 0,
+                    dayNames: dayNames,
+                    dayNamesShort: dayNamesShort,
+                    renderToolbar: function () {
+                        return (
+                            '<div class="toolbar calendar-custom-toolbar no-shadow">' +
+                            '<div class="toolbar-inner">' +
+                            '<div class="left">' +
+                            '<a href="#" class="link icon-only"><i class="icon icon-back ' +
+                            (app.theme === "md" ? "color-white" : "") +
+                            '"></i></a>' +
+                            "</div>" +
+                            '<div class="center"></div>' +
+                            '<div class="right">' +
+                            '<a href="#" class="link icon-only"><i class="icon icon-forward ' +
+                            (app.theme === "md" ? "color-white" : "") +
+                            '"></i></a>' +
+                            "</div>" +
+                            "</div>" +
+                            "</div>"
+                        );
+                    },
+                    events: events,
+                    on: {
+                        init: function (c) {
+                            $$(".calendar-custom-toolbar .center").text(monthNames[c.currentMonth] + ", " + c.currentYear);
+                            $$(".calendar-custom-toolbar .left .link").on("click", function () {
+                                calendar.prevMonth();
+                                renderMonthEvents(calendar, calendar.currentMonth + 1, calendar.currentYear);
+                            });
+                            $$(".calendar-custom-toolbar .right .link").on("click", function () {
+                                calendar.nextMonth();
+                                renderMonthEvents(calendar, calendar.currentMonth + 1, calendar.currentYear);
+                            });
+                            cargaEventosMes(c, new Date());
+                        },
+                        monthYearChangeStart: function (c) {
+                            $$(".calendar-custom-toolbar .center").text(monthNames[c.currentMonth] + ", " + c.currentYear);
+                        },
+                        calendarChange: function (calendar) {
+                            recargaEventosDay(calendar, calendar.currentMonth + 1, calendar.currentYear);
+                        },
+                    },
+                });
+
+                function renderMonthEvents(calendar, mes, anio) {
+                    let url = localStorage.getItem("url");
+
+                    axios
+                        .post(url + "Brummy/views/citas/obtenerEventosMes.php", {
+                            mes,
+                            anio,
+                        })
+                        .then(function (response) {
+                            console.log(response);
+                            if (response.status === 200) {
+                                let result = response.data.result;
+                                let html = "";
+                                if (result == "Sin Datos") {
+                                } else {
+                                    result.forEach((data, index) => {
+                                        let now = new Date(data.fechaCita + " 09:00:00");
+                                        let today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                                        let currentEvent = events.push({
+                                            date: today,
+                                            color: "#00A7B5",
+                                        });
+                                    });
+                                    setTimeout(() => {
+                                        calendar.update();
+                                        // console.log("u=>", events);
+                                    }, 1000);
+                                }
+                            }
+                        })
+                        .catch(function (error) {
+                            app.dialog.alert("Algo salió mal", "Aviso");
+                            console.log(error);
+                        });
+                }
+
+                function cargaEventosMes(calendar, date) {
+                    let mes = new Date(date).toLocaleDateString("es-MX", {
+                        month: "2-digit",
+                    });
+                    let anio = new Date(date).toLocaleDateString("es-MX", { year: "numeric" });
+
+                    let url = localStorage.getItem("url");
+                    axios
+                        .post(url + "Brummy/views/citas/obtenerEventosMes.php", {
+                            mes,
+                            anio,
+                        })
+                        .then(function (response) {
+                            console.log(response);
+                            if (response.status === 200) {
+                                let result = response.data.result;
+                                if (result == "Sin Datos") {
+                                } else {
+                                    result.forEach((data, index) => {
+                                        let now = new Date(data.fechaCita + " 09:00:00");
+                                        let today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                                        let currentEvent = events.push({
+                                            date: today,
+                                            color: "#00A7B5",
+                                        });
+                                    });
+                                    calendar.update();
+                                    console.log("a=>", events);
+                                }
+                                app.dialog.close();
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                            app.dialog.close();
+                            app.dialog.alert("Algo salió mal", "Aviso");
+                        })
+                        .finally(function () {
+                            // siempre sera ejecutado
+                        });
+                }
+
+                function recargaEventosDay(calendar, months, years) {
+                    let currentFecha = new Date(calendar.value[0]);
+
+                    const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+                    let fechaText = currentFecha.toLocaleDateString("es-MX", options);
+
+                    $("#tnAcordionCalendar").html(fechaText);
+
+                    let year = new Date(currentFecha).toLocaleDateString("es-MX", { year: "numeric" });
+                    let month = new Date(currentFecha).toLocaleDateString("es-MX", {
+                        month: "2-digit",
+                    });
+                    let day = new Date(currentFecha).toLocaleDateString("es-MX", { day: "2-digit" });
+
+                    let fecha = year + "-" + month + "-" + day;
+                    $("#fechaActual").val(fecha);
+
+                    let url = localStorage.getItem("url");
+
+                    axios
+                        .post(url + "Brummy/views/citas/obtenerEventos.php", { fecha })
+                        .then(function (response) {
+                            console.log(response);
+                            if (response.status === 200) {
+                                let result = response.data.result;
+                                if (result == "Sin Datos") {
+                                    $("#divEventos").html(`<div class="row mt-3">
+                                            <div class="col-md-12 mb-0" style="padding: 0;padding-right: 15px;">
+                                                <div class="card">
+                                                    <div class="card-body" style="border-left: 10px solid #009071;border-radius: 10px;">
+                                                        <div>
+                                                            <h4 class="mb-0" style="font-weight: normal;"><small class="text-muted" style="margin-bottom: 0px;"> No hay citas agendadas para este día </small></h4>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>`);
+                                } else {
+                                    let html = "",
+                                        colorText = "",
+                                        TextEstatus = "";
+                                    result.forEach((data, index) => {
+                                        TextEstatus = "";
+                                        if (data.estatus == 1) {
+                                            TextEstatus = `<h4 class="card-title text-success" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
+                                            colorText = "#009071";
+                                        } else if (data.estatus == 2) {
+                                            TextEstatus = `<h4 class="card-title text-primary" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
+                                            colorText = "#0277BD";
+                                        } else if (data.estatus == 3) {
+                                            TextEstatus = `<h4 class="card-title text-danger" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
+                                            colorText = "#F95F53";
+                                        } else if (data.estatus == 4) {
+                                            TextEstatus = `<h4 class="card-title text-warning" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
+                                            colorText = "#FFAF00";
+                                        }
+
+                                        html += `
+                                                <div class="row mt-3">
+                                                    <div class="col-md-12 mb-0" style="padding: 0;padding-right: 15px;">
+                                                        <div class="card" id="card_evt_${data.ID}">
+                                                            <div class="card-body" style="border-left: 10px solid ${colorText};border-radius: 10px; padding: 1rem 1.5rem;">
+                                                                <div class="row">
+                                                                    <div class="col-60">
+                                                                        <div class="row">
+                                                                            <div class="col-md-12 my-2"> <h4 class="card-title">
+                                                                            ${data.nombreCita} Y ${data.nombreMascota} </h4> <div id="div_evt_${
+                                            data.ID
+                                        }"> ${TextEstatus} </div></div>
+                                                                            <div class="col-md-12 my-2"> <span class="capitalize"> ${
+                                                                                String(data.comentariosCita).trim()
+                                                                                    ? String(data.comentariosCita).trim()
+                                                                                    : "Sin comentarios adicionales"
+                                                                            } </span></div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-40" style="display: flex;flex-direction: column;">
+                                                                        <div style="display: flex;margin-bottom: 12px;"> <span class="material-icons" style="margin-right: 15px;color: #0277bd;"> schedule </span> <strong class="capitalize" style="font-weight: 500;"> ${
+                                                                            String(data.horaCita).split(":")[0]
+                                                                        }:${String(data.horaCita).split(":")[1]} </strong></div>
+                                                                        <div style="display: flex;margin-bottom: 12px;"> <span class="material-icons" style="margin-right: 15px;color: #0277bd;"> checklist </span> <strong class="capitalize" style="font-weight: 500;"> ${String(
+                                                                            data.motivoCita
+                                                                        ).trim()} </strong> </div>
+                                                                        <div class="col-md-4 my-0" style="display: flex;">
+                                                                            <div class="divButton" style="margin-right: 20px">
+                                                                                <button class="button button-outline button-round btnBlue" onclick="marcarCita(${
+                                                                                    data.ID
+                                                                                })">
+                                                                                    Acciones <span class="material-icons iconBtn"> date_range </span>
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>`;
+                                    });
+                                    $("#divEventos").html(html);
+                                }
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                            app.dialog.close();
+                            app.dialog.alert("Algo salió mal", "Aviso");
+                        })
+                        .finally(function () {
+                            // siempre sera ejecutado
+                        });
+                }
+
+                $("#btnNuevaCita").click(() => {
+                    let url = localStorage.getItem("url");
+                    let controlMascotas;
+                    let html = "";
+                    axios
+                        .get(url + "Brummy/views/clientes/obtenerClientes.php", {})
+                        .then(function (response) {
+                            console.log(response);
+                            if (response.status === 200) {
+                                let result = response.data.result;
+                                if (result == "Sin Datos") {
+                                } else {
+                                    result.forEach((data, index) => {
+                                        html += `<option value="${data.ID}">${data.nombre} ${data.apellidoP} ${data.apellidoM}</option>`;
+                                    });
+                                    axios
+                                        .get(url + "Brummy/views/catalogos/obtenerMotivos.php", {})
+                                        .then(function (response) {
+                                            console.log(response);
+                                            if (response.status === 200) {
+                                                let result = response.data.result;
+                                                let html3 = "";
+                                                if (result == "Sin Datos") {
+                                                } else {
+                                                    result.forEach((data, index) => {
+                                                        html3 += `<option value='${data.ID}'> ${data.motivoCita} </option>`;
+                                                    });
+                                                }
+
+                                                let modalTemplate = app.popup.create({
+                                                    content: `<div class="sheet-modal demo-sheet">
+                                                            <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;"> 
+                                                                <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
+                                                            </div>
+                                                            <div class="sheet-modal-inner">
+                                                                <div class="page-content">
+                                                                    <div class="block" style="margin-top: 60px;align-items: center;display: flex;flex-direction: column;">
+                                                                        <div id="nuevaCita" style=" width: 100%; ">
+                                                                            <div class="list list-strong-ios list-dividers-ios inset-ios">
+                                                                                <ul>
+                                                                                    <li class="item-content item-input item-input-outline">
+                                                                                        <div class="item-inner">
+                                                                                            <div class="item-title item-floating-label">Cliente</div>
+                                                                                            <div class="item-input-wrap">
+                                                                                                <select class="floating obligatorio input-focused " type="text" placeholder="Cliente" id="nombreCita" name="Cliente">
+                                                                                                    <option value="">Selecciona una opción</option>
+                                                                                                    ${html}
+                                                                                                </select>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </li>
+
+                                                                                    <li class="item-content item-input item-input-outline">
+                                                                                        <div class="item-inner">
+                                                                                            <div class="item-title item-floating-label">Nombre Mascota</div>
+                                                                                            <div class="item-input-wrap">
+                                                                                                <select class="floating obligatorio input-focused " type="text" placeholder="Nombre Mascota" id="nombreMascota" name="Nombre Mascota">
+                                                                                                    <option value="">Selecciona una opción</option>
+                                                                                                </select>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </li>
+
+                                                                                    <li class="item-content item-input item-input-outline">
+                                                                                        <div class="item-inner">
+                                                                                            <div class="item-title item-floating-label">Fecha Cita</div>
+                                                                                            <div class="item-input-wrap">
+                                                                                                <input class="floating obligatorio input-focused " type="date" placeholder="Fecha Cita" id="fechaCita" name="Fecha Cita">
+                                                                                                <span class="input-clear-button"></span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </li>
+
+                                                                                    <li class="item-content item-input item-input-outline">
+                                                                                        <div class="item-inner">
+                                                                                            <div class="item-title item-floating-label">Hora Cita</div>
+                                                                                            <div class="item-input-wrap">
+                                                                                                <input class="floating obligatorio input-focused " type="time" placeholder="Hora Cita" id="horaCita" name="Hora Cita">
+                                                                                                <span class="input-clear-button"></span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </li>
+
+                                                                                    <li class="item-content item-input item-input-outline">
+                                                                                        <div class="item-inner">
+                                                                                            <div class="item-title item-floating-label">Motivo de Cita</div>
+                                                                                            <div class="item-input-wrap">
+                                                                                                <select class="floating obligatorio input-focused " type="text" placeholder="Motivo de Cita" id="motivoCita" name="Motivo de Cita">
+                                                                                                    <option value="">Selecciona una opción</option>
+                                                                                                    ${html3}
+                                                                                                </select>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </li>
+
+                                                                                    <li class="item-content item-input item-input-outline">
+                                                                                        <div class="item-inner">
+                                                                                            <div class="item-title item-floating-label">Comentarios</div>
+                                                                                            <div class="item-input-wrap">
+                                                                                                <input class="floating input-focused " type="text" placeholder="Comentarios" id="comentariosCita" name="Comentarios">
+                                                                                                <span class="input-clear-button"></span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </li>
+                                                                                    
+                                                                                </ul>
+                                                                            </div>
+                                                                        </div>
+                                                                
+                                                                        <button class="button button-outline button-round" id="btnGuardarCita">
+                                                                            Guardar <span class="material-icons iconBtn"> save </span>
+                                                                        </button>
+                                                
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>`,
+                                                    swipeToClose: false,
+                                                    closeByOutsideClick: false,
+                                                    closeByBackdropClick: false,
+                                                    closeOnEscape: false,
+                                                    on: {
+                                                        open: function (popup) {
+                                                            new TomSelect("#nombreCita", {
+                                                                create: false,
+                                                            });
+
+                                                            new TomSelect("#motivoCita", {
+                                                                create: false,
+                                                            });
+
+                                                            controlMascotas = new TomSelect("#nombreMascota", {
+                                                                create: false,
+                                                            });
+
+                                                            $("#nombreCita").change(() => {
+                                                                let FK_dueno = $("#nombreCita").val();
+                                                                if (FK_dueno) {
+                                                                    axios
+                                                                        .post(url + "Brummy/views/mascotas/obtenerMascotasDuenios.php", { FK_dueno })
+                                                                        .then(function (response) {
+                                                                            console.log(response);
+                                                                            if (response.status === 200) {
+                                                                                let result = response.data.result;
+                                                                                let html2 = "<option value=''> - - </option>";
+                                                                                if (result == "Sin Datos") {
+                                                                                    $("#nombreMascota").html(html2);
+                                                                                } else {
+                                                                                    result.forEach((data, index) => {
+                                                                                        html2 += `<option value='${data.ID}'> ${data.nombre} </option>`;
+                                                                                    });
+
+                                                                                    $("#nombreMascota").html(html2);
+                                                                                    controlMascotas.clear();
+                                                                                    controlMascotas.clearOptions();
+                                                                                    controlMascotas.sync();
+                                                                                }
+                                                                                app.dialog.close();
+                                                                            }
+                                                                        })
+                                                                        .catch(function (error) {
+                                                                            console.log(error);
+                                                                            app.dialog.close();
+                                                                            app.dialog.alert("Algo salió mal", "Aviso");
+                                                                        })
+                                                                        .finally(function () {
+                                                                            // siempre sera ejecutado
+                                                                        });
+                                                                } else {
+                                                                    $("#nombreMascota").html(`<option value=''> - - </option>`);
+                                                                    controlMascotas.clear();
+                                                                    controlMascotas.clearOptions();
+                                                                    controlMascotas.sync();
+                                                                }
+                                                            });
+
+                                                            $("#btnGuardarCita").click(() => {
+                                                                validacioesCita();
+                                                            });
+                                                        },
+                                                    },
+                                                });
+
+                                                modalTemplate.open();
+                                                app.dialog.close();
+                                            }
+                                        })
+                                        .catch(function (error) {
+                                            console.log(error);
+                                            app.dialog.close();
+                                            app.dialog.alert("Algo salió mal", "Aviso");
+                                        })
+                                        .finally(function () {
+                                            // siempre sera ejecutado
+                                        });
+                                }
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                            app.dialog.close();
+                            app.dialog.alert("Algo salió mal", "Aviso");
+                        })
+                        .finally(function () {
+                            // siempre sera ejecutado
+                        });
+                });
+
+                function validacioesCita() {
+                    let url = localStorage.getItem("url");
+                    let values = get_datos_completos("nuevaCita");
+                    let response = values.response;
+                    let valido = values.valido;
+                    if (valido) {
+                        let fechaCita = $("#fechaCita").val();
+                        let horaCita = $("#horaCita").val();
+
+                        axios
+                            .post(url + "Brummy/views/citas/validaCita.php", { fechaCita, horaCita })
+                            .then(function (response) {
+                                console.log(response);
+                                if (response.status === 200) {
+                                    let result = response.data.result;
+                                    if (result == "Sin Datos") {
+                                        guardarCita();
+                                    } else {
+                                        let Texto = "";
+                                        result.forEach((data, index) => {
+                                            Texto = ` ${data.nombreCita} y ${data.nombreMascota} que podria empalmarse. ¿Deseas continuar?`;
+                                        });
+                                        app.dialog
+                                            .create({
+                                                title: "Hay una cita ya agendada de: " + Texto,
+                                                buttons: [
+                                                    {
+                                                        text: "Cancelar",
+                                                        onClick: function () {
+                                                            console.log("Cancelar");
+                                                        },
+                                                    },
+                                                    {
+                                                        text: "OK",
+                                                        onClick: function () {
+                                                            guardarCita();
+                                                        },
+                                                    },
+                                                ],
+                                            })
+                                            .open();
+                                    }
+                                }
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                                app.dialog.close();
+                                app.dialog.alert("Algo salió mal", "Aviso");
+                            })
+                            .finally(function () {
+                                // siempre sera ejecutado
+                            });
+                    } else {
+                        let html =
+                            '<span style="font-weight: 900;">Debes llenar estos campos para poder guardar:</span> <br> <ul style="text-align: left; margin-left: 15px; font-style: italic; margin-top: 15px;"> ';
+                        response.forEach((data) => {
+                            html += `<li style="list-style: disc;">${data}.</li> `;
+                        });
+                        html += `</ul>`;
+                        // Swal.fire({ icon: "warning", title: "", html: html });
+                        swal({
+                            type: "warning",
+                            title: "",
+                            text: html,
+                            html: true,
+                        });
+                    }
+                }
+
+                function guardarCita() {
+                    let FKnombreCita = $("#nombreCita").val();
+                    let nombreCita = String($("#nombreCita").find("option:selected").text());
+                    let FKnombreMascota = $("#nombreMascota").val();
+                    let nombreMascota = String($("#nombreMascota").find("option:selected").text());
+                    let fechaCita = $("#fechaCita").val();
+                    let horaCita = $("#horaCita").val();
+                    let motivoCita = $("#motivoCita").find("option:selected").text();
+                    let comentariosCita = String($("#comentariosCita").val());
+                    let FKMotivo = $("#motivoCita").val();
+                    let url = localStorage.getItem("url");
+
+                    nombreCita.replaceAll("'", '"');
+                    nombreMascota.replaceAll("'", '"');
+                    motivoCita.replaceAll("'", '"');
+                    comentariosCita.replaceAll("'", '"');
+
+                    axios
+                        .post(url + "Brummy/views/citas/guardarCita.php", {
+                            FKnombreCita,
+                            nombreCita,
+                            FKnombreMascota,
+                            nombreMascota,
+                            fechaCita,
+                            horaCita,
+                            motivoCita,
+                            comentariosCita,
+                            FKMotivo,
+                        })
+                        .then(function (response) {
+                            console.log(response);
+                            if (response.status === 200) {
+                                $(".sheet-close").trigger("click");
+                                app.dialog.alert("Guardado correctamente", "Aviso");
+                                validaEventos(fechaCita);
+                                app.dialog.close();
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                            app.dialog.close();
+                            app.dialog.alert("Algo salió mal", "Aviso");
+                        })
+                        .finally(function () {
+                            // siempre sera ejecutado
+                        });
+                }
+
+                function validaEventos(fechaCita) {
+                    console.log(fechaCita);
+                    let anioCita = String(fechaCita).split("-")[0];
+                    let mesCita = String(fechaCita).split("-")[1];
+                    let diaCita = String(fechaCita).split("-")[2];
+
+                    let fechaActual = $("#fechaActual").val();
+
+                    let diaActual = String(fechaActual).split("-")[2];
+                    let mesActual = String(fechaActual).split("-")[1];
+                    let anioActual = String(fechaActual).split("-")[0];
+
+                    let fechaActual1 = anioActual + "-" + mesActual + "-" + diaActual;
+                    if (fechaActual1 == fechaCita) {
+                        recargaEventosDay(calendar, mesCita, anioCita);
+                        cargaEventosMes(calendar, fechaCita);
+                    } else {
+                        if (mesCita == mesActual && anioActual == anioCita) {
+                            // cargaBolitasCalendar();
+                            console.log("dar solution");
+                        }
+                    }
+                }
+            },
+        },
+    };
+</script>

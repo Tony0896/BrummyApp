@@ -5889,6 +5889,13 @@ i.icon {
     color: var(--f7-dialog-text-color);
     font-size: var(--f7-dialog-font-size);
     will-change: transform, opacity;
+    border-radius: 10px;
+    border: 2px solid #009071;
+    width: 50%;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .dialog.modal-in {
@@ -5913,7 +5920,6 @@ i.icon {
 .dialog-title {
     color: var(--f7-dialog-title-text-color);
     font-size: var(--f7-dialog-title-font-size);
-    font-weight: var(--f7-dialog-title-font-weight);
     line-height: var(--f7-dialog-title-line-height);
 }
 
@@ -5943,6 +5949,7 @@ i.icon {
     text-transform: var(--f7-dialog-button-text-transform);
     display: block;
     cursor: pointer;
+    color: #0277bd;
 }
 
 .dialog-no-buttons .dialog-buttons {
