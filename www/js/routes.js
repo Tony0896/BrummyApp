@@ -68,6 +68,31 @@ var routes = [
         path: "/nuevaVenta/",
         componentUrl: "./pages/brummy/nuevaVenta.html",
     },
+    {
+        name: "grade",
+        path: "/grade/",
+        componentUrl: "./pages/brummy/grade.html",
+    },
+    {
+        name: "bar_chart",
+        path: "/bar_chart/",
+        componentUrl: "./pages/brummy/bar_chart.html",
+    },
+    {
+        name: "campaign",
+        path: "/campaign/",
+        componentUrl: "./pages/brummy/campaign.html",
+    },
+    {
+        name: "store",
+        path: "/store/",
+        componentUrl: "./pages/brummy/store.html",
+    },
+    {
+        name: "person",
+        path: "/person/",
+        componentUrl: "./pages/brummy/person.html",
+    },
     //?Fin tecnologiasHmo
     {
         path: "(.*)",

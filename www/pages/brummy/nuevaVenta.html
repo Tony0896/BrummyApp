@@ -117,7 +117,8 @@
                             let result = response.data.result;
                             let html = "<option value=''>Selecciona una opción</option>";
                             if (result == "Sin Datos") {
-                                Swal.fire({ icon: "warning", title: "Sin datos.", text: "" });
+                                // Swal.fire({ icon: "warning", title: "Sin datos.", text: "" });
+                                app.dialog.alert("Sin datos.", "Aviso");
                             } else {
                                 result.forEach((data, index) => {
                                     html += `<option value="${data.ID}">${data.nombre} ${data.apellidoP} ${data.apellidoM}</option>`;
@@ -148,7 +149,8 @@
                             let result = response.data.result;
                             let html2 = "<option value=''>Selecciona una opción</option>";
                             if (result == "Sin Datos") {
-                                Swal.fire({ icon: "warning", title: "Sin datos.", text: "" });
+                                // Swal.fire({ icon: "warning", title: "Sin datos.", text: "" });
+                                app.dialog.alert("Sin datos.", "Aviso");
                             } else {
                                 result.forEach((data, index) => {
                                     html2 += `<option value="${data.ID}" data_Flagtipo = "${data.Flagtipo}" data_codigo = "${data.codigo}" data_descripcion = "${data.descripcion}" data_nombre = "${data.nombre}" data_precioVenta = "${data.precioVenta}" data_stockReal = "${data.stockReal}">

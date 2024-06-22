@@ -102,7 +102,8 @@
                             let tdSinData = `<span class='material-icons'> remove </span> &nbsp; <span class='material-icons'> remove </span>`;
                             let nombreMascota, fechaMascota, relacionEspecie, sexoMascota, colorMascota, rasgosMascota, FK_dueno;
                             if (result == "Sin Datos") {
-                                Swal.fire({ icon: "warning", title: "Sin datos.", text: "" });
+                                // Swal.fire({ icon: "warning", title: "Sin datos.", text: "" });
+                                app.dialog.alert("Sin datos.", "Aviso");
                             } else {
                                 result.forEach((data, index) => {
                                     // console.table(data);

@@ -1,0 +1,132 @@
+<template>
+    <div class="page" id="panel-page">
+        <div class="navbar" style="height: 5px">
+            <div class="left top-left" style="justify-content: center; background-color: #009071">
+                <div class="title" style="font-size: 18px; margin-left: 15px">Encuestas</div>
+            </div>
+        </div>
+
+        <div class="page-content" style="margin-top: 16px">
+            <div class="block">
+                <div class="divButton">
+                    <button class="button button-outline button-round" onclick="nuevaPregunta()">
+                        Nueva<span class="material-icons iconBtn"> add_circle_outline </span>
+                    </button>
+                </div>
+
+                <div class="card" style="border-radius: 10px; padding: 10px">
+                    <input class="FWM-input" type="text" id="encuestasBuscador" placeholder="Buscar Pregunta" />
+
+                    <table class="mdl-data-table table responsive table-bordered table-striped datatable" style="width: 100%" id="encuestasBodyDT">
+                        <thead>
+                            <tr>
+                                <th class="thDataTable">#</th>
+                                <th class="thDataTable">Pregunta</th>
+                                <th class="thDataTable">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="encuestasBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        on: {
+            pageInit: function () {
+                let url = localStorage.getItem("url");
+
+                $("#encuestasBuscador").on("input", function () {
+                    let table = $("#encuestasBodyDT").DataTable();
+                    table.search($(this).val()).draw();
+                });
+
+                $.ajax({
+                    method: "POST",
+                    dataType: "JSON",
+                    url: url + "Brummy/views/encuestas/obtenerEncuestas.php",
+                    data: {},
+                })
+                    .done(function (results) {
+                        let success = results.success;
+                        let result = results.result;
+                        let html = "";
+                        switch (success) {
+                            case true:
+                                if (result == "Sin Datos") {
+                                    dataTableDestroy();
+                                    $("#encuestasBody").html(html);
+                                    dataTableCreate();
+                                } else {
+                                    dataTableDestroy();
+                                    result.forEach((data, index) => {
+                                        html += `<tr>
+                                            <td>${index + 1}</td>
+                                            <td class="capitalize">${data.Pregunta}</td>
+                                            <td>
+                                                <div style="display: flex; flex-direction: row;">
+                                                    <button class="button button-outline button-round btnBlue" onclick="verPregunta(${
+                                                        data.ID
+                                                    })" style="margin-right: 10px;">
+                                                        <span class="material-icons iconBtn" style="margin: auto;vertical-align: middle;"> edit </span>
+                                                    </button>
+
+                                                    <button class="button button-outline button-round btnRed" onclick="eliminarPregunta(${data.ID})">
+                                                        <span class="material-icons iconBtn" style="margin: auto;vertical-align: middle;"> delete </span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>`;
+                                    });
+                                    $("#encuestasBody").html(html);
+                                    dataTableCreate();
+                                }
+                                break;
+                            case false:
+                                app.dialog.alert("Algo salió mal", "Aviso");
+                                break;
+                        }
+                    })
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        app.dialog.alert("Algo salió mal", "Aviso");
+                        console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+                    });
+            },
+        },
+    };
+</script>
+
+<style>
+    .paginate_button.current {
+        border: none !important;
+        background: #009071 !important;
+        border-radius: 8px !important;
+        font-weight: bold;
+        color: #fff !important;
+    }
+
+    .list ul:before {
+        display: none !important;
+    }
+
+    .list ul:after {
+        display: none !important;
+    }
+    .ts-control {
+        border: 0;
+        padding: 0;
+    }
+    .ts-control > input {
+        height: auto !important;
+    }
+    .ts-wrapper.floating.obligatorio.full.has-items {
+        border: 2px solid #009071 !important;
+        border-radius: 8px !important;
+    }
+    .grid {
+        display: flex;
+    }
+</style>

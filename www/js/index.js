@@ -13,7 +13,7 @@ function onDeviceReady() {
     StatusBar.styleLightContent();
     let Usuario = localStorage.getItem("Usuario");
     localStorage.setItem("version", "1.0.0");
-    let url = "http://192.168.100.10:8080/";
+    let url = "http://192.168.100.8:8080/";
     localStorage.setItem("url", url);
     if (Usuario) {
         pintaMenu();
@@ -126,19 +126,42 @@ function pintaMenu() {
                                 <i class="icon material-icons md-only" style="color: #009071;font-size: 50px;"> inventory_2 </i>
                                 <p style="margin: 8px;"> Inventario </p>
                             </div>
-                            <div class="col card" style="margin-left: 0;margin-right: 0;" id="travel_explore_menu" onclick="moveMenu(this.id)">
-                                <i class="icon material-icons md-only" style="color: #009071;font-size: 50px;"> travel_explore </i>
-                                <p style="margin: 8px;"> Portal </p>
+                            <div class="col card" style="margin-left: 0;margin-right: 0;" id="grade_menu" onclick="moveMenu(this.id)">
+                                <i class="icon material-icons md-only" style="color: #009071;font-size: 50px;">  grade  </i>
+                                <p style="margin: 8px;"> Encuestas </p>
                             </div>
                         </div>
 
                         <div class="row">
+                            <div class="col card" style="margin-left: 0;margin-right: 0;" id="bar_chart_menu" onclick="moveMenu(this.id)">
+                                <i class="icon material-icons md-only" style="color: #009071;font-size: 50px;">  bar_chart  </i>
+                                <p style="margin: 8px;"> KPI Satisfacción </p>
+                            </div>
+                            <div class="col card" style="margin-left: 0;margin-right: 0;" id="campaign_menu" onclick="moveMenu(this.id)">
+                                <i class="icon material-icons md-only" style="color: #009071;font-size: 50px;">  campaign  </i>
+                                <p style="margin: 8px;"> Avisos </p>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col card" style="margin-left: 0;margin-right: 0;" id="store_menu" onclick="moveMenu(this.id)">
+                                <i class="icon material-icons md-only" style="color: #009071;font-size: 50px;">  store  </i>
+                                <p style="margin: 8px;"> Perfil Veterinaria </p>
+                            </div>
+                            <div class="col card" style="margin-left: 0;margin-right: 0;" id="person_menu" onclick="moveMenu(this.id)">
+                                <i class="icon material-icons md-only" style="color: #009071;font-size: 50px;">  person  </i>
+                                <p style="margin: 8px;"> Clientes Frecunetes </p>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col card" style="margin-left: 0;margin-right: 0;" id="travel_explore_menu" onclick="moveMenu(this.id)">
+                                <i class="icon material-icons md-only" style="color: #009071;font-size: 50px;"> travel_explore </i>
+                                <p style="margin: 8px;"> Portal </p>
+                            </div>
                             <div class="col card" style="margin-left: 0;margin-right: 0;" id="settings_menu" onclick="moveMenu(this.id)">
                                 <i class="icon material-icons md-only" style="color: #009071;font-size: 50px;"> settings </i>
                                 <p style="margin: 8px;"> Configuración </p>
-                            </div>
-                            <div class="col" style="margin-left: 0;margin-right: 0;">
-                                &nbsp;
                             </div>
                         </div>
                     </div>
