@@ -360,3 +360,30 @@ function volteaFecha(fecha, tipo) {
         return nuevaFecha;
     }
 }
+
+function obtenerFechaLarga(date) {
+    //* ejemplo se recibe 14-06-2024 o 2024-06-14
+    //* y devuelve '14 de junio de 2024'
+
+    let nuevaFecha = new Date(date);
+
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return nuevaFecha.toLocaleDateString("es-MX", options);
+}
+
+function getDateWhitZeros() {
+    let MyDate = new Date();
+    let MyDateString =
+        MyDate.getFullYear() +
+        "-" +
+        ("0" + (MyDate.getMonth() + 1)).slice(-2) +
+        "-" +
+        ("0" + MyDate.getDate()).slice(-2) +
+        " " +
+        ("0" + MyDate.getHours()).slice(-2) +
+        ":" +
+        ("0" + MyDate.getMinutes()).slice(-2) +
+        ":" +
+        ("0" + MyDate.getSeconds()).slice(-2);
+    return MyDateString;
+}

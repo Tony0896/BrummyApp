@@ -158,11 +158,6 @@ function verDetalleVenta(ID) {
                                                             </div>
                                                         </div>
                                                     </div>
-                                            
-                                                    <button class="button button-outline button-round" onclick="guardarMascota()">
-                                                        Guardar <span class="material-icons iconBtn"> save </span>
-                                                    </button>
-                            
                                                 </div>
                                             </div>
                                         </div>

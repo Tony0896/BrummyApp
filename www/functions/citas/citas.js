@@ -105,3 +105,46 @@ function guardarEstausCita(ID) {
             // siempre sera ejecutado
         });
 }
+
+function generarLinkEncuesta(ID) {
+    // preloader.show();
+    let url = localStorage.getItem("url");
+
+    $.ajax({
+        method: "POST",
+        dataType: "JSON",
+        url: url + "Brummy/views/citas/generarLinkEncuesta.php",
+        data: {
+            ID,
+        },
+    })
+        .done(function (results) {
+            let success = results.success;
+            let result = results.result;
+            switch (success) {
+                case true:
+                    // preloader.hide();
+                    let data = window.btoa(`data#-${ID}`);
+                    let url2 = url + "/Brummy/pages/encuesta/index.php?data=" + data;
+                    $(`#foo_${ID}`).val(url2);
+                    setTimeout(function () {
+                        $(`#btn_foo_${ID}`).trigger("click");
+                        cordova.plugins.clipboard.copy(url2);
+                        // msj.show("Aviso", "URL Copiada correctamente", [{ text1: "OK" }]);
+                        app.dialog.alert("URL Copiada correctamente", "Aviso");
+                    }, 1500);
+                    break;
+                case false:
+                    preloader.hide();
+                    // msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                    app.dialog.alert("Algo salió mal", "Aviso");
+                    break;
+            }
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            preloader.hide();
+            // msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+            app.dialog.alert("Algo salió mal", "Aviso");
+            console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+        });
+}

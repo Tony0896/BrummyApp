@@ -214,3 +214,9 @@ td.capitalize {
     border-radius: 10px !important;
     margin-bottom: 20px !important;
 }
+
+.popup.modal-in {
+    z-index: 12500;
+    height: 90% !important;
+    top: 30% !important;
+}

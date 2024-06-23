@@ -134,6 +134,11 @@
                                         <div class="card" style="border-radius: 10px; margin-top: 20px">
                                             <div id="demo-calendar-inline-container"></div>
                                         </div>
+                                        <div style="display: flex; align-items: end; flex-direction: column; margin-right: 20px">
+                                            <button class="button button-outline button-round btnBlue" id="irHoy">
+                                                <span class="material-icons iconBtn" style="margin-left: 0"> today </span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </li>
@@ -238,6 +243,14 @@
                             recargaEventosDay(calendar, calendar.currentMonth + 1, calendar.currentYear);
                         },
                     },
+                });
+
+                $("#irHoy").click(() => {
+                    let dateOld = getDateWhitZeros();
+                    let monthOld = dateOld.split("-")[1];
+                    let yearOld = dateOld.split("-")[0];
+                    calendar.setYearMonth(yearOld, monthOld - 1, 0);
+                    $(".calendar-day.calendar-day-today.calendar-day-weekend").trigger("click");
                 });
 
                 function renderMonthEvents(calendar, mes, anio) {
@@ -405,10 +418,26 @@
                                                                             <div class="divButton" style="margin-right: 20px">
                                                                                 <button class="button button-outline button-round btnBlue" onclick="marcarCita(${
                                                                                     data.ID
+                                                                                })" style="margin-right: 20px;">
+                                                                                    <span class="material-icons iconBtn" style="margin-left: 0;"> date_range </span>
+                                                                                </button>
+
+                                                                                <button class="button button-outline button-round btnGreen" onclick="generarLinkEncuesta(${
+                                                                                    data.ID
                                                                                 })">
-                                                                                    Acciones <span class="material-icons iconBtn"> date_range </span>
+                                                                                    <span class="material-icons iconBtn" style="margin-left: 0;"> link </span>
                                                                                 </button>
                                                                             </div>
+                                                                            <input id="foo_${data.ID}" value="" style="opacity: 0;height: 0;">
+                                                                            <button class="btn" data-clipboard-target="#foo_${data.ID}" id="btn_foo_${
+                                            data.ID
+                                        }" style="height: 0;padding: 0;opacity: 0;"></button>
+                                                                            <input type="hidden" id="input_FK_mascota_${data.ID}" value="${
+                                            data.FKnombreMascota
+                                        }" />
+                                                                            <input type="hidden" id="input_nombre_${data.ID}" value="${
+                                            data.nombreMascota
+                                        }" />
                                                                         </div>
                                                                     </div>
                                                                 </div>
