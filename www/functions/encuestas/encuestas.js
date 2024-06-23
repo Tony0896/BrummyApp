@@ -3,7 +3,7 @@ function verPregunta(ID) {
     $.ajax({
         method: "POST",
         dataType: "JSON",
-        url: url + "./Brummy/views/encuestas/obtenerDataEncuesta.php",
+        url: url + "Brummy/views/encuestas/obtenerDataEncuesta.php",
         data: { ID },
     })
         .done(function (results) {
@@ -110,7 +110,7 @@ function actualizarPregunta(ID) {
     $.ajax({
         method: "POST",
         dataType: "JSON",
-        url: url + "./Brummy/views/encuestas/actualizarPregunta.php",
+        url: url + "Brummy/views/encuestas/actualizarPregunta.php",
         data: { ID, pregunta, tipoPregunta },
     })
         .done(function (results) {
@@ -263,7 +263,7 @@ function guardarPregunta() {
         $.ajax({
             method: "POST",
             dataType: "JSON",
-            url: url + "./Brummy/views/encuestas/guardarPregunta.php",
+            url: url + "Brummy/views/encuestas/guardarPregunta.php",
             data: { pregunta, tipoPregunta },
         })
             .done(function (results) {

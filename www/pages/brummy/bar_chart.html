@@ -1,0 +1,248 @@
+<template>
+    <div class="page" id="panel-page">
+        <div class="navbar" style="height: 5px">
+            <div class="left top-left" style="justify-content: center; background-color: #009071">
+                <div class="title" style="font-size: 18px; margin-left: 15px">KPI Satisfacción</div>
+            </div>
+        </div>
+
+        <div class="page-content" style="margin-top: 16px">
+            <div class="block">
+                <div class="row">
+                    <div class="col-50">
+                        <div class="list list-strong-ios list-dividers-ios inset-ios">
+                            <ul>
+                                <li class="item-content item-input item-input-outline" id="LImesEncuestas">
+                                    <div class="item-inner">
+                                        <div class="item-title item-floating-label">Mes:</div>
+                                        <div class="item-input-wrap">
+                                            <select
+                                                class="floating obligatorio input-focused"
+                                                type="text"
+                                                placeholder="Mes"
+                                                id="mesEncuestas"
+                                                name="Mes"
+                                                style="padding-top: 0px !important; height: auto; padding-bottom: 0px !important"
+                                            ></select>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-50">
+                        <div class="list list-strong-ios list-dividers-ios inset-ios">
+                            <ul>
+                                <li class="item-content item-input item-input-outline" id="LIanioEncuestas">
+                                    <div class="item-inner">
+                                        <div class="item-title item-floating-label">Año:</div>
+                                        <div class="item-input-wrap">
+                                            <select
+                                                class="floating obligatorio input-focused"
+                                                type="text"
+                                                placeholder="Año"
+                                                id="anioEncuestas"
+                                                name="Año"
+                                                style="padding-top: 0px !important; height: auto; padding-bottom: 0px !important"
+                                            ></select>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content card-content-padding" style="padding-bottom: 0; margin-bottom: 0">Encuestas generadas</div>
+                    <div class="card-header" id="encuestasGeneradas"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content card-content-padding" style="padding-bottom: 0; margin-bottom: 0">Encuestas contestadas</div>
+                    <div class="card-header" id="encuestasContestadas"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content card-content-padding" style="padding-bottom: 0; margin-bottom: 0">Encuestas por contestar</div>
+                    <div class="card-header" id="encuestasPorContestar"></div>
+                </div>
+
+                <div class="card">
+                    <div class="row">
+                        <div style="width: 100%; padding: 50px">
+                            <canvas id="bar-chart_gg" width="800" height="450"></canvas>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div style="width: 100%; padding: 50px">
+                            <table class="mdl-data-table table responsive table-bordered table-striped" style="width: 100%">
+                                <thead>
+                                    <tr>
+                                        <th style="background-color: #009071; color: #fff; padding: 10px">Calificación</th>
+                                        <th style="background-color: #009071; color: #fff; padding: 10px">Cuenta</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>5 estrellas</td>
+                                        <td id="5_estrellas">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4 estrellas</td>
+                                        <td id="4_estrellas">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3 estrellas</td>
+                                        <td id="3_estrellas">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2 estrellas</td>
+                                        <td id="2_estrellas">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>1 estrellas</td>
+                                        <td id="1_estrellas">0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="border-radius: 10px; padding: 10px">
+                    <!-- <input class="FWM-input" type="text" id="preguntasBuscador" placeholder="Buscar" /> -->
+
+                    <table class="mdl-data-table table responsive table-bordered table-striped datatable" style="width: 100%" id="preguntasBodyDT">
+                        <thead>
+                            <tr>
+                                <th class="thDataTable" style="padding: 8px 12px">#</th>
+                                <th class="thDataTable" style="padding: 8px 12px">Pregunta</th>
+                                <th class="thDataTable" style="padding: 8px 12px">Calificación</th>
+                                <th class="thDataTable" style="padding: 8px 12px">Gráfica</th>
+                            </tr>
+                        </thead>
+                        <tbody id="preguntasBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        on: {
+            pageInit: function () {
+                let url = localStorage.getItem("url");
+
+                let fechaNow = new Date().toLocaleString("sv-SE").split(" ")[0];
+                let mes = fechaNow.split("-")[1];
+                let anio = fechaNow.split("-")[0];
+
+                const months = [
+                    "Enero",
+                    "Febrero",
+                    "Marzo",
+                    "Abril",
+                    "Mayo",
+                    "Junio",
+                    "Julio",
+                    "Agosto",
+                    "Septiembre",
+                    "Octubre",
+                    "Noviembre",
+                    "Diciembre",
+                ];
+                for (let i = 0; i < months.length; i++) {
+                    let m = i;
+                    m++;
+                    if (mes == m) {
+                        $("#mesEncuestas").append(`<option value="${m}" selected>${months[i]}</option>`);
+                    } else {
+                        $("#mesEncuestas").append(`<option value="${m}">${months[i]}</option>`);
+                    }
+                }
+
+                for (let i = 3; i > 0; i--) {
+                    let new_anio = Number(anio) - i;
+                    $("#anioEncuestas").append(`<option value="${new_anio}">${new_anio}</option>`);
+                }
+                $("#anioEncuestas").append(`<option value="${anio}" selected>${anio}</option>`);
+
+                for (let i = 1; i < 4; i++) {
+                    let new_anio = Number(anio) + i;
+                    $("#anioEncuestas").append(`<option value="${new_anio}">${new_anio}</option>`);
+                }
+
+                obtenerDataSatisfaccion(mes, anio);
+
+                $("#mesEncuestas").change(() => {
+                    obtenerDataSatisfaccion($("#mesEncuestas").val(), $("#anioEncuestas").val());
+                });
+                $("#anioEncuestas").change(() => {
+                    obtenerDataSatisfaccion($("#mesEncuestas").val(), $("#anioEncuestas").val());
+                });
+
+                // app.dialog.progress("Cargando...", "#009071");
+
+                // $("#preguntasBuscador").on("input", function () {
+                //     let table = $("#preguntasBodyDT").DataTable();
+                //     table.search($(this).val()).draw();
+                // });
+
+                // new TomSelect("#mesEncuestas", {
+                //     create: false,
+                //     sortField: {
+                //         field: "text",
+                //     },
+                // });
+
+                $("#LImesEncuestas").addClass("item-input-focused");
+                $("#mesEncuestas").addClass("input-with-value input-focused item-input-outline");
+
+                // new TomSelect("#anioEncuestas", {
+                //     create: false,
+                //     sortField: {
+                //         field: "text",
+                //     },
+                // });
+
+                $("#LIanioEncuestas").addClass("item-input-focused");
+                $("#anioEncuestas").addClass("input-with-value input-focused item-input-outline");
+            },
+        },
+    };
+</script>
+
+<style>
+    .paginate_button.current {
+        border: none !important;
+        background: #009071 !important;
+        border-radius: 8px !important;
+        font-weight: bold;
+        color: #fff !important;
+    }
+
+    .list ul:before {
+        display: none !important;
+    }
+
+    .list ul:after {
+        display: none !important;
+    }
+    .ts-control {
+        border: 0;
+        padding: 0;
+    }
+    .ts-control > input {
+        height: auto !important;
+    }
+    .ts-wrapper.floating.obligatorio.full.has-items {
+        border: 2px solid #009071 !important;
+        border-radius: 8px !important;
+    }
+    .grid {
+        display: flex;
+    }
+</style>
