@@ -1,9 +1,17 @@
 <template>
     <div class="page" id="panel-page">
         <div class="navbar" style="height: 5px">
-            <div class="left top-left" style="justify-content: center; background-color: #009071">
-                <div class="title" style="font-size: 18px; margin-left: 15px">Clientes</div>
+            <div
+                class="left top-left"
+                style="justify-content: space-between; background-color: #009071; flex-direction: column; height: auto; min-height: 50px"
+            >
+                <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin-top: 10px">
+                    <div>&nbsp;</div>
+                    <div class="title" style="font-size: 18px; margin-left: 15px">Clientes</div>
+                    <div>&nbsp;</div>
+                </div>
             </div>
+            <div id="marquee_clientes" style="background-color: #009071"></div>
         </div>
 
         <div class="page-content" style="margin-top: 16px">
@@ -19,6 +27,7 @@
                         <thead>
                             <tr>
                                 <th class="thDataTable">#</th>
+                                <th class="thDataTable">&nbsp;</th>
                                 <th class="thDataTable">Cliente</th>
                                 <th class="thDataTable">Teléfono</th>
                                 <th class="thDataTable">Correo</th>
@@ -38,6 +47,7 @@
     return {
         on: {
             pageInit: function () {
+                cargaDataMarquee("marquee_clientes");
                 let url = localStorage.getItem("url");
 
                 app.dialog.progress("Cargando...", "#009071");
@@ -56,10 +66,21 @@
                             } else {
                                 dataTableDestroy();
                                 let html;
+                                let temperamento = "";
                                 let tdSinData = `<span class='material-icons'> remove </span> &nbsp; <span class='material-icons'> remove </span>`;
                                 result.forEach((data, index) => {
+                                    if (data.indicadorCliente == "verde") {
+                                        temperamento = `#27AE60`;
+                                    } else if (data.indicadorCliente == "amarilo") {
+                                        temperamento = `#ffb02e`;
+                                    } else if (data.indicadorCliente == "rojo") {
+                                        temperamento = `#ff0300`;
+                                    } else {
+                                        temperamento = `#FFFFFF`;
+                                    }
                                     html += `<tr>
                                     <td>${index + 1}</td>
+                                    <td> <span class="material-icons" style="font-size: 18px;color: ${temperamento}"> fiber_manual_record </span> </td>
                                         <td class="capitalize">${data.nombre} ${data.apellidoP} ${data.apellidoM}</td>
                                         <td ${data.telefono ? "" : 'style="text-align: center;"'}>${data.telefono ? data.telefono : tdSinData}</td>
                                         <td ${data.correo ? "" : 'style="text-align: center;"'}>${data.correo ? data.correo : tdSinData}</td>

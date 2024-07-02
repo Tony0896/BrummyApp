@@ -1,9 +1,17 @@
 <template>
     <div class="page" id="panel-page">
         <div class="navbar" style="height: 5px">
-            <div class="left top-left" style="justify-content: center; background-color: #009071">
-                <div class="title" style="font-size: 18px; margin-left: 15px">Clientes</div>
+            <div
+                class="left top-left"
+                style="justify-content: space-between; background-color: #009071; flex-direction: column; height: auto; min-height: 50px"
+            >
+                <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin-top: 10px">
+                    <div>&nbsp;</div>
+                    <div class="title" style="font-size: 18px; margin-left: 15px">Perfil Mascota</div>
+                    <div>&nbsp;</div>
+                </div>
             </div>
+            <div id="marquee_perfilMascota" style="background-color: #009071"></div>
         </div>
 
         <div class="page-content" style="margin-top: 16px">
@@ -52,12 +60,15 @@
                                 <div><strong id="FK_dueno"> </strong></div>
                             </div>
                             <div class="col-50">
-                                <button
-                                    class="button button-outline button-round btnRed"
-                                    onclick="eliminarMascota(localStorage.getItem('IDMascota'))"
-                                >
-                                    Eliminar <span class="material-icons iconBtn"> delete </span>
-                                </button>
+                                <div id="btn_editar_mascota" style="margin-bottom: 20px"></div>
+                                <div>
+                                    <button
+                                        class="button button-outline button-round btnRed"
+                                        onclick="eliminarMascota(localStorage.getItem('IDMascota'))"
+                                    >
+                                        Eliminar <span class="material-icons iconBtn"> delete </span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -89,8 +100,10 @@
     return {
         on: {
             pageInit: function () {
+                cargaDataMarquee("marquee_perfilMascota");
                 let url = localStorage.getItem("url");
                 let ID = localStorage.getItem("IDMascota");
+                let btn_edit_mascota;
 
                 axios
                     .post(url + "Brummy/views/mascotas/obtenerMascota.php", { ID })
@@ -123,6 +136,14 @@
                                 $("#colorMascota").html(colorMascota);
                                 $("#rasgosMascota").html(rasgosMascota);
                                 $("#FK_dueno").html(FK_dueno);
+                                btn_edit_mascota = `<button
+                                        class="button button-outline button-round btnBlue"
+                                        onclick='editarMascota(${JSON.stringify(result)});'
+                                    >
+                                        Editar <span class="material-icons iconBtn"> edit </span>
+                                    </button>`;
+
+                                $("#btn_editar_mascota").html(btn_edit_mascota);
                             }
                             app.dialog.close();
                         }

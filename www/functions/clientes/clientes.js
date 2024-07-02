@@ -13,11 +13,22 @@ function obtenerClientes() {
                     dataTableCreate();
                 } else {
                     dataTableDestroy();
+                    let temperamento = "";
                     let html;
                     let tdSinData = `<span class='material-icons'> remove </span> &nbsp; <span class='material-icons'> remove </span>`;
                     result.forEach((data, index) => {
+                        if (data.indicadorCliente == "verde") {
+                            temperamento = `#27AE60`;
+                        } else if (data.indicadorCliente == "amarilo") {
+                            temperamento = `#ffb02e`;
+                        } else if (data.indicadorCliente == "rojo") {
+                            temperamento = `#ff0300`;
+                        } else {
+                            temperamento = `#FFFFFF`;
+                        }
                         html += `<tr>
                                     <td>${index + 1}</td>
+                                    <td> <span class="material-icons" style="font-size: 18px;color: ${temperamento}"> fiber_manual_record </span> </td>
                                         <td class="capitalize">${data.nombre} ${data.apellidoP} ${data.apellidoM}</td>
                                         <td ${data.telefono ? "" : 'style="text-align: center;"'}>${data.telefono ? data.telefono : tdSinData}</td>
                                         <td ${data.correo ? "" : 'style="text-align: center;"'}>${data.correo ? data.correo : tdSinData}</td>
@@ -118,6 +129,20 @@ function crearCliente() {
                                             </div>
                                         </div>
                                     </li>
+
+                                    <li class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-title item-floating-label">Indicador Cliente</div>
+                                            <div class="item-input-wrap">
+                                                <select class="input capitalize obligatorio" name="Indicadr Cliente" id="indicadorCliente" style="background-color: rgb(255, 255, 255);width:100%;">
+                                                    <option value="">Selecciona una opción</option>
+                                                    <option value="verde">&#129001;</option>
+                                                    <option value="amarilo">&#129000;</option>
+                                                    <option value="rojo">&#128997;</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -168,6 +193,7 @@ function verPerfilCliente(ID) {
                     let motivoMovimientoModal;
                     let fechaUlmitoMovimientoModal;
                     let IDModal;
+                    let indicadorClienteModal;
 
                     result.forEach((data, index) => {
                         nombreModal = data.nombre;
@@ -178,6 +204,7 @@ function verPerfilCliente(ID) {
                         motivoMovimientoModal = data.motivoMovimiento;
                         fechaUlmitoMovimientoModal = data.fechaUlmitoMovimiento;
                         IDModal = data.ID;
+                        indicadorClienteModal = data.indicadorCliente;
                     });
 
                     let modalTemplate = app.popup.create({
@@ -240,6 +267,20 @@ function verPerfilCliente(ID) {
                                                             </div>
                                                         </div>
                                                     </li>
+
+                                                    <li class="item-content item-input item-input-outline" id="LIindicadorModal">
+                                                        <div class="item-inner">
+                                                            <div class="item-title item-floating-label">Indicador</div>
+                                                            <div class="item-input-wrap">
+                                                                <select class="input capitalize obligatorio" name="Indicadr Cliente" id="indicadorModal" style="background-color: rgb(255, 255, 255);width:100%;">
+                                                                    <option value="">Selecciona una opción</option>
+                                                                    <option value="verde">&#129001;</option>
+                                                                    <option value="amarilo">&#129000;</option>
+                                                                    <option value="rojo">&#128997;</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -287,6 +328,11 @@ function verPerfilCliente(ID) {
                                     $("#correoModal").addClass("input-with-value input-focused item-input-outline");
                                     $("#LIcorreoModal").addClass("item-input-focused");
                                 }
+                                if (indicadorClienteModal) {
+                                    $("#indicadorModal").val(indicadorClienteModal);
+                                    $("#indicadorModal").addClass("input-with-value input-focused item-input-outline");
+                                    $("#LIindicadorModal").addClass("item-input-focused");
+                                }
                             },
                         },
                     });
@@ -315,6 +361,7 @@ function guardarCliente() {
         let apellidoM = String($("#apellidoM").val()).trim();
         let telefono = String($("#telefono").val()).trim();
         let correo = String($("#correo").val()).trim();
+        let indicadorCliente = $("#indicadorCliente").val();
 
         nombre.replaceAll("'", '"');
         apellidoP.replaceAll("'", '"');
@@ -329,6 +376,7 @@ function guardarCliente() {
                 apellidoM,
                 telefono,
                 correo,
+                indicadorCliente,
             })
             .then(function (response) {
                 console.log(response);

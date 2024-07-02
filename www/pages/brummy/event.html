@@ -105,9 +105,17 @@
 <template>
     <div class="page" id="panel-page">
         <div class="navbar" style="height: 5px">
-            <div class="left top-left" style="justify-content: center; background-color: #009071">
-                <div class="title" style="font-size: 18px; margin-left: 15px">Citas</div>
+            <div
+                class="left top-left"
+                style="justify-content: space-between; background-color: #009071; flex-direction: column; height: auto; min-height: 50px"
+            >
+                <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin-top: 10px">
+                    <div>&nbsp;</div>
+                    <div class="title" style="font-size: 18px; margin-left: 15px">Citas</div>
+                    <div>&nbsp;</div>
+                </div>
             </div>
+            <div id="marquee_citas" style="background-color: #009071"></div>
         </div>
 
         <div class="page-content" style="margin-top: 16px">
@@ -165,6 +173,7 @@
     return {
         on: {
             pageInit: function () {
+                cargaDataMarquee("marquee_citas");
                 let url = localStorage.getItem("url");
                 let calendar;
                 let eventItems = [];
@@ -250,7 +259,7 @@
                     let monthOld = dateOld.split("-")[1];
                     let yearOld = dateOld.split("-")[0];
                     calendar.setYearMonth(yearOld, monthOld - 1, 0);
-                    $(".calendar-day.calendar-day-today.calendar-day-weekend").trigger("click");
+                    $(".calendar-day-today").trigger("click");
                 });
 
                 function renderMonthEvents(calendar, mes, anio) {
@@ -371,7 +380,9 @@
                                 } else {
                                     let html = "",
                                         colorText = "",
-                                        TextEstatus = "";
+                                        TextEstatus = "",
+                                        temperamento = "",
+                                        indicadorCliente = "";
                                     result.forEach((data, index) => {
                                         TextEstatus = "";
                                         if (data.estatus == 1) {
@@ -388,6 +399,22 @@
                                             colorText = "#FFAF00";
                                         }
 
+                                        if (data.temperamento == "verde") {
+                                            temperamento = `#27AE60`;
+                                        } else if (data.temperamento == "amarilo") {
+                                            temperamento = `#ffb02e`;
+                                        } else if (data.temperamento == "rojo") {
+                                            temperamento = `#ff0300`;
+                                        }
+
+                                        if (data.indicadorCliente == "verde") {
+                                            indicadorCliente = `#27AE60`;
+                                        } else if (data.indicadorCliente == "amarilo") {
+                                            indicadorCliente = `#ffb02e`;
+                                        } else if (data.indicadorCliente == "rojo") {
+                                            indicadorCliente = `#ff0300`;
+                                        }
+
                                         html += `
                                                 <div class="row mt-3">
                                                     <div class="col-md-12 mb-0" style="padding: 0;padding-right: 15px;">
@@ -396,15 +423,19 @@
                                                                 <div class="row">
                                                                     <div class="col-60">
                                                                         <div class="row">
-                                                                            <div class="col-md-12 my-2"> <h4 class="card-title">
-                                                                            ${data.nombreCita} Y ${data.nombreMascota} </h4> <div id="div_evt_${
-                                            data.ID
-                                        }"> ${TextEstatus} </div></div>
-                                                                            <div class="col-md-12 my-2"> <span class="capitalize"> ${
-                                                                                String(data.comentariosCita).trim()
-                                                                                    ? String(data.comentariosCita).trim()
-                                                                                    : "Sin comentarios adicionales"
-                                                                            } </span></div>
+                                                                            <div class="col-md-12 my-2"> 
+                                                                                <h4 class="card-title" style="display: flex;flex-direction: row;align-items: center;">
+                                                                                    <div> <span class="material-icons" style="font-size: 18px;color: ${indicadorCliente}; margin-left: 5px; margin-right: 5px;"> fiber_manual_record </span> </div>
+                                                                            ${data.nombreCita} Y ${data.nombreMascota} 
+                                                                                    <div> <span class="material-icons" style="font-size: 18px;color: ${temperamento}; margin-left: 5px;"> fiber_manual_record </span> </div>
+                                                                                </h4> <div id="div_evt_${data.ID}"> ${TextEstatus} </div></div>
+                                                                                <div class="col-md-12 my-2"> 
+                                                                                    <span class="capitalize"> ${
+                                                                                        String(data.comentariosCita).trim()
+                                                                                            ? String(data.comentariosCita).trim()
+                                                                                            : "Sin comentarios adicionales"
+                                                                                    }</span>
+                                                                                </div>
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-40" style="display: flex;flex-direction: column;">
@@ -565,6 +596,80 @@
                                                                                         </div>
                                                                                     </li>
                                                                                     
+                                                                                    <div class="checkbox-wrapper-46" style="margin: 22px 0px 12px 8px;padding-left: 15px;">
+                                                                                        <input type="checkbox" id="cbx-46" class="inp-cbx" onchange="muestraDomicilio()"/>
+                                                                                        <label for="cbx-46" class="cbx">
+                                                                                            <span style="transform: scale(1.3);">
+                                                                                                <svg viewBox="0 0 12 10" height="10px" width="12px">
+                                                                                                    <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                                                                                </svg>
+                                                                                            </span>
+                                                                                            <span>¿Es Servicio a domicilio?</span>
+                                                                                        </label>
+                                                                                    </div>
+
+                                                                                    <div id="div_servicioDomicilio" style="display: none;padding: 10px;margin: 10px 0px;" class="card2">
+                                                                                        <li class="item-content item-input item-input-outline" id="LIcalleDomi_input">
+                                                                                            <div class="item-inner">
+                                                                                                <div class="item-title item-floating-label">Calle</div>
+                                                                                                <div class="item-input-wrap">
+                                                                                                    <input class="floating input-focused " type="text" placeholder="Calle" id="calleDomi_input" name="Calle">
+                                                                                                    <span class="input-clear-button"></span>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </li>
+                                                                                    
+                                                                                        <li class="item-content item-input item-input-outline" id="LInumeroDomi_input">
+                                                                                            <div class="item-inner">
+                                                                                                <div class="item-title item-floating-label">Número</div>
+                                                                                                <div class="item-input-wrap">
+                                                                                                    <input class="floating input-focused " type="text" placeholder="Número" id="numeroDomi_input" name="Número">
+                                                                                                    <span class="input-clear-button"></span>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </li>
+
+                                                                                        <li class="item-content item-input item-input-outline" id="LIcpDomi_input">
+                                                                                            <div class="item-inner">
+                                                                                                <div class="item-title item-floating-label">C.P.</div>
+                                                                                                <div class="item-input-wrap">
+                                                                                                    <input class="floating input-focused " type="text" placeholder="C.P." id="cpDomi_input" name="C.P.">
+                                                                                                    <span class="input-clear-button"></span>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </li>
+
+                                                                                        <li class="item-content item-input item-input-outline" id="LIcolDomi_input">
+                                                                                            <div class="item-inner">
+                                                                                                <div class="item-title item-floating-label">Colonia</div>
+                                                                                                <div class="item-input-wrap">
+                                                                                                    <input class="floating input-focused " type="text" placeholder="Colonia" id="colDomi_input" name="Colonia">
+                                                                                                    <span class="input-clear-button"></span>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </li>
+
+                                                                                        <li class="item-content item-input item-input-outline" id="LImunicipioDomi_input">
+                                                                                            <div class="item-inner">
+                                                                                                <div class="item-title item-floating-label">Municipio/Alcaldía</div>
+                                                                                                <div class="item-input-wrap">
+                                                                                                    <input class="floating input-focused " type="text" placeholder="Municipio/Alcaldía" id="municipioDomi_input" name="Municipio/Alcaldía">
+                                                                                                    <span class="input-clear-button"></span>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </li>
+
+                                                                                        <li class="item-content item-input item-input-outline" id="LIestadoDomi_input">
+                                                                                            <div class="item-inner">
+                                                                                                <div class="item-title item-floating-label">Estado</div>
+                                                                                                <div class="item-input-wrap">
+                                                                                                    <input class="floating input-focused " type="text" placeholder="Estado" id="estadoDomi_input" name="Estado">
+                                                                                                    <span class="input-clear-button"></span>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </li>
+
+                                                                                    </div>            
                                                                                 </ul>
                                                                             </div>
                                                                         </div>
@@ -628,6 +733,7 @@
                                                                         .finally(function () {
                                                                             // siempre sera ejecutado
                                                                         });
+                                                                    getDireecionCliente(FK_dueno);
                                                                 } else {
                                                                     $("#nombreMascota").html(`<option value=''> - - </option>`);
                                                                     controlMascotas.clear();
@@ -673,9 +779,46 @@
                     let values = get_datos_completos("nuevaCita");
                     let response = values.response;
                     let valido = values.valido;
+                    let fecha_actual_val = new Date();
+
+                    const year = fecha_actual_val.getFullYear();
+                    const month = String(fecha_actual_val.getMonth() + 1).padStart(2, "0");
+                    const day = String(fecha_actual_val.getDate()).padStart(2, "0");
+
+                    let fecha_actual_format = `${year}-${month}-${day}`;
+
                     if (valido) {
                         let fechaCita = $("#fechaCita").val();
                         let horaCita = $("#horaCita").val();
+
+                        if (fechaCita < fecha_actual_format) {
+                            console.log("La fecha seleccionada es menor a la actual");
+                            app.dialog.alert("La fecha de la cita no puede ser menor a la actual", "Aviso");
+                            // msj.show("Aviso", "La fecha de la cita no puede ser menor a la actual", [{ text1: "OK" }]);
+                            // preloader.hide();
+                            return false;
+                        }
+
+                        if ($("#cbx-46").prop("checked")) {
+                            let calleDomi = String($("#calleDomi_input").val()).trim();
+                            let numeroDomi = String($("#numeroDomi_input").val()).trim();
+                            let cpDomi = String($("#cpDomi_input").val()).trim();
+                            let colDomi = String($("#colDomi_input").val()).trim();
+                            let municipioDomi = String($("#municipioDomi_input").val()).trim();
+                            let estadoDomi = String($("#estadoDomi_input").val()).trim();
+
+                            calleDomi.replaceAll("'", '"');
+                            numeroDomi.replaceAll("'", '"');
+                            cpDomi.replaceAll("'", '"');
+                            colDomi.replaceAll("'", '"');
+                            municipioDomi.replaceAll("'", '"');
+                            estadoDomi.replaceAll("'", '"');
+
+                            if (!calleDomi || !numeroDomi || !cpDomi || !colDomi || !municipioDomi || !estadoDomi) {
+                                app.dialog.alert("El domicilio esta incompleto", "Aviso");
+                                return false;
+                            }
+                        }
 
                         axios
                             .post(url + "Brummy/views/citas/validaCita.php", { fechaCita, horaCita })
@@ -754,6 +897,30 @@
                     motivoCita.replaceAll("'", '"');
                     comentariosCita.replaceAll("'", '"');
 
+                    let calleDomi = "";
+                    let numeroDomi = "";
+                    let cpDomi = "";
+                    let colDomi = "";
+                    let municipioDomi = "";
+                    let estadoDomi = "";
+                    let domicilio = 0;
+                    if ($("#cbx-46").prop("checked")) {
+                        domicilio = 1;
+                        calleDomi = String($("#calleDomi_input").val()).trim();
+                        numeroDomi = String($("#numeroDomi_input").val()).trim();
+                        cpDomi = String($("#cpDomi_input").val()).trim();
+                        colDomi = String($("#colDomi_input").val()).trim();
+                        municipioDomi = String($("#municipioDomi_input").val()).trim();
+                        estadoDomi = String($("#estadoDomi_input").val()).trim();
+
+                        calleDomi.replaceAll("'", '"');
+                        numeroDomi.replaceAll("'", '"');
+                        cpDomi.replaceAll("'", '"');
+                        colDomi.replaceAll("'", '"');
+                        municipioDomi.replaceAll("'", '"');
+                        estadoDomi.replaceAll("'", '"');
+                    }
+
                     axios
                         .post(url + "Brummy/views/citas/guardarCita.php", {
                             FKnombreCita,
@@ -765,6 +932,13 @@
                             motivoCita,
                             comentariosCita,
                             FKMotivo,
+                            calleDomi,
+                            numeroDomi,
+                            cpDomi,
+                            colDomi,
+                            municipioDomi,
+                            estadoDomi,
+                            domicilio,
                         })
                         .then(function (response) {
                             console.log(response);

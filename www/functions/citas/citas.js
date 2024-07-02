@@ -66,12 +66,15 @@ function guardarEstausCita(ID) {
     let flagEstatus = String($("#newEstatusCita").find("option:selected").text());
     let comentariosAdicionales = String($("#comentariosAdicionales").val()).trim();
 
+    let FK_mascota = $("#input_FK_mascota_" + ID).val();
+    let nombre = $("#input_nombre_" + ID).val();
+
     console.log(estatus, flagEstatus, comentariosAdicionales);
 
     let url = localStorage.getItem("url");
 
     axios
-        .post(url + "Brummy/views/citas/guardarEstausCita.php", { estatus, flagEstatus, comentariosAdicionales, ID })
+        .post(url + "Brummy/views/citas/guardarEstausCita.php", { estatus, flagEstatus, comentariosAdicionales, ID, FK_mascota, nombre })
         .then(function (response) {
             console.log(response);
             if (response.status === 200) {
@@ -145,6 +148,101 @@ function generarLinkEncuesta(ID) {
             preloader.hide();
             // msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
             app.dialog.alert("Algo salió mal", "Aviso");
+            console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+        });
+}
+
+function muestraDomicilio() {
+    if ($("#cbx-46").prop("checked")) {
+        $("#div_servicioDomicilio").css("display", "block");
+    } else {
+        $("#div_servicioDomicilio").css("display", "none");
+    }
+}
+
+function getDireecionCliente(FK_dueno) {
+    let url = localStorage.getItem("url");
+
+    $.ajax({
+        method: "POST",
+        dataType: "JSON",
+        url: url + "Brummy/views/clientes/getDireecionCliente.php",
+        data: { FK_dueno },
+    })
+        .done(function (results) {
+            let success = results.success;
+            let result = results.result;
+            let html2 = "<option value=''> Selecciona una opción </option>";
+            switch (success) {
+                case true:
+                    if (result == "Sin Datos") {
+                        $("#calleDomi_input").val("");
+                        $("#LIcalleDomi_input").removeClass("item-input-focused");
+                        $("#calleDomi_input").removeClass("input-with-value input-focused item-input-outline");
+                        $("#numeroDomi_input").val("");
+                        $("#LInumeroDomi_input").removeClass("item-input-focused");
+                        $("#numeroDomi_input").removeClass("input-with-value input-focused item-input-outline");
+                        $("#cpDomi_input").val("");
+                        $("#LIcpDomi_input").removeClass("item-input-focused");
+                        $("#cpDomi_input").removeClass("input-with-value input-focused item-input-outline");
+                        $("#colDomi_input").val("");
+                        $("#LIcolDomi_input").removeClass("item-input-focused");
+                        $("#colDomi_input").removeClass("input-with-value input-focused item-input-outline");
+                        $("#municipioDomi_input").val("");
+                        $("#LImunicipioDomi_input").removeClass("item-input-focused");
+                        $("#municipioDomi_input").removeClass("input-with-value input-focused item-input-outline");
+                        $("#estadoDomi_input").val("");
+                        $("#LIestadoDomi_input").removeClass("item-input-focused");
+                        $("#estadoDomi_input").removeClass("input-with-value input-focused item-input-outline");
+                    } else {
+                        result.forEach((data, index) => {
+                            if (data.calle) {
+                                $("#calleDomi_input").val(data.calle);
+                                $("#LIcalleDomi_input").addClass("item-input-focused");
+                                $("#calleDomi_input").addClass("input-with-value input-focused item-input-outline");
+                            }
+
+                            if (data.numero) {
+                                $("#numeroDomi_input").val(data.numero);
+                                $("#LInumeroDomi_input").addClass("item-input-focused");
+                                $("#numeroDomi_input").addClass("input-with-value input-focused item-input-outline");
+                            }
+
+                            if (data.cp) {
+                                $("#cpDomi_input").val(data.cp);
+                                $("#LIcpDomi_input").addClass("item-input-focused");
+                                $("#cpDomi_input").addClass("input-with-value input-focused item-input-outline");
+                            }
+
+                            if (data.col) {
+                                $("#colDomi_input").val(data.col);
+                                $("#LIcolDomi_input").addClass("item-input-focused");
+                                $("#colDomi_input").addClass("input-with-value input-focused item-input-outline");
+                            }
+
+                            if (data.municipio) {
+                                $("#municipioDomi_input").val(data.municipio);
+                                $("#LImunicipioDomi_input").addClass("item-input-focused");
+                                $("#municipioDomi_input").addClass("input-with-value input-focused item-input-outline");
+                            }
+
+                            if (data.estado) {
+                                $("#estadoDomi_input").val(data.estado);
+                                $("#LIestadoDomi_input").addClass("item-input-focused");
+                                $("#estadoDomi_input").addClass("input-with-value input-focused item-input-outline");
+                            }
+                        });
+                    }
+                    break;
+                case false:
+                    preloader.hide();
+                    msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                    break;
+            }
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            preloader.hide();
+            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
             console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
         });
 }

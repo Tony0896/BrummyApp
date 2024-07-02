@@ -1,0 +1,152 @@
+<template>
+    <div class="page" id="panel-page">
+        <div class="navbar" style="height: 5px">
+            <div
+                class="left top-left"
+                style="justify-content: space-between; background-color: #009071; flex-direction: column; height: auto; min-height: 50px"
+            >
+                <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin-top: 10px">
+                    <div>&nbsp;</div>
+                    <div class="title" style="font-size: 18px; margin-left: 15px">Avisos</div>
+                    <div>&nbsp;</div>
+                </div>
+            </div>
+            <div id="marquee_avisos" style="background-color: #009071"></div>
+        </div>
+
+        <div class="page-content" style="margin-top: 16px">
+            <div class="block">
+                <div class="divButton">
+                    <button class="button button-outline button-round" onclick="crearNuevoAviso()">
+                        Nuevo<span class="material-icons iconBtn"> add_circle_outline </span>
+                    </button>
+                </div>
+                <input type="hidden" id="estatusAvisos" value="1" />
+                <div class="card" style="border-radius: 10px; padding: 10px">
+                    <input class="FWM-input" type="text" id="avisoBuscador" placeholder="Buscar Aviso" />
+                    <table class="mdl-data-table table responsive table-bordered table-striped datatable" id="avisosBodyDT">
+                        <thead>
+                            <tr>
+                                <th class="thDataTable">#</th>
+                                <th class="thDataTable">Aviso</th>
+                                <th class="thDataTable">Fecha Inicio</th>
+                                <th class="thDataTable">Fecha Fin</th>
+                                <th class="thDataTable">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="avisosBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        on: {
+            pageInit: function () {
+                cargaDataMarquee("marquee_avisos");
+                let url = localStorage.getItem("url");
+
+                let estatus = $("#estatusAvisos").val();
+
+                app.dialog.progress("Cargando...", "#009071");
+
+                $.ajax({
+                    method: "POST",
+                    dataType: "JSON",
+                    url: url + "Brummy/views/avisos/obtenerAvisos.php",
+                    data: { estatus },
+                })
+                    .done(function (results) {
+                        let success = results.success;
+                        let result = results.result;
+                        let html = "";
+                        switch (success) {
+                            case true:
+                                if (result == "Sin Datos") {
+                                    dataTableDestroy();
+                                    $("#avisosBody").html(html);
+                                    dataTableCreateDes();
+                                    app.dialog.close();
+                                } else {
+                                    dataTableDestroy();
+                                    result.forEach((data, index) => {
+                                        html += `<tr>
+                                            <td>${Number(index + 1)}</td>
+                                            <td class="capitalize" style="text-wrap: wrap;">${data.aviso}</td>
+                                            <td>${FormatDate(data.fechaInicio)}</td>
+                                            <td>${FormatDate(data.fechaFin)}</td>
+                                            <td>
+                                                <div style="display: flex; flex-direction: row;">
+                                                    <button class="button button-outline button-round btnGreen" onclick="verDetalleAvisos(${
+                                                        data.ID
+                                                    })" style="margin-right: 10px;">
+                                                        <span class="text-sm mb-0"><i class="material-icons" style="margin: auto;vertical-align: middle;"> edit </i></span>
+                                                    </button>
+
+                                                    <button class="button button-outline button-round btnRed" onclick="eliminarAviso(${data.ID})">
+                                                        <span class="material-icons iconBtn" style="margin: auto;vertical-align: middle;"> delete </span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>`;
+                                    });
+                                    $("#avisosBody").html(html);
+                                    dataTableCreateDes();
+                                    app.dialog.close();
+                                }
+                                break;
+                            case false:
+                                app.dialog.close();
+                                app.dialog.alert("Algo salió mal", "Aviso");
+                                break;
+                        }
+                    })
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        app.dialog.close();
+                        app.dialog.alert("Algo salió mal", "Aviso");
+                        console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+                    });
+
+                $("#avisoBuscador").on("input", function () {
+                    let table = $("#avisosBodyDT").DataTable();
+                    table.search($(this).val()).draw();
+                });
+            },
+        },
+    };
+</script>
+
+<style>
+    .paginate_button.current {
+        border: none !important;
+        background: #009071 !important;
+        border-radius: 8px !important;
+        font-weight: bold;
+        color: #fff !important;
+    }
+
+    .list ul:before {
+        display: none !important;
+    }
+
+    .list ul:after {
+        display: none !important;
+    }
+    .ts-control {
+        border: 0;
+        padding: 0;
+    }
+    .ts-control > input {
+        height: auto !important;
+    }
+    .ts-wrapper.floating.obligatorio.full.has-items {
+        border: 2px solid #009071 !important;
+        border-radius: 8px !important;
+    }
+    .grid {
+        display: flex;
+    }
+</style>

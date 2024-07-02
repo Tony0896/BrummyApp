@@ -1,9 +1,17 @@
 <template>
     <div class="page" id="panel-page">
         <div class="navbar" style="height: 5px">
-            <div class="left top-left" style="justify-content: center; background-color: #009071">
-                <div class="title" style="font-size: 18px; margin-left: 15px">Encuestas</div>
+            <div
+                class="left top-left"
+                style="justify-content: space-between; background-color: #009071; flex-direction: column; height: auto; min-height: 50px"
+            >
+                <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin-top: 10px">
+                    <div>&nbsp;</div>
+                    <div class="title" style="font-size: 18px; margin-left: 15px">Encuestas</div>
+                    <div>&nbsp;</div>
+                </div>
             </div>
+            <div id="marquee_encuestas" style="background-color: #009071"></div>
         </div>
 
         <div class="page-content" style="margin-top: 16px">
@@ -37,6 +45,7 @@
     return {
         on: {
             pageInit: function () {
+                cargaDataMarquee("marquee_encuestas");
                 let url = localStorage.getItem("url");
 
                 $("#encuestasBuscador").on("input", function () {

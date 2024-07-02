@@ -78,15 +78,18 @@ function pintaMenu() {
         <div class="view view-main view-init">
             <div class="page animate__animated animate__slideInRight" id="panel-page">
                 <div class="navbar" style="height: 5px">
-                    <div class="left top-left" style="justify-content: space-between;background-color: #009071;">
-                        <div> &nbsp; </div>
-                        <div class="title" style="font-size: 18px;margin-left: 15px;">Bienvenido</div>
-                        <div>
-                            <a class="panel-open" href="#" data-panel="right">
-                                <i class="icon material-icons md-only" style="margin-right: 15px;"> menu </i>
-                            </a>
+                    <div class="left top-left" style="justify-content: space-between;background-color: #009071;flex-direction: column;height: auto;min-height: 50px;">
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;width: 100%;margin-top: 10px;">
+                            <div> &nbsp; </div>
+                            <div class="title" style="font-size: 18px;margin-left: 15px;">Bienvenido</div>
+                            <div>
+                                <a class="panel-open" href="#" data-panel="right">
+                                    <i class="icon material-icons md-only" style="margin-right: 15px;"> menu </i>
+                                </a>
+                            </div>
                         </div>
                     </div>
+                    <div id="marquee_index" style="background-color: #009071;"></div> 
                 </div>
                 
                 <div class="page-content grid-demo">
@@ -170,6 +173,7 @@ function pintaMenu() {
         </div>`);
 
     StatusBar.styleLightContent();
+    cargaDataMarquee("marquee_index");
 }
 
 function pintaLogin() {
@@ -386,4 +390,72 @@ function getDateWhitZeros() {
         ":" +
         ("0" + MyDate.getSeconds()).slice(-2);
     return MyDateString;
+}
+
+function dataTableCreateDes() {
+    $(".datatable")
+        .DataTable({
+            responsive: true,
+            language: {
+                lengthMenu: "_MENU_ registros por pagina",
+                zeroRecords: "No hay resultados",
+                info: "Pagina _PAGE_ de _PAGES_",
+                infoEmpty: "No hay registros disponibles",
+                infoFiltered: "(Mostrar _MAX_ registros)",
+                paginate: {
+                    previous: "‹",
+                    next: "›",
+                },
+                aria: {
+                    paginate: {
+                        previous: "Previous",
+                        next: "Next",
+                    },
+                },
+                search: "Buscar",
+            },
+            order: [[0, "desc"]],
+        })
+        .draw();
+}
+
+function cargaDataMarquee(idMarquee) {
+    console.log(idMarquee);
+    let url = localStorage.getItem("url");
+
+    $.ajax({
+        method: "POST",
+        dataType: "json",
+        url: url + "Brummy/views/avisos/obtenerAvisosToday.php",
+        data: {},
+    })
+        .done(function (result) {
+            let success = result.success;
+            let results = result.result;
+            let htmlAviso = "",
+                html;
+            switch (success) {
+                case true:
+                    if (results == "Sin Datos") {
+                        html = `<marquee class="card2"><p class="p_marquee" style="padding-bottom: 1px;margin-bottom: 0;color: #FFF;font-size: 17px;font-weight: bold;margin-top: 0;">&nbsp;</p></marquee>`;
+                        $("#" + idMarquee).html(html);
+                        $(".page-content > .block").css("padding-top", "35px");
+                    } else {
+                        results.forEach((data, index) => {
+                            htmlAviso += data.aviso + `&emsp;- -&emsp;`;
+                        });
+
+                        htmlAviso = String(htmlAviso).slice(0, -9);
+                        html = `<marquee class="card2"><p class="p_marquee" style="padding-bottom: 1px;margin-bottom: 0;color: #FFF;font-size: 17px;font-weight: bold;margin-top: 0;">${htmlAviso}</p></marquee>`;
+                        $("#" + idMarquee).html(html);
+                        $(".page-content > .block").css("padding-top", "35px");
+                    }
+                    break;
+                case false:
+                    break;
+            }
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            console.log("accesoUsuarioView  - Server: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+        });
 }

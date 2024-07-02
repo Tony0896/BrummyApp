@@ -1,13 +1,21 @@
 <template>
     <div class="page" id="panel-page">
         <div class="navbar" style="height: 5px">
-            <div class="left top-left" style="justify-content: center; background-color: #009071">
-                <div class="title" style="font-size: 18px; margin-left: 15px">Catálogos</div>
+            <div
+                class="left top-left"
+                style="justify-content: space-between; background-color: #009071; flex-direction: column; height: auto; min-height: 50px"
+            >
+                <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin-top: 10px">
+                    <div>&nbsp;</div>
+                    <div class="title" style="font-size: 18px; margin-left: 15px">Catálogos</div>
+                    <div>&nbsp;</div>
+                </div>
             </div>
+            <div id="marquee_catalogos" style="background-color: #009071"></div>
         </div>
 
         <div class="page-content" style="margin-top: 16px">
-            <div style="width: 75%; margin: auto">
+            <div style="width: 75%; margin: auto" class="block">
                 <div class="toolbar toolbar-bottom tabbar" style="border-radius: 50px">
                     <div class="toolbar-inner" style="border-top-left-radius: 50px; border-bottom-left-radius: 50px">
                         <a href="#tab-1" class="tab-link tab-link-active">Especies</a>
@@ -96,6 +104,7 @@
     return {
         on: {
             pageInit: function () {
+                cargaDataMarquee("marquee_catalogos");
                 let url = localStorage.getItem("url");
 
                 app.dialog.progress("Cargando...", "#009071");

@@ -1,9 +1,17 @@
 <template>
     <div class="page" id="panel-page">
         <div class="navbar" style="height: 5px">
-            <div class="left top-left" style="justify-content: center; background-color: #009071">
-                <div class="title" style="font-size: 18px; margin-left: 15px">Métricas</div>
+            <div
+                class="left top-left"
+                style="justify-content: space-between; background-color: #009071; flex-direction: column; height: auto; min-height: 50px"
+            >
+                <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin-top: 10px">
+                    <div>&nbsp;</div>
+                    <div class="title" style="font-size: 18px; margin-left: 15px">Métricas</div>
+                    <div>&nbsp;</div>
+                </div>
             </div>
+            <div id="marquee_metricas" style="background-color: #009071"></div>
         </div>
 
         <div class="page-content" style="margin-top: 16px">
@@ -56,7 +64,12 @@
                 </div>
 
                 <div class="card">
-                    <div class="card-header">TOP 5 Productos más vendidos</div>
+                    <div class="card-header">
+                        TOP 5 Productos más vendidos
+                        <!-- <button class="button button-outline button-round" onclick="reporteProductosVendidos()">
+                            Exportar<span class="material-icons iconBtn"> file_download </span>
+                        </button> -->
+                    </div>
                     <div class="card-content">
                         <canvas id="bar-chart2" width="800" height="450"></canvas>
                     </div>
@@ -67,6 +80,19 @@
                     <div class="card-content">
                         <canvas id="bar-chart" width="800" height="450"></canvas>
                     </div>
+                </div>
+
+                <div id="dataToExport" style="display: none">
+                    <table class="table table-bordered tableExport" data-cols-width="10,20,30">
+                        <thead thead class="cabecerath">
+                            <tr>
+                                <th data-f-bold="true" data-fill-color="ff91d2ff">#</th>
+                                <th data-f-bold="true" data-fill-color="ff91d2ff">Nombre producto</th>
+                                <th data-f-bold="true" data-fill-color="ff91d2ff">Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyExportInventario"></tbody>
+                    </table>
                 </div>
 
                 <!-- <div class="row">
@@ -83,6 +109,7 @@
     return {
         on: {
             pageInit: function () {
+                cargaDataMarquee("marquee_metricas");
                 let url = localStorage.getItem("url");
 
                 app.dialog.progress("Cargando...", "#009071");
@@ -127,13 +154,8 @@
                                 result.forEach((data, index) => {
                                     html += `<tr>
                                         <td>${index + 1}</td>
-                                        <td class="capitalize">${data.nombreRaza}</td>
-                                        <td class="capitalize">${data.especie}</td>
-                                        <td>
-                                            <button class="button button-outline button-round btnEliminar" onclick="deleteRaza(${data.ID})">
-                                                <span class="material-icons iconBtn"> delete </span>
-                                            </button>
-                                        </td>
+                                        <td class="capitalize">${data.nombreCita}</td>
+                                        <td class="capitalize">${data.nombreMascota}</td>
                                     </tr>`;
                                 });
                                 $("#bodyCitasDashbora").html(html);

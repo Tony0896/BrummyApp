@@ -1,9 +1,17 @@
 <template>
     <div class="page" id="panel-page">
         <div class="navbar" style="height: 5px">
-            <div class="left top-left" style="justify-content: center; background-color: #009071">
-                <div class="title" style="font-size: 18px; margin-left: 15px">Mascotas</div>
+            <div
+                class="left top-left"
+                style="justify-content: space-between; background-color: #009071; flex-direction: column; height: auto; min-height: 50px"
+            >
+                <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin-top: 10px">
+                    <div>&nbsp;</div>
+                    <div class="title" style="font-size: 18px; margin-left: 15px">Mascotas</div>
+                    <div>&nbsp;</div>
+                </div>
             </div>
+            <div id="marquee_mascotas" style="background-color: #009071"></div>
         </div>
 
         <div class="page-content" style="margin-top: 16px">
@@ -20,6 +28,7 @@
                         <thead>
                             <tr>
                                 <th class="thDataTable">#</th>
+                                <th class="thDataTable">&nbsp;</th>
                                 <th class="thDataTable">Mascota</th>
                                 <th class="thDataTable">Dueño</th>
                                 <th class="thDataTable">Fecha N.</th>
@@ -41,6 +50,7 @@
     return {
         on: {
             pageInit: function () {
+                cargaDataMarquee("marquee_mascotas");
                 let url = localStorage.getItem("url");
 
                 app.dialog.progress("Cargando...", "#009071");
@@ -48,7 +58,6 @@
                 axios
                     .get(url + "Brummy/views/mascotas/obtenerMascotas.php", {})
                     .then(function (response) {
-                        console.log(response);
                         if (response.status === 200) {
                             let result = response.data.result;
                             let html = "";
@@ -58,11 +67,22 @@
                                 dataTableCreate();
                             } else {
                                 dataTableDestroy();
+                                let temperamento = "";
                                 let html;
                                 let tdSinData = `<span class='material-icons'> remove </span> &nbsp; <span class='material-icons'> remove </span>`;
                                 result.forEach((data, index) => {
+                                    if (data.temperamentoMascota == "verde") {
+                                        temperamento = `#27AE60`;
+                                    } else if (data.temperamentoMascota == "amarilo") {
+                                        temperamento = `#ffb02e`;
+                                    } else if (data.temperamentoMascota == "rojo") {
+                                        temperamento = `#ff0300`;
+                                    } else {
+                                        temperamento = `#FFFFFF`;
+                                    }
                                     html += `<tr>
                                         <td>${index + 1}</td>
+                                        <td> <span class="material-icons" style="font-size: 18px;color: ${temperamento}"> fiber_manual_record </span> </td>
                                         <td class="capitalize"> 
                                             <div> 
                                                 <div><span>${data.nombre}</span></div> 

@@ -13,11 +13,22 @@ function obtenerMascotas() {
                     dataTableCreate();
                 } else {
                     dataTableDestroy();
+                    let temperamento = "";
                     let html;
                     let tdSinData = `<span class='material-icons'> remove </span> &nbsp; <span class='material-icons'> remove </span>`;
                     result.forEach((data, index) => {
+                        if (data.temperamentoMascota == "verde") {
+                            temperamento = `#27AE60`;
+                        } else if (data.temperamentoMascota == "amarilo") {
+                            temperamento = `#ffb02e`;
+                        } else if (data.temperamentoMascota == "rojo") {
+                            temperamento = `#ff0300`;
+                        } else {
+                            temperamento = `#FFFFFF`;
+                        }
                         html += `<tr>
                             <td>${index + 1}</td>
+                            <td> <span class="material-icons" style="font-size: 18px;color: ${temperamento}"> fiber_manual_record </span> </td>
                             <td class="capitalize"> 
                                 <div> 
                                     <div><span>${data.nombre}</span></div> 
@@ -173,6 +184,32 @@ function crearMascota() {
                                                                         </div>
                                                                     </li>
                                                                     
+                                                                    <li class="item-content item-input item-input-outline">
+                                                                        <div class="item-inner">
+                                                                            <div class="item-title item-floating-label">Temperamento Mascota</div>
+                                                                            <div class="item-input-wrap">
+                                                                                <select class="floating obligatorio input-focused " type="text" placeholder="Temperamento Mascota" id="temperamentoMascota" name="Temperamento Mascota" style="padding: 0px 10px !important;">
+                                                                                    <option value="">Selecciona una opción</option>
+                                                                                    <option value="verde">&#129001;</option>
+                                                                                    <option value="amarilo">&#129000;</option>
+                                                                                    <option value="rojo">&#128997;</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                    </li>
+
+                                                                    <li class="item-content item-input item-input-outline">
+                                                                        <div class="item-inner">
+                                                                            <div class="container_upload"> 
+                                                                                <div class="header_upload"> 
+                                                                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> 
+                                                                                    <path d="M7 10V9C7 6.23858 9.23858 4 12 4C14.7614 4 17 6.23858 17 9V10C19.2091 10 21 11.7909 21 14C21 15.4806 20.1956 16.8084 19 17.5M7 10C4.79086 10 3 11.7909 3 14C3 15.4806 3.8044 16.8084 5 17.5M7 10C7.43285 10 7.84965 10.0688 8.24006 10.1959M12 12V21M12 12L15 15M12 12L9 15" stroke="#009071" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg> <p>Adjuntar una foto de la mascota!</p>
+                                                                                </div> 
+                                                                                <input id="file" type="file"> 
+                                                                            </div>
+                                                                        </div>
+                                                                    </li>
+
                                                                 </ul>
                                                             </div>
                                                         </div>
@@ -257,6 +294,7 @@ function guardarMascota() {
         let color = String($("#colorMascota").val());
         let rasgosParticulares = String($("#rasgosMascota").val());
         let FK_dueno = String($("#FK_dueno").val());
+        let temperamentoMascota = $("#temperamentoMascota").val();
 
         nombre.replaceAll("'", '"');
         fechaNacimiento.replaceAll("'", '"');
@@ -281,6 +319,7 @@ function guardarMascota() {
                 color,
                 rasgosParticulares,
                 FK_dueno,
+                temperamentoMascota,
             })
             .then(function (response) {
                 console.log(response);
@@ -356,4 +395,358 @@ function eliminarMascota(ID) {
             ],
         })
         .open();
+}
+
+function editarMascota(data_mascota) {
+    // preloader.show();
+    let url = localStorage.getItem("url");
+    $.ajax({
+        method: "POST",
+        dataType: "JSON",
+        url: url + "Brummy/views/catalogos/obtenerRazas.php",
+        data: {},
+    })
+        .done(function (results2) {
+            let success2 = results2.success;
+            let result2 = results2.result;
+            switch (success2) {
+                case true:
+                    if (result2 == "Sin Datos") {
+                    } else {
+                        let html2 = "";
+                        let attr_selected_especie = "";
+                        let templates_sexo_animal =
+                            data_mascota[0]["sexo"] == "Macho"
+                                ? `<option value="Macho" selected>Macho</option> <option value="Hembra">Hembra</option>`
+                                : `<option value="Macho">Macho</option> <option value="Hembra" selected>Hembra</option>`;
+
+                        result2.forEach((data2, index) => {
+                            attr_selected_especie =
+                                data2.especie == data_mascota[0]["especie"] && data2.nombreRaza == data_mascota[0]["raza"] ? "selected" : "";
+                            html2 += `<option value="${data2.ID}" FK_especie="${data2.FK_especie}" especie="${data2.especie}" raza="${data2.nombreRaza}" ${attr_selected_especie} >${data2.especie} - ${data2.nombreRaza}</option>`;
+                        });
+                        let url = localStorage.getItem("url");
+                        $.ajax({
+                            method: "POST",
+                            dataType: "JSON",
+                            url: url + "Brummy/views/clientes/obtenerClientes.php",
+                            data: {},
+                        })
+                            .done(function (results3) {
+                                let success3 = results3.success;
+                                let result3 = results3.result;
+                                switch (success3) {
+                                    case true:
+                                        if (result3 == "Sin Datos") {
+                                        } else {
+                                            let html3 = "";
+                                            let attr_selected_dueno = "";
+                                            result3.forEach((data3, index) => {
+                                                attr_selected_dueno = data3.ID == data_mascota[0]["FK_dueno"] ? "selected" : "";
+                                                html3 += `<option value="${data3.ID}" ${attr_selected_dueno}>${data3.nombre} ${data3.apellidoP} ${data3.apellidoM}</option>`;
+                                            });
+
+                                            let modalTemplate = app.popup.create({
+                                                content: `<div class="sheet-modal demo-sheet">
+                                                                <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;"> 
+                                                                    <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
+                                                                </div>
+                                                                <div class="sheet-modal-inner">
+                                                                    <div class="page-content">
+                                                                        <div class="block" style="margin-top: 60px;align-items: center;display: flex;flex-direction: column;">
+                                                                            <div id="formMascotas" style=" width: 100%; ">
+                                                                                <div class="list list-strong-ios list-dividers-ios inset-ios">
+                                                                                    <ul>
+                                                                                        <li class="item-content item-input item-input-outline" id="LIeditNombreMascota">
+                                                                                            <div class="item-inner">
+                                                                                                <div class="item-title item-floating-label">Nombre Mascota</div>
+                                                                                                <div class="item-input-wrap">
+                                                                                                    <input class="floating obligatorio input-focused " type="text" placeholder="Nombre Mascota" id="editNombreMascota" name="Nombre Mascota">
+                                                                                                    <span class="input-clear-button"></span>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </li>
+
+                                                                                        <li class="item-content item-input item-input-outline" id="LIeditFechaMascota" >
+                                                                                            <div class="item-inner">
+                                                                                                <div class="item-title item-floating-label">Fecha Nacimiento</div>
+                                                                                                <div class="item-input-wrap">
+                                                                                                    <input class="floating obligatorio input-focused " type="text" placeholder="Fecha Nacimiento" id="editFechaMascota" name="Fecha Nacimiento">
+                                                                                                    <span class="input-clear-button"></span>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </li>
+                                            
+                                                                                        <li class="item-content item-input item-input-outline" id="LIeditRelacionEspecie">
+                                                                                            <div class="item-inner">
+                                                                                                <div class="item-title item-floating-label">Relación Especie</div>
+                                                                                                <div class="item-input-wrap">
+                                                                                                    <select class="floating obligatorio input-focused " type="text" placeholder="Relación Especie" id="editRelacionEspecie" name="Relación Especie">
+                                                                                                        <option value="">Selecciona una opción</option>
+                                                                                                        ${html2}
+                                                                                                    </select>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </li>
+
+                                                                                        <li class="item-content item-input item-input-outline" id="LIeditSexoMascota">
+                                                                                            <div class="item-inner">
+                                                                                                <div class="item-title item-floating-label">Sexo Mascota</div>
+                                                                                                <div class="item-input-wrap">
+                                                                                                    <select class="floating obligatorio input-focused " style="padding-top: 0 !important;padding-bottom: 0 !important;" type="text" placeholder="Sexo Mascota" id="editSexoMascota" name="Sexo Mascota">
+                                                                                                        <option value="">Selecciona una opción</option>
+                                                                                                        ${templates_sexo_animal}
+                                                                                                    </select>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </li>
+
+                                                                                        <li class="item-content item-input item-input-outline" id="LIeditColorMascota">
+                                                                                            <div class="item-inner">
+                                                                                                <div class="item-title item-floating-label">Color Mascota</div>
+                                                                                                <div class="item-input-wrap">
+                                                                                                    <input class="floating obligatorio input-focused " type="text" placeholder="Color Mascota" id="editColorMascota" name="Color Mascota">
+                                                                                                    <span class="input-clear-button"></span>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </li>
+
+                                                                                        <li class="item-content item-input item-input-outline" id="LIeditRasgosMascota">
+                                                                                            <div class="item-inner">
+                                                                                                <div class="item-title item-floating-label">Rasgos Particulares</div>
+                                                                                                <div class="item-input-wrap">
+                                                                                                    <input class="floating obligatorio input-focused " type="text" placeholder="Rasgos Particulares" id="editRasgosMascota" name="Rasgos Particulares">
+                                                                                                    <span class="input-clear-button"></span>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </li>
+
+                                                                                        <li class="item-content item-input item-input-outline" id="LIEdit_FK_dueno">
+                                                                                            <div class="item-inner">
+                                                                                                <div class="item-title item-floating-label">Dueño Mascota</div>
+                                                                                                <div class="item-input-wrap">
+                                                                                                    <select class="floating obligatorio input-focused " placeholder="Dueño Mascota" id="Edit_FK_dueno" name="Dueño Mascota"
+                                                                                                        <option value="">Selecciona una opción</option>
+                                                                                                        ${html3}
+                                                                                                    </select>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </li>
+                                                                                        
+                                                                                    </ul>
+
+                                                                                    <div class="coolinput">
+                                                                                        <div class="container_upload"> 
+                                                                                            <div class="header_upload"> 
+                                                                                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> 
+                                                                                                <path d="M7 10V9C7 6.23858 9.23858 4 12 4C14.7614 4 17 6.23858 17 9V10C19.2091 10 21 11.7909 21 14C21 15.4806 20.1956 16.8084 19 17.5M7 10C4.79086 10 3 11.7909 3 14C3 15.4806 3.8044 16.8084 5 17.5M7 10C7.43285 10 7.84965 10.0688 8.24006 10.1959M12 12V21M12 12L15 15M12 12L9 15" stroke="#009071" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg> <p>Adjuntar una foto de la mascota!</p>
+                                                                                            </div> 
+                                                                                            <input id="file" type="file"> 
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                    
+                                                                            <button class="button button-outline button-round" onclick="guardarEdicionMascota()">
+                                                                                Guardar <span class="material-icons iconBtn"> save </span>
+                                                                            </button>
+                                                    
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>`,
+                                                swipeToClose: false,
+                                                closeByOutsideClick: false,
+                                                closeByBackdropClick: false,
+                                                closeOnEscape: false,
+                                                on: {
+                                                    open: function (popup) {
+                                                        new TomSelect("#editRelacionEspecie", {
+                                                            create: false,
+                                                            sortField: {
+                                                                field: "text",
+                                                            },
+                                                        });
+
+                                                        new TomSelect("#Edit_FK_dueno", {
+                                                            create: false,
+                                                            sortField: {
+                                                                field: "text",
+                                                            },
+                                                        });
+
+                                                        if (data_mascota[0]["nombre"]) {
+                                                            $("#editNombreMascota").val(data_mascota[0]["nombre"]);
+                                                            $("#LIeditNombreMascota").addClass("item-input-focused");
+                                                            $("#editNombreMascota").addClass("input-with-value input-focused item-input-outline");
+                                                        }
+                                                        if (data_mascota[0]["fechaNacimiento"]) {
+                                                            $("#editFechaMascota").val(data_mascota[0]["fechaNacimiento"]);
+                                                            $("#LIeditFechaMascota").addClass("item-input-focused");
+                                                            $("#editFechaMascota").addClass("input-with-value input-focused item-input-outline");
+                                                        }
+                                                        if (data_mascota[0]["color"]) {
+                                                            $("#editColorMascota").val(data_mascota[0]["color"]);
+                                                            $("#LIeditColorMascota").addClass("item-input-focused");
+                                                            $("#editColorMascota").addClass("input-with-value input-focused item-input-outline");
+                                                        }
+                                                        if (data_mascota[0]["rasgosParticulares"]) {
+                                                            $("#editRasgosMascota").val(data_mascota[0]["rasgosParticulares"]);
+                                                            $("#LIeditRasgosMascota").addClass("item-input-focused");
+                                                            $("#editRasgosMascota").addClass("input-with-value input-focused item-input-outline");
+                                                        }
+
+                                                        if (data_mascota[0]["especie"]) {
+                                                            $("#LIeditRelacionEspecie").addClass("item-input-focused");
+                                                            $("#editRelacionEspecie").addClass("input-with-value input-focused item-input-outline");
+                                                        }
+                                                        if (data_mascota[0]["sexo"]) {
+                                                            $("#LIeditSexoMascota").addClass("item-input-focused");
+                                                            $("#editSexoMascota").addClass("input-with-value input-focused item-input-outline");
+                                                        }
+                                                        if (data_mascota[0]["FK_dueno"]) {
+                                                            $("#LIEdit_FK_dueno").addClass("item-input-focused");
+                                                            $("#Edit_FK_dueno").addClass("input-with-value input-focused item-input-outline");
+                                                        }
+                                                    },
+                                                },
+                                            });
+
+                                            modalTemplate.open();
+                                        }
+                                        break;
+                                    case false:
+                                        // preloader.hide();
+                                        // msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                        app.dialog.alert("Algo salió mal", "Aviso");
+                                        break;
+                                }
+                            })
+                            .fail(function (jqXHR, textStatus, errorThrown) {
+                                // preloader.hide();
+                                // msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                app.dialog.alert("Algo salió mal", "Aviso");
+                                console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+                            });
+                    }
+                    break;
+                case false:
+                    // preloader.hide();
+                    // msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                    app.dialog.alert("Algo salió mal", "Aviso");
+                    break;
+            }
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            // preloader.hide();
+            // msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+            app.dialog.alert("Algo salió mal", "Aviso");
+            console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+        });
+}
+
+function guardarEdicionMascota() {
+    let url = localStorage.getItem("url");
+
+    let arr_data = {
+        ID: localStorage.getItem("IDMascota"),
+        editNombreMascota: $("#editNombreMascota").val(),
+        editFechaMascota: $("#editFechaMascota").val(),
+        raza: String($("#editRelacionEspecie").find(":selected").attr("raza")),
+        especie: String($("#editRelacionEspecie").find(":selected").attr("especie")),
+        FK_especie: String($("#editRelacionEspecie").find(":selected").attr("FK_especie")),
+        FK_raza: $("#editRelacionEspecie").val(),
+        editSexoMascota: $("#editSexoMascota").val(),
+        editColorMascota: $("#editColorMascota").val(),
+        editRasgosMascota: $("#editRasgosMascota").val(),
+        Edit_FK_dueno: $("#Edit_FK_dueno").val(),
+    };
+
+    axios
+        .post(url + "Brummy/views/mascotas/guardarEdicionMascota.php", { arr_data: arr_data })
+        .then((response) => {
+            if (response.status == 200) {
+                let success = response.data.success;
+                let result = response.data.result;
+
+                switch (success) {
+                    case true:
+                        if (result == "Sin Datos") {
+                        } else {
+                            app.dialog.alert("Guardado Correctamente", "Aviso");
+                            // preloader.hide();
+                            // $("#modalTemplate").modal("hide");
+                            $(".sheet-close").trigger("click");
+                            verPerfilMascota(localStorage.getItem("IDMascota"));
+                        }
+                        break;
+                    case false:
+                        // preloader.hide();
+                        app.dialog.alert("Algo salió mal", "Aviso");
+                        break;
+                }
+            }
+        })
+        .catch((error) => {
+            // preloader.hide();
+            app.dialog.alert("Algo salió mal", "Aviso");
+            // console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+            console.error("Ocurrio un error : " + error);
+        })
+        .finally();
+}
+
+function verPerfilMascota(ID) {
+    let url = localStorage.getItem("url");
+    axios
+        .post(url + "Brummy/views/mascotas/obtenerMascota.php", { ID })
+        .then(function (response) {
+            console.log(response);
+            if (response.status === 200) {
+                let result = response.data.result;
+                let html = "";
+                let tdSinData = `<span class='material-icons'> remove </span> &nbsp; <span class='material-icons'> remove </span>`;
+                let nombreMascota, fechaMascota, relacionEspecie, sexoMascota, colorMascota, rasgosMascota, FK_dueno;
+                if (result == "Sin Datos") {
+                    // Swal.fire({ icon: "warning", title: "Sin datos.", text: "" });
+                    app.dialog.alert("Sin datos.", "Aviso");
+                } else {
+                    result.forEach((data, index) => {
+                        // console.table(data);
+                        nombreMascota = data.nombre;
+                        fechaMascota = data.fechaNacimiento;
+                        relacionEspecie = `${data.especie} - ${data.raza}`;
+                        sexoMascota = data.sexo;
+                        colorMascota = data.color ? data.color : tdSinData;
+                        rasgosMascota = data.rasgosParticulares ? data.rasgosParticulares : tdSinData;
+                        FK_dueno = data.NombreCliente;
+                    });
+                    // traerHistorialMascota(ID);
+                    $("#nombreMascota").html(nombreMascota);
+                    $("#fechaMascota").html(fechaMascota);
+                    $("#relacionEspecie").html(relacionEspecie);
+                    $("#sexoMascota").html(sexoMascota);
+                    $("#colorMascota").html(colorMascota);
+                    $("#rasgosMascota").html(rasgosMascota);
+                    $("#FK_dueno").html(FK_dueno);
+                    btn_edit_mascota = `<button
+                                        class="button button-outline button-round btnBlue"
+                                        onclick='editarMascota(${JSON.stringify(result)});'
+                                    >
+                                        Editar <span class="material-icons iconBtn"> edit </span>
+                                    </button>`;
+
+                    $("#btn_editar_mascota").html(btn_edit_mascota);
+                }
+                app.dialog.close();
+            }
+        })
+        .catch(function (error) {
+            console.log(error);
+            app.dialog.close();
+            app.dialog.alert("Algo salió mal", "Aviso");
+        })
+        .finally(function () {
+            // siempre sera ejecutado
+        });
 }
