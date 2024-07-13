@@ -46,7 +46,7 @@ function obtenerMascotas() {
                         }</div> </div></td>
                             <td>
                                 <div style="display: flex; flex-direction: row;">
-                                    <button class="button button-outline button-round btnGreen" onclick="verMascota(${data.ID})">
+                                    <button class="button button-outline button-round btnGreen" onclick="verMascota(${data.ID}, ${data.FK_dueno})">
                                         <span class="material-icons iconBtn" style="margin: auto;vertical-align: middle;"> pets </span>
                                     </button>
                                 </div>
@@ -350,8 +350,9 @@ function guardarMascota() {
     }
 }
 
-function verMascota(ID) {
+function verMascota(ID, FK_dueno) {
     localStorage.setItem("IDMascota", ID);
+    localStorage.setItem("FK_dueno", FK_dueno);
     let name = "perfilMascota";
     app.views.main.router.navigate({ name: name });
 }
@@ -749,4 +750,332 @@ function verPerfilMascota(ID) {
         .finally(function () {
             // siempre sera ejecutado
         });
+}
+
+function crearComentarioMascota() {
+    let modalTemplate = app.popup.create({
+        content: `<div class="sheet-modal demo-sheet">
+                        <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;"> 
+                            <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
+                        </div>
+                        <div class="sheet-modal-inner">
+                            <div class="page-content">
+                                <div class="block" style="margin-top: 60px;align-items: center;display: flex;flex-direction: column;">
+                                    <div id="formAvisos" style=" width: 100%; ">
+                                        <div class="list list-strong-ios list-dividers-ios inset-ios">
+                                            <ul>
+                                                <li class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">Comentario:</div>
+                                                        <div class="item-input-wrap">
+                                                            <textarea class="floating obligatorio input-focused " name="Contenido Comentario" class="input capitalize obligatorio" id="contenido_comentario" cols="30" rows="10"></textarea>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                            
+                                    <button class="button button-outline button-round" onclick="guardarComentario()">
+                                        Guardar <span class="material-icons iconBtn"> save </span>
+                                    </button>
+            
+                                </div>
+                            </div>
+                        </div>
+                    </div>`,
+        swipeToClose: false,
+        closeByOutsideClick: false,
+        closeByBackdropClick: false,
+        closeOnEscape: false,
+        on: {
+            open: function (popup) {},
+        },
+    });
+
+    modalTemplate.open();
+}
+
+function guardarComentario() {
+    const ID_MASCOTA = localStorage.getItem("IDMascota");
+    const FK_dueno = localStorage.getItem("FK_dueno");
+    const contenido_comentario = $("#contenido_comentario").val();
+
+    if (!contenido_comentario) {
+        msj.show("Aviso", "El campo de comentarios no puede estar vacío.", [{ text1: "OK" }]);
+        return false;
+    }
+
+    let arr_data = {
+        ID_MASCOTA: ID_MASCOTA,
+        contenido_comentario: contenido_comentario,
+        FK_dueno: FK_dueno,
+    };
+
+    // preloader.show();
+
+    let url = localStorage.getItem("url");
+    axios
+        .post(url + "Brummy/views/mascotas/guardarComentario.php", { arr_data: arr_data })
+        .then((response) => {
+            if (response.status == 200) {
+                let success = response.data.success;
+                let result = response.data.result;
+
+                switch (success) {
+                    case true:
+                        if (result == "error_execute_query") {
+                        } else {
+                            msj.show("Aviso", "Se registro el comentario correctamente", [{ text1: "OK" }]);
+                            // preloader.hide();
+                            // $("#modalTemplate").modal("hide");
+                            $(".sheet-close").trigger("click");
+                            obtenerComentarios();
+                        }
+                        break;
+
+                    case false:
+                        // preloader.hide();
+                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                        break;
+
+                    default:
+                        // ocurrio algo raro
+                        break;
+                }
+            }
+        })
+        .catch((error) => {
+            // preloader.hide();
+            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+            // console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+            console.error("Ocurrio un error : " + error);
+        })
+        .finally(() => {
+            // siempre se ejecuta
+        });
+}
+
+function obtenerComentarios() {
+    let id_mascota = localStorage.getItem("IDMascota");
+    let url = localStorage.getItem("url");
+    axios
+        .post(url + "Brummy/views/mascotas/obtenerComentarios.php", { ID: id_mascota })
+        .then((response) => {
+            console.log(response);
+            if (response.status === 200) {
+                let success = response.data.success;
+                let result = response.data.result;
+
+                switch (success) {
+                    case true:
+                        if (result == "Sin Datos") {
+                        } else {
+                            let template_comentario = "";
+                            result.forEach((data, index) => {
+                                template_comentario += `
+                                <div class="card_comentario">
+                                    <div class="container_comentario">
+                                        <div class="left">
+                                            <div class="status-ind"></div>
+                                        </div>
+                                        <div class="right">
+                                            <div class="text-wrap">
+                                                <p class="text-content">
+                                                    <a class="">${data.redaccion}</a>
+                                                </p>
+                                                <p class="time">${data.fecha_comentario_up}</p>
+                                                <p class="time">${data.nombre_completo_up}</p>
+                                            </div>
+                                            <div class="button-wrap">
+                                                <button class="primary-cta" onClick ="eliminarComentarioMascota(${data.ID})" >Eliminar</button>
+                                                <button class="secondary-cta" onClick ='editarComentarioMascota(${data.ID} , ${JSON.stringify(
+                                    data.redaccion
+                                )})' >Editar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                `;
+                            });
+
+                            $("#content_comentario").html(template_comentario);
+                        }
+                        break;
+                    case false:
+                        // preloader.hide();
+                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                        break;
+                }
+            }
+        })
+        .catch((error) => {
+            // preloader.hide();
+            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+            // console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+            console.error("Ocurrio un error : " + error);
+        })
+        .finally(() => {
+            // siempre sera ejecutado
+        });
+}
+
+function editarComentarioMascota(id_comentario, comentario_mascota) {
+    let modalTemplate = app.popup.create({
+        content: `<div class="sheet-modal demo-sheet">
+                        <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;"> 
+                            <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
+                        </div>
+                        <div class="sheet-modal-inner">
+                            <div class="page-content">
+                                <div class="block" style="margin-top: 60px;align-items: center;display: flex;flex-direction: column;">
+                                    <div id="formAvisos" style=" width: 100%; ">
+                                        <div class="list list-strong-ios list-dividers-ios inset-ios">
+                                            <ul>
+                                                <li class="item-content item-input item-input-outline ${
+                                                    comentario_mascota ? "item-input-focused" : ""
+                                                }">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">Comentario:</div>
+                                                        <div class="item-input-wrap">
+                                                            <textarea class="floating obligatorio input-focused ${
+                                                                comentario_mascota ? "input-with-value input-focused item-input-outline" : ""
+                                                            }" name="Contenido Comentario" class="input capitalize obligatorio" id="contenido_comentario_update" cols="30" rows="10">${comentario_mascota}</textarea>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                            
+                                    <button class="button button-outline button-round" onclick="actualizarComentarioMascota(${id_comentario})">
+                                        Guardar <span class="material-icons iconBtn"> save </span>
+                                    </button>
+            
+                                </div>
+                            </div>
+                        </div>
+                    </div>`,
+        swipeToClose: false,
+        closeByOutsideClick: false,
+        closeByBackdropClick: false,
+        closeOnEscape: false,
+        on: {
+            open: function (popup) {},
+        },
+    });
+
+    modalTemplate.open();
+}
+
+function actualizarComentarioMascota(id_comentario) {
+    let comentario_act = $("#contenido_comentario_update").val();
+
+    const arr_data = {
+        comentario_act: comentario_act,
+        id_comentario: id_comentario,
+    };
+
+    let url = localStorage.getItem("url");
+
+    axios
+        .post(url + "Brummy/views/mascotas/actualizarComentarioMascota.php", { arr_data: arr_data })
+        .then((response) => {
+            if (response.status == 200) {
+                let success = response.data.success;
+                let result = response.data.result;
+
+                switch (success) {
+                    case true:
+                        if (result) {
+                            if (result == "error_execute_query") {
+                            } else {
+                                msj.show("Aviso", "Se Actualizo el comentario correctamente", [{ text1: "OK" }]);
+                                // preloader.hide();
+                                // $("#modalTemplate").modal("hide");
+                                $(".sheet-close").trigger("click");
+                                obtenerComentarios();
+                            }
+                        }
+
+                        break;
+                    case false:
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        })
+        .catch((error) => {
+            // preloader.hide();
+            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+            // console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+            console.error("Ocurrio un error : " + error);
+        })
+        .finally(() => {});
+}
+
+function eliminarComentarioMascota(id_comentario) {
+    // preloader.show();
+    app.dialog
+        .create({
+            title: "¿Estás seguro de querer eliminar el registro?",
+            buttons: [
+                {
+                    text: "Cancelar",
+                    onClick: function () {
+                        console.log("Cancelar");
+                    },
+                },
+                {
+                    text: "OK",
+                    onClick: function () {
+                        let url = localStorage.getItem("url");
+                        const FK_dueno = localStorage.getItem("FK_dueno");
+
+                        const arr_data = {
+                            FK_dueno: FK_dueno,
+                            id_comentario: id_comentario,
+                        };
+
+                        axios
+                            .post(url + "Brummy/views/mascotas/eliminarComentarioMascota.php", { arr_data: arr_data })
+                            .then((response) => {
+                                if (response.status == 200) {
+                                    let success = response.data.success;
+                                    let result = response.data.result;
+                                    switch (success) {
+                                        case true:
+                                            console.info(2);
+                                            if (result == "error_execute_query") {
+                                            } else {
+                                                msj.show("Aviso", "Se elimino el comentario correctamente", [{ text1: "OK" }]);
+                                                // preloader.hide();
+                                                obtenerComentarios();
+                                            }
+                                            break;
+                                        case false:
+                                            // preloader.hide();
+                                            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            })
+                            .catch((error) => {
+                                // preloader.hide();
+                                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                // console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+                                console.error("Ocurrio un error : " + error);
+                            })
+                            .finally(() => {});
+                    },
+                },
+            ],
+        })
+        .open();
 }

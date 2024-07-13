@@ -175,12 +175,18 @@ function guardarAviso() {
             });
     } else {
         let html =
-            '<span style="font-weight: 900;">Debes llenar estos campos para poder guardar:</span> <br> <ul style="text-align: left; margin-left: 15px; font-style: italic;"> ';
+            '<span style="font-weight: 900;">Debes llenar estos campos para poder guardar:</span> <br> <ul style="text-align: left; margin-left: 15px; font-style: italic;margin-top: 15px;"> ';
         response.forEach((data) => {
             html += `<li style="list-style: disc;">${data}.</li> `;
         });
         html += `</ul>`;
-        Swal.fire({ icon: "warning", title: "", html: html });
+        // Swal.fire({ icon: "warning", title: "", html: html });
+        swal({
+            type: "warning",
+            title: "",
+            text: html,
+            html: true,
+        });
     }
 }
 

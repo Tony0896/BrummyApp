@@ -351,3 +351,116 @@ td.capitalize {
 .button-wrapper > button:hover {
     text-decoration: none;
 }
+
+.d-sm-flex {
+    display: flex !important;
+}
+
+/* * PROTOTIPE COMENTS */
+
+.card_comentario {
+    width: auto;
+    background-color: #f2f3f7;
+    border-radius: 0.75em;
+    cursor: pointer;
+    transition: ease 0.2s;
+    box-shadow: 1em 1em 1em #d8dae0b1, -0.75em -0.75em 1em #ffffff;
+    border: 1.5px solid #f2f3f7;
+    margin-bottom: 20px;
+}
+
+.card_comentario:hover {
+    background-color: #d3ddf1;
+    border: 1.5px solid #1677ff;
+}
+
+.container_comentario {
+    margin-top: 1.25em;
+    margin-bottom: 1.375em;
+    margin-left: 1.375em;
+    margin-right: 2em;
+    display: flex;
+    flex-direction: row;
+    gap: 0.75em;
+}
+
+.status-ind {
+    width: 0.625em;
+    height: 0.625em;
+    background-color: #ff0000;
+    margin: 0.375em 0;
+    border-radius: 0.5em;
+}
+
+.text-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
+    color: #333;
+}
+
+.time {
+    font-size: 0.875em;
+    color: #777;
+    margin: 0 0 0 0.5rem;
+}
+
+.text-link {
+    font-weight: 500;
+    text-decoration: none;
+    color: black;
+}
+
+.button-wrap {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    align-items: center;
+}
+
+.secondary-cta {
+    background-color: transparent;
+    border: none;
+    font-size: 15px;
+    font-weight: 400;
+    color: #666;
+    cursor: pointer;
+}
+
+.primary-cta {
+    font-size: 15px;
+    background-color: transparent;
+    font-weight: 600;
+    color: #1677ff;
+    border: none;
+    border-radius: 1.5em;
+    cursor: pointer;
+}
+
+.right {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875em;
+}
+
+#content_comentario {
+    width: auto; /* Ancho del div */
+    overflow-y: auto; /* Añadir barra de desplazamiento vertical */
+    padding: 10px; /* Espaciado interno para mejor apariencia */
+}
+
+.header_upload svg {
+    height: 100px;
+}
+
+.header_upload p {
+    text-align: center;
+    color: #009071;
+}
+
+.file_upload_brummy {
+    display: none;
+}
+p.text-content {
+    margin: 0;
+}

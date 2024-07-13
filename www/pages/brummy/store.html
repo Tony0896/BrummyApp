@@ -1,0 +1,817 @@
+<template>
+    <div class="page" id="panel-page">
+        <div class="navbar" style="height: 5px">
+            <div
+                class="left top-left"
+                style="justify-content: space-between; background-color: #009071; flex-direction: column; height: auto; min-height: 50px"
+            >
+                <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin-top: 10px">
+                    <div>&nbsp;</div>
+                    <div class="title" style="font-size: 18px; margin-left: 15px">Perfil Veterinaria</div>
+                    <div>&nbsp;</div>
+                </div>
+            </div>
+            <div id="marquee_perfilMascota" style="background-color: #009071"></div>
+        </div>
+
+        <div class="page-content" style="margin-top: 16px">
+            <div class="block">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="item-title" style="font-weight: bold">Datos de la Veterinaria</div>
+                    </div>
+                    <div class="card-content" style="padding: 10px">
+                        <div class="row">
+                            <div class="col-50 mb-2">
+                                <div class="cointainer-info">
+                                    <div style="display: flex; align-items: center; margin-bottom: 0px" class="cointainer-info">
+                                        <h4 style="margin-right: 5px; margin-bottom: 0; font-weight: 300">Nombre</h4>
+                                        <div style="display: flex; justify-content: end">
+                                            <button
+                                                class="button button-outline button-round btnGreen"
+                                                onclick="editaInfoVete(this.id)"
+                                                style="border: 0px; margin: 0; padding: 0px !important"
+                                                id="btn_edita_nombre"
+                                            >
+                                                <span class="material-icons iconBtn"> edit </span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="list list-strong-ios list-dividers-ios inset-ios"
+                                        style="width: 80%; display: none"
+                                        id="nombreVete_div"
+                                    >
+                                        <ul>
+                                            <li class="item-content item-input item-input-outline" style="padding-left: 0">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Nombre</div>
+                                                    <div class="item-input-wrap">
+                                                        <input
+                                                            class="floating obligatorio input-focused"
+                                                            type="text"
+                                                            placeholder="Nombre"
+                                                            id="nombreVete_input"
+                                                            name="Nombre"
+                                                        />
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <span class="capitalize" style="padding: 10px" id="nombreVete_span"></span>
+
+                                    <button
+                                        class="button button-outline button-round btnGreen"
+                                        onclick="guardarNombreVete();"
+                                        id="nombreVete_btn"
+                                        style="display: none; margin-bottom: 10px"
+                                    >
+                                        Guardar <span class="material-icons iconBtn"> save </span>
+                                    </button>
+
+                                    <button
+                                        class="button button-outline button-round btnRed"
+                                        onclick="cancelarNombreVete();"
+                                        id="Cancel_nombreVete_btn"
+                                        style="display: none"
+                                    >
+                                        Cancelar <span class="material-icons iconBtn"> cancel </span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-50 mb-2">
+                                <div class="cointainer-info">
+                                    <h4 style="font-weight: 300">Logo</h4>
+                                    <div class="coolinput">
+                                        <div class="container_upload" style="width: 60%; height: 200px; margin-top: 10px; margin-bottom: 15px">
+                                            <div class="header_upload">
+                                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                                    <g id="SVGRepo_iconCarrier">
+                                                        <path
+                                                            d="M7 10V9C7 6.23858 9.23858 4 12 4C14.7614 4 17 6.23858 17 9V10C19.2091 10 21 11.7909 21 14C21 15.4806 20.1956 16.8084 19 17.5M7 10C4.79086 10 3 11.7909 3 14C3 15.4806 3.8044 16.8084 5 17.5M7 10C7.43285 10 7.84965 10.0688 8.24006 10.1959M12 12V21M12 12L15 15M12 12L9 15"
+                                                            stroke="#009071"
+                                                            stroke-width="1.5"
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                        ></path>
+                                                    </g>
+                                                </svg>
+                                                <p>Adjunta tu logo!</p>
+                                            </div>
+                                            <input class="file_upload_brummy" type="file" style="opacity: 0" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-50 mb-2">
+                                <div class="cointainer-info">
+                                    <div style="display: flex; align-items: center; margin-bottom: 0px" class="cointainer-info">
+                                        <h4 style="font-weight: 300; margin-right: 5px; margin-bottom: 0">Eslogan</h4>
+                                        <div style="display: flex; justify-content: end">
+                                            <button
+                                                class="button button-outline button-round btnGreen"
+                                                onclick="editaInfoVete(this.id)"
+                                                style="border: 0px; margin: 0; padding: 0px !important"
+                                                id="btn_edita_eslogan"
+                                            >
+                                                <span class="material-icons iconBtn"> edit </span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="list list-strong-ios list-dividers-ios inset-ios"
+                                        style="width: 80%; display: none"
+                                        id="esloganVete_div"
+                                    >
+                                        <ul>
+                                            <li class="item-content item-input item-input-outline" style="padding-left: 0">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Eslogan</div>
+                                                    <div class="item-input-wrap">
+                                                        <input
+                                                            class="floating obligatorio input-focused"
+                                                            type="text"
+                                                            placeholder="Eslogan"
+                                                            id="esloganVete_input"
+                                                            name="Eslogan"
+                                                        />
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <span class="capitalize" style="padding: 10px" id="esloganVete_span"></span>
+
+                                    <button
+                                        class="button button-outline button-round btnGreen"
+                                        onclick="guardaresloganVete();"
+                                        id="esloganVete_btn"
+                                        style="display: none; margin-bottom: 10px"
+                                    >
+                                        Guardar <span class="material-icons iconBtn"> save </span>
+                                    </button>
+
+                                    <button
+                                        class="button button-outline button-round btnRed"
+                                        onclick="cancelaresloganVete();"
+                                        id="Cancel_esloganVete_btn"
+                                        style="display: none"
+                                    >
+                                        Cancelar <span class="material-icons iconBtn"> cancel </span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-50 mb-2">
+                                <div class="cointainer-info">
+                                    <div style="display: flex; align-items: center; margin-bottom: 0px" class="cointainer-info">
+                                        <h4 style="font-weight: 300; margin-right: 5px; margin-bottom: 0">Descripción</h4>
+                                        <div style="display: flex; justify-content: end">
+                                            <button
+                                                class="button button-outline button-round btnGreen"
+                                                onclick="editaInfoVete(this.id)"
+                                                style="border: 0px; margin: 0; padding: 0px !important"
+                                                id="btn_edita_descripcion"
+                                            >
+                                                <span class="material-icons iconBtn"> edit </span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="list list-strong-ios list-dividers-ios inset-ios"
+                                        style="width: 80%; display: none"
+                                        id="descripcionVete_div"
+                                    >
+                                        <ul>
+                                            <li class="item-content item-input item-input-outline" style="padding-left: 0">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Descripción</div>
+                                                    <div class="item-input-wrap">
+                                                        <input
+                                                            class="floating obligatorio input-focused"
+                                                            type="text"
+                                                            placeholder="Descripción"
+                                                            id="descripcionVete_input"
+                                                            name="Descripción"
+                                                        />
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <span class="capitalize" style="padding: 10px" id="descripcionVete_span"></span>
+
+                                    <button
+                                        class="button button-outline button-round btnGreen"
+                                        onclick="guardardescripcionVete();"
+                                        id="descripcionVete_btn"
+                                        style="margin-bottom: 10px; display: none"
+                                    >
+                                        Guardar <span class="material-icons iconBtn"> save </span>
+                                    </button>
+
+                                    <button
+                                        class="button button-outline button-round btnRed"
+                                        onclick="cancelardescripcionVete();"
+                                        id="Cancel_descripcionVete_btn"
+                                        style="display: none"
+                                    >
+                                        Cancelar <span class="material-icons iconBtn"> cancel </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-50 mb-2">
+                                <div class="cointainer-info">
+                                    <div style="display: flex; align-items: center; margin-bottom: 0px" class="cointainer-info">
+                                        <h4 style="font-weight: 300; margin-right: 5px; margin-bottom: 0">Dirección</h4>
+                                        <div style="display: flex; justify-content: end">
+                                            <button
+                                                class="button button-outline button-round btnGreen"
+                                                onclick="editaInfoVete(this.id)"
+                                                style="border: 0px; margin: 0; padding: 0px !important"
+                                                id="btn_edita_direccion"
+                                            >
+                                                <span class="material-icons iconBtn"> edit </span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="list list-strong-ios list-dividers-ios inset-ios"
+                                        style="width: 80%; display: none"
+                                        id="direccionVete_div"
+                                    >
+                                        <ul>
+                                            <li class="item-content item-input item-input-outline" style="padding-left: 0">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Calle</div>
+                                                    <div class="item-input-wrap">
+                                                        <input
+                                                            class="floating obligatorio input-focused"
+                                                            type="text"
+                                                            placeholder="Calle"
+                                                            id="calleVete_input"
+                                                            name="Calle"
+                                                        />
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input item-input-outline" style="padding-left: 0">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Número</div>
+                                                    <div class="item-input-wrap">
+                                                        <input
+                                                            class="floating obligatorio input-focused"
+                                                            type="text"
+                                                            placeholder="Número"
+                                                            id="numeroVete_input"
+                                                            name="Número"
+                                                        />
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input item-input-outline" style="padding-left: 0">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">C.P.</div>
+                                                    <div class="item-input-wrap">
+                                                        <input
+                                                            class="floating obligatorio input-focused"
+                                                            type="text"
+                                                            placeholder="C.P."
+                                                            id="cpVete_input"
+                                                            name="C.P."
+                                                        />
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input item-input-outline" style="padding-left: 0">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Col.</div>
+                                                    <div class="item-input-wrap">
+                                                        <input
+                                                            class="floating obligatorio input-focused"
+                                                            type="text"
+                                                            placeholder="Col."
+                                                            id="colVete_input"
+                                                            name="Col."
+                                                        />
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input item-input-outline" style="padding-left: 0">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Municipio/Alcaldía</div>
+                                                    <div class="item-input-wrap">
+                                                        <input
+                                                            class="floating obligatorio input-focused"
+                                                            type="text"
+                                                            placeholder="Municipio/Alcaldía"
+                                                            id="municipioVete_input"
+                                                            name="Municipio/Alcaldía"
+                                                        />
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input item-input-outline" style="padding-left: 0">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Estado</div>
+                                                    <div class="item-input-wrap">
+                                                        <input
+                                                            class="floating obligatorio input-focused"
+                                                            type="text"
+                                                            placeholder="Estado"
+                                                            id="estadoVete_input"
+                                                            name="Estado"
+                                                        />
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <span class="capitalize" style="padding: 10px" id="direccionVete_span"></span>
+
+                                    <button
+                                        class="button button-outline button-round btnGreen"
+                                        onclick="guardardireccionVete();"
+                                        id="direccionVete_btn"
+                                        style="margin-bottom: 10px; display: none"
+                                    >
+                                        Guardar <span class="material-icons iconBtn"> save </span>
+                                    </button>
+
+                                    <button
+                                        class="button button-outline button-round btnRed"
+                                        onclick="cancelardireccionVete();"
+                                        id="Cancel_direccionVete_btn"
+                                        style="display: none"
+                                    >
+                                        Cancelar <span class="material-icons iconBtn"> cancel </span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-50 mb-2">
+                                <div class="cointainer-info">
+                                    <div style="display: flex; align-items: center; margin-bottom: 0px" class="cointainer-info">
+                                        <h4 style="font-weight: 300; margin-right: 5px; margin-bottom: 0">Horarios</h4>
+                                        <div style="display: flex; justify-content: end">
+                                            <button
+                                                class="button button-outline button-round btnGreen"
+                                                onclick="editaInfoVete(this.id)"
+                                                style="border: 0px; margin: 0; padding: 0px !important"
+                                                id="btn_edita_horarios"
+                                            >
+                                                <span class="material-icons iconBtn"> edit </span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div id="horariosVete_span" style="display: flex; flex-direction: column; font-weight: 600"></div>
+
+                                    <div
+                                        class="list list-strong-ios list-dividers-ios inset-ios"
+                                        style="width: 80%; display: none"
+                                        id="horariosVete_div"
+                                    >
+                                        <ul>
+                                            <li class="item-content item-input item-input-outline" style="padding-left: 0">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Día 1</div>
+                                                    <div class="item-input-wrap">
+                                                        <select
+                                                            class="floating obligatorio input-focused"
+                                                            type="text"
+                                                            placeholder="Día 1"
+                                                            id="diaVete_1"
+                                                            name="Día 1"
+                                                            style="padding-top: 0 !important; padding-bottom: 0 !important"
+                                                        >
+                                                            <option value="1" abreviacion="Lu">Lunes</option>
+                                                            <option value="2" abreviacion="Ma">Martes</option>
+                                                            <option value="3" abreviacion="Mi">Miércoles</option>
+                                                            <option value="4" abreviacion="Ju">Jueves</option>
+                                                            <option value="5" abreviacion="Vi">Viernes</option>
+                                                            <option value="6" abreviacion="Sá">Sábado</option>
+                                                            <option value="7" abreviacion="Do">Domingo</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <li class="item-content item-input item-input-outline" style="padding-left: 0">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Día 2</div>
+                                                    <div class="item-input-wrap">
+                                                        <select
+                                                            class="floating obligatorio input-focused"
+                                                            type="text"
+                                                            placeholder="Día 2"
+                                                            id="diaVete_2"
+                                                            name="Día 2"
+                                                            style="padding-top: 0 !important; padding-bottom: 0 !important"
+                                                        >
+                                                            <option value="1" abreviacion="Lu">Lunes</option>
+                                                            <option value="2" abreviacion="Ma">Martes</option>
+                                                            <option value="3" abreviacion="Mi">Miércoles</option>
+                                                            <option value="4" abreviacion="Ju">Jueves</option>
+                                                            <option value="5" abreviacion="Vi">Viernes</option>
+                                                            <option value="6" abreviacion="Sá">Sábado</option>
+                                                            <option value="7" abreviacion="Do">Domingo</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <li class="item-content item-input item-input-outline" style="padding-left: 0">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Abierto/Cerrado</div>
+                                                    <div class="item-input-wrap">
+                                                        <select
+                                                            class="floating obligatorio input-focused"
+                                                            type="text"
+                                                            placeholder="Abierto/Cerrado"
+                                                            id="diaVete_cerrado"
+                                                            name="Abierto/Cerrado"
+                                                            style="padding-top: 0 !important; padding-bottom: 0 !important"
+                                                            onchange="cambioDeDia()"
+                                                        >
+                                                            <option value="Abierto" selected>Abierto</option>
+                                                            <option value="Cerrado">Cerrado</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input item-input-outline" style="padding-left: 0" id="div_horario1">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Horario Apertura</div>
+                                                    <div class="item-input-wrap">
+                                                        <input
+                                                            class="floating obligatorio input-focused"
+                                                            type="time"
+                                                            placeholder="Horario Apertura"
+                                                            id="horario_1"
+                                                            name="Horario Apertura"
+                                                        />
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input item-input-outline" style="padding-left: 0" id="div_horario2">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Horario Cierre</div>
+                                                    <div class="item-input-wrap">
+                                                        <input
+                                                            class="floating obligatorio input-focused"
+                                                            type="time"
+                                                            placeholder="Horario Cierre"
+                                                            id="horario_2"
+                                                            name="Horario Cierre"
+                                                        />
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <button
+                                        class="button button-outline button-round btnGreen"
+                                        onclick="guardarhorariosVete();"
+                                        id="horariosVete_btn"
+                                        style="margin-bottom: 10px; display: none"
+                                    >
+                                        Guardar <span class="material-icons iconBtn"> save </span>
+                                    </button>
+
+                                    <button
+                                        class="button button-outline button-round btnRed"
+                                        onclick="cancelarhorariosVete();"
+                                        id="Cancel_horariosVete_btn"
+                                        style="display: none"
+                                    >
+                                        Cancelar <span class="material-icons iconBtn"> cancel </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-50 mb-2">
+                                <div class="cointainer-info">
+                                    <div style="display: flex; align-items: center; margin-bottom: 0px" class="cointainer-info">
+                                        <h4 style="font-weight: 300; margin-right: 5px; margin-bottom: 0">Número de contacto</h4>
+                                        <div style="display: flex; justify-content: end">
+                                            <button
+                                                class="button button-outline button-round btnGreen"
+                                                onclick="editaInfoVete(this.id)"
+                                                style="border: 0px; margin: 0; padding: 0px !important"
+                                                id="btn_edita_contactos"
+                                            >
+                                                <span class="material-icons iconBtn"> edit </span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div id="contactosVete_span" style="display: flex; flex-direction: column; font-weight: 600">
+                                        <!-- <span class="capitalize" style="padding: 10px;" id="nombreMascota">Hola</span> -->
+                                    </div>
+
+                                    <div
+                                        class="list list-strong-ios list-dividers-ios inset-ios"
+                                        style="width: 80%; display: none"
+                                        id="contactosVete_div"
+                                    >
+                                        <ul>
+                                            <li class="item-content item-input item-input-outline" style="padding-left: 0">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Nombre Contacto</div>
+                                                    <div class="item-input-wrap">
+                                                        <input
+                                                            class="floating obligatorio input-focused"
+                                                            type="text"
+                                                            placeholder="Nombre Contacto"
+                                                            id="nombreVeteContacto_input"
+                                                            name="Nombre Contacto"
+                                                        />
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input item-input-outline" style="padding-left: 0">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Número</div>
+                                                    <div class="item-input-wrap">
+                                                        <input
+                                                            class="floating obligatorio input-focused"
+                                                            type="text"
+                                                            placeholder="Número"
+                                                            id="numeroVeteContacto_input"
+                                                            name="Número"
+                                                        />
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <button
+                                        class="button button-outline button-round btnGreen"
+                                        onclick="guardarcontactosVete();"
+                                        id="contactosVete_btn"
+                                        style="margin-bottom: 10px; display: none"
+                                    >
+                                        Guardar <span class="material-icons iconBtn"> save </span>
+                                    </button>
+
+                                    <button
+                                        class="button button-outline button-round btnRed"
+                                        onclick="cancelarcontactosVete();"
+                                        id="Cancel_contactosVete_btn"
+                                        style="display: none"
+                                    >
+                                        Cancelar <span class="material-icons iconBtn"> cancel </span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-50 mb-2">
+                                <div class="cointainer-info">
+                                    <div style="display: flex; align-items: center; margin-bottom: 0px" class="cointainer-info">
+                                        <h4 style="font-weight: 300; margin-right: 5px; margin-bottom: 0">Redes sociales</h4>
+                                        <div style="display: flex; justify-content: end">
+                                            <button
+                                                class="button button-outline button-round btnGreen"
+                                                onclick="editaInfoVete(this.id)"
+                                                style="border: 0px; margin: 0; padding: 0px !important"
+                                                id="btn_edita_redes"
+                                            >
+                                                <span class="material-icons iconBtn"> edit </span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div id="redesVete_span" style="display: flex; flex-direction: column; font-weight: 600">
+                                        <!-- <span class="capitalize" style="padding: 10px;" id="nombreMascota">Hola</span> -->
+                                    </div>
+
+                                    <div
+                                        class="list list-strong-ios list-dividers-ios inset-ios"
+                                        style="width: 80%; display: none"
+                                        id="redesVete_div"
+                                    >
+                                        <ul>
+                                            <li class="item-content item-input item-input-outline" style="padding-left: 0">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Red Social</div>
+                                                    <div class="item-input-wrap">
+                                                        <select
+                                                            class="floating obligatorio input-focused"
+                                                            placeholder="Red Social"
+                                                            id="redSocial_input"
+                                                            name="Red Social"
+                                                            style="padding-top: 0 !important; padding-bottom: 0 !important"
+                                                        >
+                                                            <option value="Facebook">Facebook</option>
+                                                            <option value="Instagram">Instagram</option>
+                                                            <option value="X (antes Twitter)">X (antes Twitter)</option>
+                                                            <option value="YouTube">YouTube</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input item-input-outline" style="padding-left: 0">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">URL/Nombre</div>
+                                                    <div class="item-input-wrap">
+                                                        <input
+                                                            class="floating obligatorio input-focused"
+                                                            type="text"
+                                                            placeholder="URL/Nombre"
+                                                            id="urlRedSocial_input"
+                                                            name="URL/Nombre"
+                                                        />
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <button
+                                        class="button button-outline button-round btnGreen"
+                                        onclick="guardarredesVete();"
+                                        id="redesVete_btn"
+                                        style="margin-bottom: 10px; display: none"
+                                    >
+                                        Guardar <span class="material-icons iconBtn"> save </span>
+                                    </button>
+
+                                    <button
+                                        class="button button-outline button-round btnRed"
+                                        onclick="cancelarredesVete();"
+                                        id="Cancel_redesVete_btn"
+                                        style="display: none"
+                                    >
+                                        Cancelar <span class="material-icons iconBtn"> cancel </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        on: {
+            pageInit: function () {
+                cargaDataMarquee("marquee_perfilVeterinaria");
+
+                let url = localStorage.getItem("url");
+                $.ajax({
+                    method: "POST",
+                    dataType: "JSON",
+                    url: url + "Brummy/views/store/obtenerDataVeterinaria.php",
+                    data: {},
+                })
+                    .done(function (results) {
+                        let success = results.success;
+                        let result = results.result;
+                        switch (success) {
+                            case true:
+                                if (result == "Sin Datos") {
+                                    // preloader.hide();
+                                } else {
+                                    let nombreVete, calle, col, cp, descripcion, eslogan, estado, municipio, numero, pais, urlLogo;
+                                    result.forEach((data, index) => {
+                                        nombreVete = data.nombreVete ? data.nombreVete : "";
+                                        calle = data.calle ? data.calle : "";
+                                        col = data.col ? data.col : "";
+                                        cp = data.cp ? data.cp : "";
+                                        descripcion = data.descripcion ? data.descripcion : "";
+                                        eslogan = data.eslogan ? data.eslogan : "";
+                                        estado = data.estado ? data.estado : "";
+                                        municipio = data.municipio ? data.municipio : "";
+                                        numero = data.numero ? data.numero : "";
+                                        pais = data.pais ? data.pais : "";
+                                        urlLogo = data.urlLogo ? data.urlLogo : "";
+                                    });
+                                    $("#nombreVete_span").html(nombreVete);
+                                    let directionCompleta = calle ? `${calle} ${numero}, ${cp} ${col}, ${municipio} ${estado}` : "";
+                                    $("#direccionVete_span").html(directionCompleta);
+                                    $("#esloganVete_span").html(eslogan);
+                                    $("#descripcionVete_span").html(descripcion);
+                                    obtenerRedesSocialesVete();
+                                    obtenerContactosVete();
+                                    obtenerHorariosVete();
+                                }
+                                break;
+                            case false:
+                                // preloader.hide();
+                                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                break;
+                        }
+                    })
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        // preloader.hide();
+                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                        console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+                    });
+
+                $("#diaVete_1").change(() => {
+                    let diaVete_1 = $("#diaVete_1").val();
+                    let dias = [];
+                    dias[1] = "Lunes";
+                    dias[2] = "Martes";
+                    dias[3] = "Miércoles";
+                    dias[4] = "Jueves";
+                    dias[5] = "Viernes";
+                    dias[6] = "Sábado";
+                    dias[7] = "Domingo";
+
+                    let abre = [];
+                    abre[1] = "Lu";
+                    abre[2] = "Ma";
+                    abre[3] = "Mi";
+                    abre[4] = "Ju";
+                    abre[5] = "Vi";
+                    abre[6] = "Sá";
+                    abre[7] = "Do";
+
+                    if (diaVete_1) {
+                        if (diaVete_1 <= 7) {
+                            $("#diaVete_2").html("<option value=''>Selecciona una opción</option>");
+                            for (i = diaVete_1; i <= 7; i++) {
+                                $("#diaVete_2").append(`<option value="${i}" abreviacion="${abre[i]}">${dias[i]}</option>`);
+                            }
+                        }
+                    } else {
+                        $("#diaVete_2").html("<option value=''>Selecciona una opción</option>");
+                    }
+                });
+            },
+        },
+    };
+</script>
+
+<style>
+    .paginate_button.current {
+        border: none !important;
+        background: #009071 !important;
+        border-radius: 8px !important;
+        font-weight: bold;
+        color: #fff !important;
+    }
+
+    .list ul:before {
+        display: none !important;
+    }
+
+    .list ul:after {
+        display: none !important;
+    }
+    .ts-control {
+        border: 0;
+        padding: 0;
+    }
+    .ts-control > input {
+        height: auto !important;
+    }
+    .ts-wrapper.floating.obligatorio.full.has-items {
+        border: 2px solid #009071 !important;
+        border-radius: 8px !important;
+    }
+    .grid {
+        display: flex;
+    }
+</style>

@@ -182,7 +182,7 @@ function pintaLogin() {
             <div class="container-login100" id="bodyLogin">
                 <div class="wrap-login100">
                     <div style="text-align: center; padding-bottom: 25px; width: 100%; padding-top: 25px">
-                        <img src="img/logo.png" height="100px" alt="Logo CISA" id="img_logo" />
+                        <img src="img/logo.png" height="150px" alt="Logo CISA" id="img_logo" />
                     </div>
                     <form method="post" class="login100-form validate-form" id="formulario">
                         <div class="wrap-input100 validate-input m-b-18">
@@ -458,4 +458,30 @@ function cargaDataMarquee(idMarquee) {
         .fail(function (jqXHR, textStatus, errorThrown) {
             console.log("accesoUsuarioView  - Server: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
         });
+}
+
+const msj = function () {};
+
+msj.show = function (title, subtile, buttons) {
+    app.dialog.alert(subtile, title);
+};
+
+function CantidadConCommas(valor) {
+    let retorno = 0;
+    if (String(valor).includes(".")) {
+        let newValor = valor.split(".");
+        valor = String(newValor[0]).replaceAll(",", "");
+        let newValor2 = numberWithCommas(valor);
+        retorno = newValor2 + "." + newValor[1];
+    } else {
+        valor = String(valor).replaceAll(",", "");
+        let newValor = numberWithCommas(valor);
+        retorno = newValor;
+    }
+
+    return retorno;
+}
+
+function numberWithCommas(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }

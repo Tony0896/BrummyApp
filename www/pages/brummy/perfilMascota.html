@@ -76,10 +76,15 @@
 
                 <div class="card">
                     <div class="card-header">
-                        <div class="item-title" style="font-weight: bold">Notas</div>
+                        <div class="item-title" style="font-weight: bold">Comentarios</div>
+                        <div style="margin-top: 10px">
+                            <button class="button button-outline button-round btnGreen" onclick="crearComentarioMascota()">
+                                Crear <span class="material-icons iconBtn"> add_circle </span>
+                            </button>
+                        </div>
                     </div>
                     <div class="card-content" style="padding: 10px; display: flex; justify-content: center; max-height: 500px; overflow-y: scroll">
-                        <div class="item-subtitle">Sin notas</div>
+                        <div class="item-subtitle" id="content_comentario" style="width: 100%">Sin Comentarios</div>
                     </div>
                 </div>
 
@@ -208,6 +213,7 @@
                         // siempre sera ejecutado
                     });
 
+                obtenerComentarios();
                 // app.dialog.progress("Cargando...", "#009071");
             },
         },

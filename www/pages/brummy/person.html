@@ -1,0 +1,327 @@
+<template>
+    <div class="page" id="panel-page">
+        <div class="navbar" style="height: 5px">
+            <div
+                class="left top-left"
+                style="justify-content: space-between; background-color: #009071; flex-direction: column; height: auto; min-height: 50px"
+            >
+                <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin-top: 10px">
+                    <div>&nbsp;</div>
+                    <div class="title" style="font-size: 18px; margin-left: 15px">Clientes Frecuentes</div>
+                    <div>&nbsp;</div>
+                </div>
+            </div>
+            <div id="marquee_catalogos" style="background-color: #009071"></div>
+        </div>
+
+        <div class="page-content" style="margin-top: 16px">
+            <div style="width: 75%; margin: auto" class="block">
+                <div class="toolbar toolbar-bottom tabbar" style="border-radius: 50px">
+                    <div class="toolbar-inner" style="border-top-left-radius: 50px; border-bottom-left-radius: 50px">
+                        <a href="#tab-4" class="tab-link tab-link-active">Citas</a>
+                        <a href="#tab-5" class="tab-link">Compras</a>
+                        <!-- <a href="#tab-3" class="tab-link">Motivos</a> -->
+                        <span class="tab-link-highlight" style="width: 33.3333%; transform: translate3d(0%, 0px, 0px); display: none"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="tabs-animated-wrap" style="height: auto">
+                <div class="tabs">
+                    <div id="tab-4" class="page-content tab tab-active" style="padding-top: 0px">
+                        <div class="block">
+                            <div>
+                                <div class="list list-strong-ios list-dividers-ios inset-ios">
+                                    <ul class="row">
+                                        <li class="item-content item-input item-input-outline item-input-focused col-33">
+                                            <div class="item-inner">
+                                                <div class="item-title item-floating-label">Top:</div>
+                                                <div class="item-input-wrap">
+                                                    <select
+                                                        class="floating obligatorio input-focused input-with-value input-focused item-input-outline"
+                                                        style="
+                                                            border: 2px solid #009071 !important;
+                                                            padding-top: 0 !important;
+                                                            padding-bottom: 0 !important;
+                                                        "
+                                                        type="text"
+                                                        placeholder="Top"
+                                                        id="filtroCitas"
+                                                        name="Top"
+                                                    >
+                                                        <option value="5">5</option>
+                                                        <option value="10">10</option>
+                                                        <option value="15">15</option>
+                                                        <option value="20">20</option>
+                                                        <option value="50">50</option>
+                                                        <option value="100">100</option>
+                                                        <option value="TODOS">TODOS</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                        <li class="item-content item-input item-input-outline item-input-focused col-33">
+                                            <div class="item-inner">
+                                                <div class="item-title item-floating-label">Año:</div>
+                                                <div class="item-input-wrap">
+                                                    <select
+                                                        class="floating obligatorio input-focused input-with-value input-focused item-input-outline"
+                                                        style="
+                                                            border: 2px solid #009071 !important;
+                                                            padding-top: 0 !important;
+                                                            padding-bottom: 0 !important;
+                                                        "
+                                                        type="text"
+                                                        placeholder="Año"
+                                                        id="filtroAnioCitas"
+                                                        name="Año"
+                                                    ></select>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                        <li class="item-content item-input item-input-outline item-input-focused col-33">
+                                            <div class="item-inner">
+                                                <div class="item-title item-floating-label">Mes</div>
+                                                <div class="item-input-wrap">
+                                                    <select
+                                                        class="floating obligatorio input-focused input-with-value input-focused item-input-outline"
+                                                        style="
+                                                            border: 2px solid #009071 !important;
+                                                            padding-top: 0 !important;
+                                                            padding-bottom: 0 !important;
+                                                        "
+                                                        type="text"
+                                                        placeholder="Mes"
+                                                        id="filtroMesCitas"
+                                                        name="Mes"
+                                                    ></select>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card" style="border-radius: 10px; padding: 10px">
+                                <input class="FWM-input" type="text" id="especieBuscador" placeholder="Buscar especie" />
+                                <table class="mdl-data-table table responsive table-bordered table-striped datatable" id="especiesBodyDT">
+                                    <thead>
+                                        <tr>
+                                            <th class="thDataTable">#</th>
+                                            <th class="thDataTable">ID</th>
+                                            <th class="thDataTable">Cliente</th>
+                                            <th class="thDataTable">Citas Agendadas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="frecuentesCitasBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-5" class="page-content tab" style="padding-top: 0px">
+                        <div class="block">
+                            <div>
+                                <div class="list list-strong-ios list-dividers-ios inset-ios">
+                                    <ul class="row">
+                                        <li class="item-content item-input item-input-outline item-input-focused col-33">
+                                            <div class="item-inner">
+                                                <div class="item-title item-floating-label">Top:</div>
+                                                <div class="item-input-wrap">
+                                                    <select
+                                                        class="floating obligatorio input-focused input-with-value input-focused item-input-outline"
+                                                        style="
+                                                            border: 2px solid #009071 !important;
+                                                            padding-top: 0 !important;
+                                                            padding-bottom: 0 !important;
+                                                        "
+                                                        type="text"
+                                                        placeholder="Top"
+                                                        id="filtroCompras"
+                                                        name="Top"
+                                                    >
+                                                        <option value="5">5</option>
+                                                        <option value="10">10</option>
+                                                        <option value="15">15</option>
+                                                        <option value="20">20</option>
+                                                        <option value="50">50</option>
+                                                        <option value="100">100</option>
+                                                        <option value="TODOS">TODOS</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                        <li class="item-content item-input item-input-outline item-input-focused col-33">
+                                            <div class="item-inner">
+                                                <div class="item-title item-floating-label">Año:</div>
+                                                <div class="item-input-wrap">
+                                                    <select
+                                                        class="floating obligatorio input-focused input-with-value input-focused item-input-outline"
+                                                        style="
+                                                            border: 2px solid #009071 !important;
+                                                            padding-top: 0 !important;
+                                                            padding-bottom: 0 !important;
+                                                        "
+                                                        type="text"
+                                                        placeholder="Año"
+                                                        id="filtroAnioCompras"
+                                                        name="Año"
+                                                    ></select>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                        <li class="item-content item-input item-input-outline item-input-focused col-33">
+                                            <div class="item-inner">
+                                                <div class="item-title item-floating-label">Mes</div>
+                                                <div class="item-input-wrap">
+                                                    <select
+                                                        class="floating obligatorio input-focused input-with-value input-focused item-input-outline"
+                                                        style="
+                                                            border: 2px solid #009071 !important;
+                                                            padding-top: 0 !important;
+                                                            padding-bottom: 0 !important;
+                                                        "
+                                                        type="text"
+                                                        placeholder="Mes"
+                                                        id="filtroMesCompras"
+                                                        name="Mes"
+                                                    ></select>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card" style="border-radius: 10px; padding: 10px">
+                                <input class="FWM-input" type="text" id="razasBuscador" placeholder="Buscar razas" />
+                                <table class="mdl-data-table table responsive table-bordered table-striped datatable" id="razasBodyDT">
+                                    <thead>
+                                        <tr>
+                                            <th class="thDataTable">#</th>
+                                            <th class="thDataTable">ID</th>
+                                            <th class="thDataTable">Cliente</th>
+                                            <th class="thDataTable">Total Compras</th>
+                                            <th class="thDataTable">Productos</th>
+                                            <th class="thDataTable">Suma de Compras</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="frecuentesComprasBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        on: {
+            pageInit: function () {
+                cargaDataMarquee("marquee_catalogos");
+                let url = localStorage.getItem("url");
+
+                let fechaNow = new Date().toLocaleString("sv-SE").split(" ")[0];
+                let mes = fechaNow.split("-")[1];
+                let anio = fechaNow.split("-")[0];
+
+                const months = [
+                    "Enero",
+                    "Febrero",
+                    "Marzo",
+                    "Abril",
+                    "Mayo",
+                    "Junio",
+                    "Julio",
+                    "Agosto",
+                    "Septiembre",
+                    "Octubre",
+                    "Noviembre",
+                    "Diciembre",
+                ];
+                $("#filtroMesCitas").append(`<option value="TODOS" selected>TODOS</option>`);
+                $("#filtroMesCompras").append(`<option value="TODOS" selected>TODOS</option>`);
+                for (let i = 0; i < months.length; i++) {
+                    let m = i;
+                    m++;
+                    $("#filtroMesCitas").append(`<option value="${m}">${months[i]}</option>`);
+                    $("#filtroMesCompras").append(`<option value="${m}">${months[i]}</option>`);
+                }
+
+                for (let i = 3; i > 0; i--) {
+                    let new_anio = Number(anio) - i;
+                    $("#filtroAnioCitas").append(`<option value="${new_anio}">${new_anio}</option>`);
+                    $("#filtroAnioCompras").append(`<option value="${new_anio}">${new_anio}</option>`);
+                }
+
+                $("#filtroAnioCitas").append(`<option value="${anio}" selected>${anio}</option>`);
+                $("#filtroAnioCompras").append(`<option value="${anio}" selected>${anio}</option>`);
+
+                for (let i = 1; i < 4; i++) {
+                    let new_anio = Number(anio) + i;
+                    $("#filtroAnioCitas").append(`<option value="${new_anio}">${new_anio}</option>`);
+                    $("#filtroAnioCompras").append(`<option value="${new_anio}">${new_anio}</option>`);
+                }
+
+                obtenerCitasFrecuentes();
+                obtenerComprasFrecuentes();
+
+                $("#filtroCitas").change(() => {
+                    obtenerCitasFrecuentes();
+                });
+
+                $("#filtroAnioCitas").change(() => {
+                    obtenerCitasFrecuentes();
+                });
+
+                $("#filtroMesCitas").change(() => {
+                    obtenerCitasFrecuentes();
+                });
+
+                $("#filtroCompras").change(() => {
+                    obtenerComprasFrecuentes();
+                });
+
+                $("#filtroAnioCompras").change(() => {
+                    obtenerComprasFrecuentes();
+                });
+
+                $("#filtroMesCompras").change(() => {
+                    obtenerComprasFrecuentes();
+                });
+            },
+        },
+    };
+</script>
+
+<style>
+    .paginate_button.current {
+        border: none !important;
+        background: #009071 !important;
+        border-radius: 8px !important;
+        font-weight: bold;
+        color: #fff !important;
+    }
+
+    .list ul:before {
+        display: none !important;
+    }
+
+    .list ul:after {
+        display: none !important;
+    }
+    .ts-control {
+        border: 0;
+        padding: 0;
+    }
+    .ts-control > input {
+        height: auto !important;
+    }
+    .ts-wrapper.floating.obligatorio.full.has-items {
+        border: 2px solid #009071 !important;
+        border-radius: 8px !important;
+    }
+</style>
