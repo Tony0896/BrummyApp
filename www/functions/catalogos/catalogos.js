@@ -54,21 +54,48 @@ function guardarEspecie() {
 
         // app.dialog.progress("Cargando...", "#009071");
         let url = localStorage.getItem("url");
-        axios
-            .post(url + "Brummy/views/catalogos/guardarEspecie.php", {
-                nombreEspecie,
-            })
-            .then(function (response) {
-                console.log(response);
-                if (response.status === 200) {
-                    $(".sheet-close").trigger("click");
-                    app.dialog.alert("Guardado correctamente", "Aviso");
-                    obtenerEspecies();
+        // axios
+        //     .post(url + "Brummy/views/catalogos/guardarEspecie.php", {
+        //         nombreEspecie,
+        //     })
+        //     .then(function (response) {
+        //         console.log(response);
+        //         if (response.status === 200) {
+        //             $(".sheet-close").trigger("click");
+        //             app.dialog.alert("Guardado correctamente", "Aviso");
+        //             obtenerEspecies();
+        //         }
+        //     })
+        //     .catch(function (error) {
+        //         app.dialog.alert("Algo salió mal", "Aviso");
+        //         console.log(error);
+        //     });
+        $.ajax({
+            method: "POST",
+            dataType: "JSON",
+            url: url + "Brummy/views/catalogos/guardarEspecie.php",
+            data: { nombreEspecie },
+        })
+            .done(function (results) {
+                let success = results.success;
+                let result = results.result;
+
+                switch (success) {
+                    case true:
+                        $(".sheet-close").trigger("click");
+                        app.dialog.alert("Guardado correctamente", "Aviso");
+                        obtenerEspecies();
+                        break;
+                    case false:
+                        // preloader.hide();
+                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                        break;
                 }
             })
-            .catch(function (error) {
-                app.dialog.alert("Algo salió mal", "Aviso");
-                console.log(error);
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                // preloader.hide();
+                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
             });
     } else {
         let html =
@@ -108,7 +135,7 @@ function obtenerEspecies() {
                             <td class="capitalize">${data.nombreEspecie}</td>
                             <td>
                                 <button class="button button-outline button-round btnEliminar" onclick="deleteEspecie(${data.ID})">
-                                    <span class="material-icons iconBtn"> delete </span>
+                                    <span class="material-icons iconBtn" style="margin-left: 0;"> delete </span>
                                 </button>
                             </td>
                         </tr>`;
@@ -150,7 +177,7 @@ function obtenerRazas() {
                             <td class="capitalize">${data.especie}</td>
                             <td>
                                 <button class="button button-outline button-round btnEliminar" onclick="deleteRaza(${data.ID})">
-                                    <span class="material-icons iconBtn"> delete </span>
+                                    <span class="material-icons iconBtn" style="margin-left: 0;"> delete </span>
                                 </button>
                             </td>
                         </tr>`;
@@ -278,23 +305,54 @@ function guardarRaza() {
 
         nombreRaza.replaceAll("'", '"');
         let url = localStorage.getItem("url");
-        axios
-            .post(url + "Brummy/views/catalogos/guardarRaza.php", {
+        // axios
+        //     .post(url + "Brummy/views/catalogos/guardarRaza.php", {
+        //         nombreRaza,
+        //         FK_especie,
+        //         especie,
+        //     })
+        //     .then(function (response) {
+        //         console.log(response);
+        //         if (response.status === 200) {
+        //             $(".sheet-close").trigger("click");
+        //             app.dialog.alert("Guardado correctamente", "Aviso");
+        //             obtenerRazas();
+        //         }
+        //     })
+        //     .catch(function (error) {
+        //         app.dialog.alert("Algo salió mal", "Aviso");
+        //         console.log(error);
+        //     });
+        $.ajax({
+            method: "POST",
+            dataType: "JSON",
+            url: url + "Brummy/views/catalogos/guardarRaza.php",
+            data: {
                 nombreRaza,
                 FK_especie,
                 especie,
-            })
-            .then(function (response) {
-                console.log(response);
-                if (response.status === 200) {
-                    $(".sheet-close").trigger("click");
-                    app.dialog.alert("Guardado correctamente", "Aviso");
-                    obtenerRazas();
+            },
+        })
+            .done(function (results) {
+                let success = results.success;
+                let result = results.result;
+
+                switch (success) {
+                    case true:
+                        $(".sheet-close").trigger("click");
+                        app.dialog.alert("Guardado correctamente", "Aviso");
+                        obtenerRazas();
+                        break;
+                    case false:
+                        // preloader.hide();
+                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                        break;
                 }
             })
-            .catch(function (error) {
-                app.dialog.alert("Algo salió mal", "Aviso");
-                console.log(error);
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                // preloader.hide();
+                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
             });
     } else {
         let html =
@@ -328,20 +386,46 @@ function deleteEspecie(ID) {
                     text: "OK",
                     onClick: function () {
                         let url = localStorage.getItem("url");
-                        axios
-                            .post(url + "Brummy/views/catalogos/deleteEspecie.php", {
-                                ID,
-                            })
-                            .then(function (response) {
-                                console.log(response);
-                                if (response.status === 200) {
-                                    app.dialog.alert("Eliminado correctamente", "Aviso");
-                                    obtenerEspecies();
+                        // axios
+                        //     .post(url + "Brummy/views/catalogos/deleteEspecie.php", {
+                        //         ID,
+                        //     })
+                        //     .then(function (response) {
+                        //         console.log(response);
+                        //         if (response.status === 200) {
+                        //             app.dialog.alert("Eliminado correctamente", "Aviso");
+                        //             obtenerEspecies();
+                        //         }
+                        //     })
+                        //     .catch(function (error) {
+                        //         app.dialog.alert("Algo salió mal", "Aviso");
+                        //         console.log(error);
+                        //     });
+                        $.ajax({
+                            method: "POST",
+                            dataType: "JSON",
+                            url: url + "Brummy/views/catalogos/deleteEspecie.php",
+                            data: { ID },
+                        })
+                            .done(function (results) {
+                                let success = results.success;
+                                let result = results.result;
+
+                                switch (success) {
+                                    case true:
+                                        app.dialog.alert("Eliminado correctamente", "Aviso");
+                                        obtenerEspecies();
+                                        break;
+                                    case false:
+                                        // preloader.hide();
+                                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                        break;
                                 }
                             })
-                            .catch(function (error) {
-                                app.dialog.alert("Algo salió mal", "Aviso");
-                                console.log(error);
+                            .fail(function (jqXHR, textStatus, errorThrown) {
+                                // preloader.hide();
+                                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
                             });
                     },
                 },
@@ -365,20 +449,46 @@ function deleteRaza(ID) {
                     text: "OK",
                     onClick: function () {
                         let url = localStorage.getItem("url");
-                        axios
-                            .post(url + "Brummy/views/catalogos/deleteRaza.php", {
-                                ID,
-                            })
-                            .then(function (response) {
-                                console.log(response);
-                                if (response.status === 200) {
-                                    app.dialog.alert("Eliminado correctamente", "Aviso");
-                                    obtenerRazas();
+                        // axios
+                        //     .post(url + "Brummy/views/catalogos/deleteRaza.php", {
+                        //         ID,
+                        //     })
+                        //     .then(function (response) {
+                        //         console.log(response);
+                        //         if (response.status === 200) {
+                        //             app.dialog.alert("Eliminado correctamente", "Aviso");
+                        //             obtenerRazas();
+                        //         }
+                        //     })
+                        //     .catch(function (error) {
+                        //         app.dialog.alert("Algo salió mal", "Aviso");
+                        //         console.log(error);
+                        //     });
+                        $.ajax({
+                            method: "POST",
+                            dataType: "JSON",
+                            url: url + "Brummy/views/catalogos/deleteRaza.php",
+                            data: { ID },
+                        })
+                            .done(function (results) {
+                                let success = results.success;
+                                let result = results.result;
+
+                                switch (success) {
+                                    case true:
+                                        app.dialog.alert("Eliminado correctamente", "Aviso");
+                                        obtenerRazas();
+                                        break;
+                                    case false:
+                                        // preloader.hide();
+                                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                        break;
                                 }
                             })
-                            .catch(function (error) {
-                                app.dialog.alert("Algo salió mal", "Aviso");
-                                console.log(error);
+                            .fail(function (jqXHR, textStatus, errorThrown) {
+                                // preloader.hide();
+                                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
                             });
                     },
                 },
@@ -408,7 +518,7 @@ function obtenerMotivos() {
                             <td class="capitalize">${data.motivoCita}</td>
                             <td>
                                 <button class="button button-outline button-round btnEliminar" onclick="deleteMotivoCita(${data.ID})">
-                                    <span class="material-icons iconBtn"> delete </span>
+                                    <span class="material-icons iconBtn" style="margin-left: 0;"> delete </span>
                                 </button>
                             </td>
                         </tr>`;
@@ -481,21 +591,48 @@ function guardarMotivoCita() {
 
         motivoCita.replaceAll("'", '"');
         let url = localStorage.getItem("url");
-        axios
-            .post(url + "Brummy/views/catalogos/guardarMotivoCita.php", {
-                motivoCita,
-            })
-            .then(function (response) {
-                console.log(response);
-                if (response.status === 200) {
-                    $(".sheet-close").trigger("click");
-                    app.dialog.alert("Guardado correctamente", "Aviso");
-                    obtenerMotivos();
+        // axios
+        //     .post(url + "Brummy/views/catalogos/guardarMotivoCita.php", {
+        //         motivoCita,
+        //     })
+        //     .then(function (response) {
+        //         console.log(response);
+        //         if (response.status === 200) {
+        //             $(".sheet-close").trigger("click");
+        //             app.dialog.alert("Guardado correctamente", "Aviso");
+        //             obtenerMotivos();
+        //         }
+        //     })
+        //     .catch(function (error) {
+        //         app.dialog.alert("Algo salió mal", "Aviso");
+        //         console.log(error);
+        //     });
+        $.ajax({
+            method: "POST",
+            dataType: "JSON",
+            url: url + "Brummy/views/catalogos/guardarMotivoCita.php",
+            data: { motivoCita },
+        })
+            .done(function (results) {
+                let success = results.success;
+                let result = results.result;
+
+                switch (success) {
+                    case true:
+                        $(".sheet-close").trigger("click");
+                        app.dialog.alert("Guardado correctamente", "Aviso");
+                        obtenerMotivos();
+                        break;
+                    case false:
+                        // preloader.hide();
+                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                        break;
                 }
             })
-            .catch(function (error) {
-                app.dialog.alert("Algo salió mal", "Aviso");
-                console.log(error);
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                // preloader.hide();
+                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
             });
     } else {
         let html =
@@ -529,20 +666,46 @@ function deleteMotivoCita(ID) {
                     text: "OK",
                     onClick: function () {
                         let url = localStorage.getItem("url");
-                        axios
-                            .post(url + "Brummy/views/catalogos/deleteMotivoCita.php", {
-                                ID,
-                            })
-                            .then(function (response) {
-                                console.log(response);
-                                if (response.status === 200) {
-                                    app.dialog.alert("Eliminado correctamente", "Aviso");
-                                    obtenerMotivos();
+                        // axios
+                        //     .post(url + "Brummy/views/catalogos/deleteMotivoCita.php", {
+                        //         ID,
+                        //     })
+                        //     .then(function (response) {
+                        //         console.log(response);
+                        //         if (response.status === 200) {
+                        //             app.dialog.alert("Eliminado correctamente", "Aviso");
+                        //             obtenerMotivos();
+                        //         }
+                        //     })
+                        //     .catch(function (error) {
+                        //         app.dialog.alert("Algo salió mal", "Aviso");
+                        //         console.log(error);
+                        //     });
+                        $.ajax({
+                            method: "POST",
+                            dataType: "JSON",
+                            url: url + "Brummy/views/catalogos/deleteMotivoCita.php",
+                            data: { ID },
+                        })
+                            .done(function (results) {
+                                let success = results.success;
+                                let result = results.result;
+
+                                switch (success) {
+                                    case true:
+                                        app.dialog.alert("Eliminado correctamente", "Aviso");
+                                        obtenerMotivos();
+                                        break;
+                                    case false:
+                                        // preloader.hide();
+                                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                        break;
                                 }
                             })
-                            .catch(function (error) {
-                                app.dialog.alert("Algo salió mal", "Aviso");
-                                console.log(error);
+                            .fail(function (jqXHR, textStatus, errorThrown) {
+                                // preloader.hide();
+                                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
                             });
                     },
                 },

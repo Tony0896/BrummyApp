@@ -214,8 +214,34 @@ function guardarProducto() {
 
         let url = localStorage.getItem("url");
 
-        axios
-            .post(url + "Brummy/views/inventario/guardarProducto.php", {
+        // axios
+        //     .post(url + "Brummy/views/inventario/guardarProducto.php", {
+        //         tipoProducto,
+        //         nombre,
+        //         codigo,
+        //         descripcion,
+        //         precioCompra,
+        //         precioVenta,
+        //         stockMinimo,
+        //         stockReal,
+        //     })
+        //     .then(function (response) {
+        //         console.log(response);
+        //         if (response.status === 200) {
+        //             $(".sheet-close").trigger("click");
+        //             app.dialog.alert("Guardado correctamente", "Aviso");
+        //             obtenerInventario();
+        //         }
+        //     })
+        //     .catch(function (error) {
+        //         app.dialog.alert("Algo salió mal", "Aviso");
+        //         console.log(error);
+        //     });
+        $.ajax({
+            method: "POST",
+            dataType: "JSON",
+            url: url + "Brummy/views/inventario/guardarProducto.php",
+            data: {
                 tipoProducto,
                 nombre,
                 codigo,
@@ -224,18 +250,28 @@ function guardarProducto() {
                 precioVenta,
                 stockMinimo,
                 stockReal,
-            })
-            .then(function (response) {
-                console.log(response);
-                if (response.status === 200) {
-                    $(".sheet-close").trigger("click");
-                    app.dialog.alert("Guardado correctamente", "Aviso");
-                    obtenerInventario();
+            },
+        })
+            .done(function (results) {
+                let success = results.success;
+                let result = results.result;
+
+                switch (success) {
+                    case true:
+                        $(".sheet-close").trigger("click");
+                        app.dialog.alert("Guardado correctamente", "Aviso");
+                        obtenerInventario();
+                        break;
+                    case false:
+                        // preloader.hide();
+                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                        break;
                 }
             })
-            .catch(function (error) {
-                app.dialog.alert("Algo salió mal", "Aviso");
-                console.log(error);
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                // preloader.hide();
+                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
             });
     } else {
         let html =
@@ -256,198 +292,402 @@ function guardarProducto() {
 
 function verProducto(ID) {
     let url = localStorage.getItem("url");
-    axios
-        .post(url + "Brummy/views/inventario/obtenerProducto.php", {
-            ID,
-        })
-        .then(function (response) {
-            console.log(response);
-            if (response.status === 200) {
-                let result = response.data.result;
-                if (result == "Sin Datos") {
-                    app.dialog.alert("No se encontro información al respecto.", "Aviso");
-                } else {
-                    result.forEach((data, index) => {
-                        let modalTemplate = app.popup.create({
-                            content: `<div class="sheet-modal demo-sheet">
-                                            <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;"> 
-                                                <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
-                                            </div>
-                                            <div class="sheet-modal-inner">
-                                                <div class="page-content">
-                                                    <div class="block" style="margin-top: 60px;align-items: center;display: flex;flex-direction: column;">
-                                                        <div id="formInventarioModal" style=" width: 100%; ">
-                                                            <div class="list list-strong-ios list-dividers-ios inset-ios">
-                                                                <ul>
-                                                                    <li class="item-content item-input item-input-outline" id="LItipoProductoModal">
-                                                                        <div class="item-inner">
-                                                                            <div class="item-title item-floating-label">Tipo Producto</div>
-                                                                            <div class="item-input-wrap">
-                                                                                <select class="floating obligatorio capitalize input-focused " type="text" placeholder="Tipo Producto" id="tipoProductoModal" name="Tipo Producto"  onchange="asignaObligatorios(this.value)" style="padding-top: 0px !important; height: auto; padding-bottom: 0px !important">
-                                                                                    <option value=""> - - </option>
-                                                                                    <option value="Producto">Producto</option>
-                                                                                    <option value="Servicio">Servicio</option>
-                                                                                </select>
-                                                                            </div>
-                                                                        </div>
-                                                                    </li>
-                    
-                                                                    <li class="item-content item-input item-input-outline div_producto div_servicio" id="LInombreModal">
-                                                                        <div class="item-inner">
-                                                                            <div class="item-title item-floating-label">Nombre</div>
-                                                                            <div class="item-input-wrap">
-                                                                                <input class="floating obligatorio producto capitalize input-focused servicio" type="text" placeholder="Nombre" id="nombreModal" name="Nombre">
-                                                                                <span class="input-clear-button"></span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </li>
-                        
-                                                                    <li class="item-content item-input item-input-outline div_producto" id="LIcodigoModal">
-                                                                        <div class="item-inner">
-                                                                            <div class="item-title item-floating-label">Código</div>
-                                                                            <div class="item-input-wrap">
-                                                                                <input class="floating obligatorio producto capitalize input-focused " type="text" placeholder="Código" id="codigoModal" name="Código">
-                                                                                <span class="input-clear-button"></span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </li>
-                    
-                                                                    <li class="item-content item-input item-input-outline div_producto div_servicio" id="LIdescripcionModal">
-                                                                        <div class="item-inner">
-                                                                            <div class="item-title item-floating-label">Descripción</div>
-                                                                            <div class="item-input-wrap">
-                                                                                <input class="floating obligatorio producto capitalize input-focused servicio" type="text" placeholder="Descripción" id="descripcionModal" name="Descripción">
-                                                                                <span class="input-clear-button"></span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </li>
-                    
-                                                                    <li class="item-content item-input item-input-outline div_producto" id="LIprecioCompraModal">
-                                                                        <div class="item-inner">
-                                                                            <div class="item-title item-floating-label">Precio Compra</div>
-                                                                            <div class="item-input-wrap">
-                                                                                <input class="floating obligatorio producto capitalize input-focused " type="text" placeholder="Precio Compra" id="precioCompraModal" name="Precio Compra">
-                                                                                <span class="input-clear-button"></span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </li>
-                    
-                                                                    <li class="item-content item-input item-input-outline div_producto div_servicio" id="LIprecioVentaModal">
-                                                                        <div class="item-inner">
-                                                                            <div class="item-title item-floating-label">Precio Venta</div>
-                                                                            <div class="item-input-wrap">
-                                                                                <input class="floating obligatorio producto capitalize input-focused servicio" type="text" placeholder="Precio Venta" id="precioVentaModal" name="Precio Venta">
-                                                                                <span class="input-clear-button"></span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </li>
-                    
-                                                                    <li class="item-content item-input item-input-outline div_producto" id="LIstockMinimoModal">
-                                                                        <div class="item-inner">
-                                                                            <div class="item-title item-floating-label">Stock mínimo</div>
-                                                                            <div class="item-input-wrap">
-                                                                                <input class="floating obligatorio producto capitalize input-focused " type="text" placeholder="Stock mínimo" id="stockMinimoModal" name="Stock mínimo">
-                                                                                <span class="input-clear-button"></span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </li>
-                    
-                                                                    <li class="item-content item-input item-input-outline div_producto" id="LIstockRealModal">
-                                                                        <div class="item-inner">
-                                                                            <div class="item-title item-floating-label">Stock real</div>
-                                                                            <div class="item-input-wrap">
-                                                                                <input class="floating obligatorio producto capitalize input-focused " type="text" placeholder="Stock real" id="stockRealModal" name="Stock real">
-                                                                                <span class="input-clear-button"></span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </li>
-                                                                    
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                
-                                                        <button class="button button-outline button-round" onclick="actualizarProducto(${ID})">
-                                                            Actualizar <span class="material-icons iconBtn"> save </span>
-                                                        </button>
-                                
-                                                        <button class="button button-outline button-round btnRed" onclick="eliminarProdcuto(${ID})" style="margin-top: 40px;">
-                                                            Eliminar <span class="material-icons iconBtn"> delete </span>
-                                                        </button>
-                                                        
+    // axios
+    //     .post(url + "Brummy/views/inventario/obtenerProducto.php", {
+    //         ID,
+    //     })
+    //     .then(function (response) {
+    //         console.log(response);
+    //         if (response.status === 200) {
+    //             let result = response.data.result;
+    //             if (result == "Sin Datos") {
+    //                 app.dialog.alert("No se encontro información al respecto.", "Aviso");
+    //             } else {
+    //                 result.forEach((data, index) => {
+    //                     let modalTemplate = app.popup.create({
+    //                         content: `<div class="sheet-modal demo-sheet">
+    //                                         <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;">
+    //                                             <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
+    //                                         </div>
+    //                                         <div class="sheet-modal-inner">
+    //                                             <div class="page-content">
+    //                                                 <div class="block" style="margin-top: 60px;align-items: center;display: flex;flex-direction: column;">
+    //                                                     <div id="formInventarioModal" style=" width: 100%; ">
+    //                                                         <div class="list list-strong-ios list-dividers-ios inset-ios">
+    //                                                             <ul>
+    //                                                                 <li class="item-content item-input item-input-outline" id="LItipoProductoModal">
+    //                                                                     <div class="item-inner">
+    //                                                                         <div class="item-title item-floating-label">Tipo Producto</div>
+    //                                                                         <div class="item-input-wrap">
+    //                                                                             <select class="floating obligatorio capitalize input-focused " type="text" placeholder="Tipo Producto" id="tipoProductoModal" name="Tipo Producto"  onchange="asignaObligatorios(this.value)" style="padding-top: 0px !important; height: auto; padding-bottom: 0px !important">
+    //                                                                                 <option value=""> - - </option>
+    //                                                                                 <option value="Producto">Producto</option>
+    //                                                                                 <option value="Servicio">Servicio</option>
+    //                                                                             </select>
+    //                                                                         </div>
+    //                                                                     </div>
+    //                                                                 </li>
+
+    //                                                                 <li class="item-content item-input item-input-outline div_producto div_servicio" id="LInombreModal">
+    //                                                                     <div class="item-inner">
+    //                                                                         <div class="item-title item-floating-label">Nombre</div>
+    //                                                                         <div class="item-input-wrap">
+    //                                                                             <input class="floating obligatorio producto capitalize input-focused servicio" type="text" placeholder="Nombre" id="nombreModal" name="Nombre">
+    //                                                                             <span class="input-clear-button"></span>
+    //                                                                         </div>
+    //                                                                     </div>
+    //                                                                 </li>
+
+    //                                                                 <li class="item-content item-input item-input-outline div_producto" id="LIcodigoModal">
+    //                                                                     <div class="item-inner">
+    //                                                                         <div class="item-title item-floating-label">Código</div>
+    //                                                                         <div class="item-input-wrap">
+    //                                                                             <input class="floating obligatorio producto capitalize input-focused " type="text" placeholder="Código" id="codigoModal" name="Código">
+    //                                                                             <span class="input-clear-button"></span>
+    //                                                                         </div>
+    //                                                                     </div>
+    //                                                                 </li>
+
+    //                                                                 <li class="item-content item-input item-input-outline div_producto div_servicio" id="LIdescripcionModal">
+    //                                                                     <div class="item-inner">
+    //                                                                         <div class="item-title item-floating-label">Descripción</div>
+    //                                                                         <div class="item-input-wrap">
+    //                                                                             <input class="floating obligatorio producto capitalize input-focused servicio" type="text" placeholder="Descripción" id="descripcionModal" name="Descripción">
+    //                                                                             <span class="input-clear-button"></span>
+    //                                                                         </div>
+    //                                                                     </div>
+    //                                                                 </li>
+
+    //                                                                 <li class="item-content item-input item-input-outline div_producto" id="LIprecioCompraModal">
+    //                                                                     <div class="item-inner">
+    //                                                                         <div class="item-title item-floating-label">Precio Compra</div>
+    //                                                                         <div class="item-input-wrap">
+    //                                                                             <input class="floating obligatorio producto capitalize input-focused " type="text" placeholder="Precio Compra" id="precioCompraModal" name="Precio Compra">
+    //                                                                             <span class="input-clear-button"></span>
+    //                                                                         </div>
+    //                                                                     </div>
+    //                                                                 </li>
+
+    //                                                                 <li class="item-content item-input item-input-outline div_producto div_servicio" id="LIprecioVentaModal">
+    //                                                                     <div class="item-inner">
+    //                                                                         <div class="item-title item-floating-label">Precio Venta</div>
+    //                                                                         <div class="item-input-wrap">
+    //                                                                             <input class="floating obligatorio producto capitalize input-focused servicio" type="text" placeholder="Precio Venta" id="precioVentaModal" name="Precio Venta">
+    //                                                                             <span class="input-clear-button"></span>
+    //                                                                         </div>
+    //                                                                     </div>
+    //                                                                 </li>
+
+    //                                                                 <li class="item-content item-input item-input-outline div_producto" id="LIstockMinimoModal">
+    //                                                                     <div class="item-inner">
+    //                                                                         <div class="item-title item-floating-label">Stock mínimo</div>
+    //                                                                         <div class="item-input-wrap">
+    //                                                                             <input class="floating obligatorio producto capitalize input-focused " type="text" placeholder="Stock mínimo" id="stockMinimoModal" name="Stock mínimo">
+    //                                                                             <span class="input-clear-button"></span>
+    //                                                                         </div>
+    //                                                                     </div>
+    //                                                                 </li>
+
+    //                                                                 <li class="item-content item-input item-input-outline div_producto" id="LIstockRealModal">
+    //                                                                     <div class="item-inner">
+    //                                                                         <div class="item-title item-floating-label">Stock real</div>
+    //                                                                         <div class="item-input-wrap">
+    //                                                                             <input class="floating obligatorio producto capitalize input-focused " type="text" placeholder="Stock real" id="stockRealModal" name="Stock real">
+    //                                                                             <span class="input-clear-button"></span>
+    //                                                                         </div>
+    //                                                                     </div>
+    //                                                                 </li>
+
+    //                                                             </ul>
+    //                                                         </div>
+    //                                                     </div>
+
+    //                                                     <button class="button button-outline button-round" onclick="actualizarProducto(${ID})">
+    //                                                         Actualizar <span class="material-icons iconBtn"> save </span>
+    //                                                     </button>
+
+    //                                                     <button class="button button-outline button-round btnRed" onclick="eliminarProdcuto(${ID})" style="margin-top: 40px;">
+    //                                                         Eliminar <span class="material-icons iconBtn"> delete </span>
+    //                                                     </button>
+
+    //                                                 </div>
+    //                                             </div>
+    //                                         </div>
+    //                                     </div>`,
+    //                         swipeToClose: false,
+    //                         closeByOutsideClick: false,
+    //                         closeByBackdropClick: false,
+    //                         closeOnEscape: false,
+    //                         on: {
+    //                             open: function (popup) {
+    //                                 $(".capitalize").removeClass("obligatorio");
+    //                                 $(".div_producto").css("display", "none");
+    //                                 if (data.tipo) {
+    //                                     $("#tipoProductoModal").val(data.tipo);
+    //                                     $("#LItipoProductoModal").addClass("item-input-focused");
+    //                                     $("#tipoProductoModal").addClass("input-with-value input-focused item-input-outline");
+    //                                 }
+    //                                 if (data.nombre) {
+    //                                     $("#nombreModal").val(data.nombre);
+    //                                     $("#LInombreModal").addClass("item-input-focused");
+    //                                     $("#nombreModal").addClass("input-with-value input-focused item-input-outline");
+    //                                 }
+    //                                 if (data.codigo) {
+    //                                     data.tipo == "Servicio"
+    //                                         ? $("#codigoModal").val(String(data.codigo) + String(data.ID))
+    //                                         : $("#codigoModal").val(data.codigo);
+    //                                     $("#codigoModal").val(data.descripcion);
+    //                                     $("#LIcodigoModal").addClass("item-input-focused");
+    //                                     $("#codigoModal").addClass("input-with-value input-focused item-input-outline");
+    //                                 }
+    //                                 if (data.descripcion) {
+    //                                     $("#descripcionModal").val(data.descripcion);
+    //                                     $("#LIdescripcionModal").addClass("item-input-focused");
+    //                                     $("#descripcionModal").addClass("input-with-value input-focused item-input-outline");
+    //                                 }
+    //                                 if (data.precioCompra) {
+    //                                     $("#precioCompraModal").val(data.precioCompra);
+    //                                     $("#LIprecioCompraModal").addClass("item-input-focused");
+    //                                     $("#precioCompraModal").addClass("input-with-value input-focused item-input-outline");
+    //                                 }
+    //                                 if (data.precioVenta) {
+    //                                     $("#precioVentaModal").val(data.precioVenta);
+    //                                     $("#LIprecioVentaModal").addClass("item-input-focused");
+    //                                     $("#precioVentaModal").addClass("input-with-value input-focused item-input-outline");
+    //                                 }
+    //                                 if (data.stockMinimo) {
+    //                                     $("#stockMinimoModal").val(data.stockMinimo);
+    //                                     $("#LIstockMinimoModal").addClass("item-input-focused");
+    //                                     $("#stockMinimoModal").addClass("input-with-value input-focused item-input-outline");
+    //                                 }
+    //                                 if (data.stockReal) {
+    //                                     $("#stockRealModal").val(data.stockReal);
+    //                                     $("#LIstockRealModal").addClass("item-input-focused");
+    //                                     $("#stockRealModal").addClass("input-with-value input-focused item-input-outline");
+    //                                 }
+    //                                 if (data.tipo == "Producto") {
+    //                                     $(".producto").addClass("obligatorio");
+    //                                     $(".div_producto").css("display", "flex");
+    //                                 } else if (data.tipo == "Servicio") {
+    //                                     $(".servicio").addClass("obligatorio");
+    //                                     $(".div_servicio").css("display", "flex");
+    //                                 }
+    //                             },
+    //                         },
+    //                     });
+
+    //                     modalTemplate.open();
+    //                 });
+    //             }
+    //         }
+    //     })
+    //     .catch(function (error) {
+    //         app.dialog.alert("Algo salió mal", "Aviso");
+    //         console.log(error);
+    //     });
+
+    $.ajax({
+        method: "POST",
+        dataType: "JSON",
+        url: url + "Brummy/views/inventario/obtenerProducto.php",
+        data: { ID },
+    })
+        .done(function (results) {
+            let success = results.success;
+            let result = results.result;
+
+            switch (success) {
+                case true:
+                    if (result == "Sin Datos") {
+                        app.dialog.alert("No se encontro información al respecto.", "Aviso");
+                    } else {
+                        result.forEach((data, index) => {
+                            let modalTemplate = app.popup.create({
+                                content: `<div class="sheet-modal demo-sheet">
+                                    <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;">
+                                        <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
+                                    </div>
+                                    <div class="sheet-modal-inner">
+                                        <div class="page-content">
+                                            <div class="block" style="margin-top: 60px;align-items: center;display: flex;flex-direction: column;">
+                                                <div id="formInventarioModal" style=" width: 100%; ">
+                                                    <div class="list list-strong-ios list-dividers-ios inset-ios">
+                                                        <ul>
+                                                            <li class="item-content item-input item-input-outline" id="LItipoProductoModal">
+                                                                <div class="item-inner">
+                                                                    <div class="item-title item-floating-label">Tipo Producto</div>
+                                                                    <div class="item-input-wrap">
+                                                                        <select class="floating obligatorio capitalize input-focused " type="text" placeholder="Tipo Producto" id="tipoProductoModal" name="Tipo Producto"  onchange="asignaObligatorios(this.value)" style="padding-top: 0px !important; height: auto; padding-bottom: 0px !important">
+                                                                            <option value=""> - - </option>
+                                                                            <option value="Producto">Producto</option>
+                                                                            <option value="Servicio">Servicio</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+
+                                                            <li class="item-content item-input item-input-outline div_producto div_servicio" id="LInombreModal">
+                                                                <div class="item-inner">
+                                                                    <div class="item-title item-floating-label">Nombre</div>
+                                                                    <div class="item-input-wrap">
+                                                                        <input class="floating obligatorio producto capitalize input-focused servicio" type="text" placeholder="Nombre" id="nombreModal" name="Nombre">
+                                                                        <span class="input-clear-button"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+
+                                                            <li class="item-content item-input item-input-outline div_producto" id="LIcodigoModal">
+                                                                <div class="item-inner">
+                                                                    <div class="item-title item-floating-label">Código</div>
+                                                                    <div class="item-input-wrap">
+                                                                        <input class="floating obligatorio producto capitalize input-focused " type="text" placeholder="Código" id="codigoModal" name="Código">
+                                                                        <span class="input-clear-button"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+
+                                                            <li class="item-content item-input item-input-outline div_producto div_servicio" id="LIdescripcionModal">
+                                                                <div class="item-inner">
+                                                                    <div class="item-title item-floating-label">Descripción</div>
+                                                                    <div class="item-input-wrap">
+                                                                        <input class="floating obligatorio producto capitalize input-focused servicio" type="text" placeholder="Descripción" id="descripcionModal" name="Descripción">
+                                                                        <span class="input-clear-button"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+
+                                                            <li class="item-content item-input item-input-outline div_producto" id="LIprecioCompraModal">
+                                                                <div class="item-inner">
+                                                                    <div class="item-title item-floating-label">Precio Compra</div>
+                                                                    <div class="item-input-wrap">
+                                                                        <input class="floating obligatorio producto capitalize input-focused " type="text" placeholder="Precio Compra" id="precioCompraModal" name="Precio Compra">
+                                                                        <span class="input-clear-button"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+
+                                                            <li class="item-content item-input item-input-outline div_producto div_servicio" id="LIprecioVentaModal">
+                                                                <div class="item-inner">
+                                                                    <div class="item-title item-floating-label">Precio Venta</div>
+                                                                    <div class="item-input-wrap">
+                                                                        <input class="floating obligatorio producto capitalize input-focused servicio" type="text" placeholder="Precio Venta" id="precioVentaModal" name="Precio Venta">
+                                                                        <span class="input-clear-button"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+
+                                                            <li class="item-content item-input item-input-outline div_producto" id="LIstockMinimoModal">
+                                                                <div class="item-inner">
+                                                                    <div class="item-title item-floating-label">Stock mínimo</div>
+                                                                    <div class="item-input-wrap">
+                                                                        <input class="floating obligatorio producto capitalize input-focused " type="text" placeholder="Stock mínimo" id="stockMinimoModal" name="Stock mínimo">
+                                                                        <span class="input-clear-button"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+
+                                                            <li class="item-content item-input item-input-outline div_producto" id="LIstockRealModal">
+                                                                <div class="item-inner">
+                                                                    <div class="item-title item-floating-label">Stock real</div>
+                                                                    <div class="item-input-wrap">
+                                                                        <input class="floating obligatorio producto capitalize input-focused " type="text" placeholder="Stock real" id="stockRealModal" name="Stock real">
+                                                                        <span class="input-clear-button"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+
+                                                        </ul>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </div>`,
-                            swipeToClose: false,
-                            closeByOutsideClick: false,
-                            closeByBackdropClick: false,
-                            closeOnEscape: false,
-                            on: {
-                                open: function (popup) {
-                                    $(".capitalize").removeClass("obligatorio");
-                                    $(".div_producto").css("display", "none");
-                                    if (data.tipo) {
-                                        $("#tipoProductoModal").val(data.tipo);
-                                        $("#LItipoProductoModal").addClass("item-input-focused");
-                                        $("#tipoProductoModal").addClass("input-with-value input-focused item-input-outline");
-                                    }
-                                    if (data.nombre) {
-                                        $("#nombreModal").val(data.nombre);
-                                        $("#LInombreModal").addClass("item-input-focused");
-                                        $("#nombreModal").addClass("input-with-value input-focused item-input-outline");
-                                    }
-                                    if (data.codigo) {
-                                        data.tipo == "Servicio"
-                                            ? $("#codigoModal").val(String(data.codigo) + String(data.ID))
-                                            : $("#codigoModal").val(data.codigo);
-                                        $("#codigoModal").val(data.descripcion);
-                                        $("#LIcodigoModal").addClass("item-input-focused");
-                                        $("#codigoModal").addClass("input-with-value input-focused item-input-outline");
-                                    }
-                                    if (data.descripcion) {
-                                        $("#descripcionModal").val(data.descripcion);
-                                        $("#LIdescripcionModal").addClass("item-input-focused");
-                                        $("#descripcionModal").addClass("input-with-value input-focused item-input-outline");
-                                    }
-                                    if (data.precioCompra) {
-                                        $("#precioCompraModal").val(data.precioCompra);
-                                        $("#LIprecioCompraModal").addClass("item-input-focused");
-                                        $("#precioCompraModal").addClass("input-with-value input-focused item-input-outline");
-                                    }
-                                    if (data.precioVenta) {
-                                        $("#precioVentaModal").val(data.precioVenta);
-                                        $("#LIprecioVentaModal").addClass("item-input-focused");
-                                        $("#precioVentaModal").addClass("input-with-value input-focused item-input-outline");
-                                    }
-                                    if (data.stockMinimo) {
-                                        $("#stockMinimoModal").val(data.stockMinimo);
-                                        $("#LIstockMinimoModal").addClass("item-input-focused");
-                                        $("#stockMinimoModal").addClass("input-with-value input-focused item-input-outline");
-                                    }
-                                    if (data.stockReal) {
-                                        $("#stockRealModal").val(data.stockReal);
-                                        $("#LIstockRealModal").addClass("item-input-focused");
-                                        $("#stockRealModal").addClass("input-with-value input-focused item-input-outline");
-                                    }
-                                    if (data.tipo == "Producto") {
-                                        $(".producto").addClass("obligatorio");
-                                        $(".div_producto").css("display", "flex");
-                                    } else if (data.tipo == "Servicio") {
-                                        $(".servicio").addClass("obligatorio");
-                                        $(".div_servicio").css("display", "flex");
-                                    }
-                                },
-                            },
-                        });
 
-                        modalTemplate.open();
-                    });
-                }
+                                                <button class="button button-outline button-round" onclick="actualizarProducto(${ID})">
+                                                    Actualizar <span class="material-icons iconBtn"> save </span>
+                                                </button>
+
+                                                <button class="button button-outline button-round btnRed" onclick="eliminarProdcuto(${ID})" style="margin-top: 40px;">
+                                                    Eliminar <span class="material-icons iconBtn"> delete </span>
+                                                </button>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>`,
+                                swipeToClose: false,
+                                closeByOutsideClick: false,
+                                closeByBackdropClick: false,
+                                closeOnEscape: false,
+                                on: {
+                                    open: function (popup) {
+                                        $(".capitalize").removeClass("obligatorio");
+                                        $(".div_producto").css("display", "none");
+                                        if (data.tipo) {
+                                            $("#tipoProductoModal").val(data.tipo);
+                                            $("#LItipoProductoModal").addClass("item-input-focused");
+                                            $("#tipoProductoModal").addClass("input-with-value input-focused item-input-outline");
+                                        }
+                                        if (data.nombre) {
+                                            $("#nombreModal").val(data.nombre);
+                                            $("#LInombreModal").addClass("item-input-focused");
+                                            $("#nombreModal").addClass("input-with-value input-focused item-input-outline");
+                                        }
+                                        if (data.codigo) {
+                                            data.tipo == "Servicio"
+                                                ? $("#codigoModal").val(String(data.codigo) + String(data.ID))
+                                                : $("#codigoModal").val(data.codigo);
+                                            $("#codigoModal").val(data.descripcion);
+                                            $("#LIcodigoModal").addClass("item-input-focused");
+                                            $("#codigoModal").addClass("input-with-value input-focused item-input-outline");
+                                        }
+                                        if (data.descripcion) {
+                                            $("#descripcionModal").val(data.descripcion);
+                                            $("#LIdescripcionModal").addClass("item-input-focused");
+                                            $("#descripcionModal").addClass("input-with-value input-focused item-input-outline");
+                                        }
+                                        if (data.precioCompra) {
+                                            $("#precioCompraModal").val(data.precioCompra);
+                                            $("#LIprecioCompraModal").addClass("item-input-focused");
+                                            $("#precioCompraModal").addClass("input-with-value input-focused item-input-outline");
+                                        }
+                                        if (data.precioVenta) {
+                                            $("#precioVentaModal").val(data.precioVenta);
+                                            $("#LIprecioVentaModal").addClass("item-input-focused");
+                                            $("#precioVentaModal").addClass("input-with-value input-focused item-input-outline");
+                                        }
+                                        if (data.stockMinimo) {
+                                            $("#stockMinimoModal").val(data.stockMinimo);
+                                            $("#LIstockMinimoModal").addClass("item-input-focused");
+                                            $("#stockMinimoModal").addClass("input-with-value input-focused item-input-outline");
+                                        }
+                                        if (data.stockReal) {
+                                            $("#stockRealModal").val(data.stockReal);
+                                            $("#LIstockRealModal").addClass("item-input-focused");
+                                            $("#stockRealModal").addClass("input-with-value input-focused item-input-outline");
+                                        }
+                                        if (data.tipo == "Producto") {
+                                            $(".producto").addClass("obligatorio");
+                                            $(".div_producto").css("display", "flex");
+                                        } else if (data.tipo == "Servicio") {
+                                            $(".servicio").addClass("obligatorio");
+                                            $(".div_servicio").css("display", "flex");
+                                        }
+                                    },
+                                },
+                            });
+
+                            modalTemplate.open();
+                        });
+                    }
+                    break;
+                case false:
+                    // preloader.hide();
+                    msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                    break;
             }
         })
-        .catch(function (error) {
-            app.dialog.alert("Algo salió mal", "Aviso");
-            console.log(error);
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            // preloader.hide();
+            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+            console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
         });
 }
 
@@ -476,26 +716,60 @@ function actualizarProducto(ID) {
 
         let url = localStorage.getItem("url");
 
-        axios
-            .post(url + "Brummy/views/inventario/actualizaProducto.php", {
+        // axios
+        //     .post(url + "Brummy/views/inventario/actualizaProducto.php", {
+        //         descripcion,
+        //         precioCompra,
+        //         precioVenta,
+        //         stockMinimo,
+        //         stockReal,
+        //         ID,
+        //     })
+        //     .then(function (response) {
+        //         console.log(response);
+        //         if (response.status === 200) {
+        //             $(".sheet-close").trigger("click");
+        //             app.dialog.alert("Actualizado correctamente", "Aviso");
+        //             obtenerInventario();
+        //         }
+        //     })
+        //     .catch(function (error) {
+        //         app.dialog.alert("Algo salió mal", "Aviso");
+        //         console.log(error);
+        //     });
+        $.ajax({
+            method: "POST",
+            dataType: "JSON",
+            url: url + "Brummy/views/inventario/actualizaProducto.php",
+            data: {
                 descripcion,
                 precioCompra,
                 precioVenta,
                 stockMinimo,
                 stockReal,
                 ID,
-            })
-            .then(function (response) {
-                console.log(response);
-                if (response.status === 200) {
-                    $(".sheet-close").trigger("click");
-                    app.dialog.alert("Actualizado correctamente", "Aviso");
-                    obtenerInventario();
+            },
+        })
+            .done(function (results) {
+                let success = results.success;
+                let result = results.result;
+
+                switch (success) {
+                    case true:
+                        $(".sheet-close").trigger("click");
+                        app.dialog.alert("Actualizado correctamente", "Aviso");
+                        obtenerInventario();
+                        break;
+                    case false:
+                        // preloader.hide();
+                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                        break;
                 }
             })
-            .catch(function (error) {
-                app.dialog.alert("Algo salió mal", "Aviso");
-                console.log(error);
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                // preloader.hide();
+                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
             });
     } else {
         let html =
@@ -530,21 +804,48 @@ function eliminarProdcuto(ID) {
                 {
                     text: "OK",
                     onClick: function () {
-                        axios
-                            .post(url + "Brummy/views/inventario/eliminarProdcuto.php", {
-                                ID,
-                            })
-                            .then(function (response) {
-                                console.log(response);
-                                if (response.status === 200) {
-                                    $(".sheet-close").trigger("click");
-                                    app.dialog.alert("Eliminado correctamente", "Aviso");
-                                    obtenerInventario();
+                        // axios
+                        //     .post(url + "Brummy/views/inventario/eliminarProdcuto.php", {
+                        //         ID,
+                        //     })
+                        //     .then(function (response) {
+                        //         console.log(response);
+                        //         if (response.status === 200) {
+                        //             $(".sheet-close").trigger("click");
+                        //             app.dialog.alert("Eliminado correctamente", "Aviso");
+                        //             obtenerInventario();
+                        //         }
+                        //     })
+                        //     .catch(function (error) {
+                        //         app.dialog.alert("Algo salió mal", "Aviso");
+                        //         console.log(error);
+                        //     });
+                        $.ajax({
+                            method: "POST",
+                            dataType: "JSON",
+                            url: url + "Brummy/views/inventario/eliminarProdcuto.php",
+                            data: { ID },
+                        })
+                            .done(function (results) {
+                                let success = results.success;
+                                let result = results.result;
+
+                                switch (success) {
+                                    case true:
+                                        $(".sheet-close").trigger("click");
+                                        app.dialog.alert("Eliminado correctamente", "Aviso");
+                                        obtenerInventario();
+                                        break;
+                                    case false:
+                                        // preloader.hide();
+                                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                        break;
                                 }
                             })
-                            .catch(function (error) {
-                                app.dialog.alert("Algo salió mal", "Aviso");
-                                console.log(error);
+                            .fail(function (jqXHR, textStatus, errorThrown) {
+                                // preloader.hide();
+                                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
                             });
                     },
                 },

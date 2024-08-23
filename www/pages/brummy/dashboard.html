@@ -6,9 +6,13 @@
                 style="justify-content: space-between; background-color: #009071; flex-direction: column; height: auto; min-height: 50px"
             >
                 <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin-top: 10px">
-                    <div>&nbsp;</div>
-                    <div class="title" style="font-size: 18px; margin-left: 15px">Métricas</div>
-                    <div>&nbsp;</div>
+                    <div style="width: 33.3%">
+                        <a href="#" data-panel="left" style="font-size: 15px" onclick="globalBack()">
+                            <i class="icon material-icons md-only" style="margin-left: 15px; font-size: 28px"> arrow_back </i>
+                        </a>
+                    </div>
+                    <div class="title" style="font-size: 18px; margin-left: 15px; width: 33.3%; text-align: center">Métricas</div>
+                    <div style="width: 33.3%">&nbsp;</div>
                 </div>
             </div>
             <div id="marquee_metricas" style="background-color: #009071"></div>
@@ -114,161 +118,351 @@
 
                 app.dialog.progress("Cargando...", "#009071");
 
-                axios
-                    .get(url + "Brummy/views/login/dataHeader.php", {})
-                    .then(function (response) {
-                        // console.log(response);
-                        if (response.status === 200) {
-                            let result = response.data.result;
-                            result.forEach((data, index) => {
-                                $("#gananciasDia").html(`$${Number(data.cuenta).toFixed(2)}`);
-                                $("#citasAgendadasCita").html(`${Number(data.cuentaAgenda)}`);
-                                $("#citasAtendidasDia").html(`${Number(data.cuentaAtendidas)}`);
-                            });
-                            app.dialog.close();
+                // axios
+                //     .get(url + "Brummy/views/login/dataHeader.php", {})
+                //     .then(function (response) {
+                //         // console.log(response);
+                //         if (response.status === 200) {
+                //             let result = response.data.result;
+                //             result.forEach((data, index) => {
+                //                 $("#gananciasDia").html(`$${Number(data.cuenta).toFixed(2)}`);
+                //                 $("#citasAgendadasCita").html(`${Number(data.cuentaAgenda)}`);
+                //                 $("#citasAtendidasDia").html(`${Number(data.cuentaAtendidas)}`);
+                //             });
+                //             app.dialog.close();
+                //         }
+                //     })
+                //     .catch(function (error) {
+                //         console.log(error);
+                //         app.dialog.close();
+                //         app.dialog.alert("Algo salió mal", "Aviso");
+                //     })
+                //     .finally(function () {
+                //         // siempre sera ejecutado
+                //     });
+
+                $.ajax({
+                    method: "POST",
+                    dataType: "JSON",
+                    url: url + "Brummy/views/login/dataHeader.php",
+                    data: {},
+                })
+                    .done(function (results) {
+                        let success = results.success;
+                        let result = results.result;
+
+                        switch (success) {
+                            case true:
+                                if (result == "Sin Datos") {
+                                    app.dialog.close();
+                                } else {
+                                    result.forEach((data, index) => {
+                                        $("#gananciasDia").html(`$${Number(data.cuenta).toFixed(2)}`);
+                                        $("#citasAgendadasCita").html(`${Number(data.cuentaAgenda)}`);
+                                        $("#citasAtendidasDia").html(`${Number(data.cuentaAtendidas)}`);
+                                    });
+                                    app.dialog.close();
+                                }
+                                break;
+                            case false:
+                                // preloader.hide();
+                                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                break;
                         }
                     })
-                    .catch(function (error) {
-                        console.log(error);
-                        app.dialog.close();
-                        app.dialog.alert("Algo salió mal", "Aviso");
-                    })
-                    .finally(function () {
-                        // siempre sera ejecutado
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        // preloader.hide();
+                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                        console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
                     });
 
-                axios
-                    .get(url + "Brummy/views/login/getProximasCitas.php", {})
-                    .then(function (response) {
-                        // console.log(response);
-                        if (response.status === 200) {
-                            let result = response.data.result;
-                            let html = "";
-                            if (result == "Sin Datos") {
-                                dataTableDestroy();
-                                $("#bodyCitasDashbora").html(html);
-                                dataTableCreate();
-                            } else {
-                                dataTableDestroy();
-                                let html;
-                                result.forEach((data, index) => {
-                                    html += `<tr>
-                                        <td>${index + 1}</td>
-                                        <td class="capitalize">${data.nombreCita}</td>
-                                        <td class="capitalize">${data.nombreMascota}</td>
-                                    </tr>`;
-                                });
-                                $("#bodyCitasDashbora").html(html);
-                                dataTableCreate();
-                            }
+                // axios
+                //     .get(url + "Brummy/views/login/getProximasCitas.php", {})
+                //     .then(function (response) {
+                //         // console.log(response);
+                //         if (response.status === 200) {
+                //             let result = response.data.result;
+                //             let html = "";
+                //             if (result == "Sin Datos") {
+                //                 dataTableDestroy();
+                //                 $("#bodyCitasDashbora").html(html);
+                //                 dataTableCreate();
+                //             } else {
+                //                 dataTableDestroy();
+                //                 let html;
+                //                 result.forEach((data, index) => {
+                //                     html += `<tr>
+                //                         <td>${index + 1}</td>
+                //                         <td class="capitalize">${data.nombreCita}</td>
+                //                         <td class="capitalize">${data.nombreMascota}</td>
+                //                     </tr>`;
+                //                 });
+                //                 $("#bodyCitasDashbora").html(html);
+                //                 dataTableCreate();
+                //             }
+                //         }
+                //     })
+                //     .catch(function (error) {
+                //         console.log(error);
+                //         app.dialog.close();
+                //         app.dialog.alert("Algo salió mal", "Aviso");
+                //     })
+                //     .finally(function () {
+                //         // siempre sera ejecutado
+                //     });
+
+                $.ajax({
+                    method: "POST",
+                    dataType: "JSON",
+                    url: url + "Brummy/views/login/getProximasCitas.php",
+                    data: {},
+                })
+                    .done(function (results) {
+                        let success = results.success;
+                        let result = results.result;
+                        let html = "";
+                        switch (success) {
+                            case true:
+                                if (result == "Sin Datos") {
+                                    dataTableDestroy();
+                                    $("#bodyCitasDashbora").html(html);
+                                    dataTableCreate();
+                                } else {
+                                    dataTableDestroy();
+                                    result.forEach((data, index) => {
+                                        html += `<tr>
+                                            <td>${index + 1}</td>
+                                            <td class="capitalize">${data.nombreCita}</td>
+                                            <td class="capitalize">${data.nombreMascota}</td>
+                                        </tr>`;
+                                    });
+                                    $("#bodyCitasDashbora").html(html);
+                                    dataTableCreate();
+                                }
+                                break;
+                            case false:
+                                // preloader.hide();
+                                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                break;
                         }
                     })
-                    .catch(function (error) {
-                        console.log(error);
-                        app.dialog.close();
-                        app.dialog.alert("Algo salió mal", "Aviso");
-                    })
-                    .finally(function () {
-                        // siempre sera ejecutado
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        // preloader.hide();
+                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                        console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
                     });
 
-                axios
-                    .get(url + "Brummy/views/login/getLastVentas.php", {})
-                    .then(function (response) {
-                        // console.log(response);
-                        if (response.status === 200) {
-                            let result = response.data.result;
-                            let html = "";
-                            if (result == "Sin Datos") {
-                                dataTableDestroy();
-                                $("#bodyVentasDashbora").html(html);
-                                dataTableCreate();
-                            } else {
-                                dataTableDestroy();
-                                let html;
-                                result.forEach((data, index) => {
-                                    html += `
+                // axios
+                //     .get(url + "Brummy/views/login/getLastVentas.php", {})
+                //     .then(function (response) {
+                //         // console.log(response);
+                //         if (response.status === 200) {
+                //             let result = response.data.result;
+                //             let html = "";
+                //             if (result == "Sin Datos") {
+                //                 dataTableDestroy();
+                //                 $("#bodyVentasDashbora").html(html);
+                //                 dataTableCreate();
+                //             } else {
+                //                 dataTableDestroy();
+                //                 let html;
+                //                 result.forEach((data, index) => {
+                //                     html += `
+                //                         <tr>
+                //                             <td>${Number(index + 1)}</td>
+                //                             <td>${data.FlagProducto}</td>
+                //                             <td>$${Number(data.total).toFixed(2)}</td>
+                //                         </tr>
+                //                      `;
+                //                 });
+                //                 $("#bodyVentasDashbora").html(html);
+                //                 dataTableCreate();
+                //             }
+                //         }
+                //     })
+                //     .catch(function (error) {
+                //         console.log(error);
+                //         app.dialog.close();
+                //         app.dialog.alert("Algo salió mal", "Aviso");
+                //     })
+                //     .finally(function () {
+                //         // siempre sera ejecutado
+                //     });
+
+                $.ajax({
+                    method: "POST",
+                    dataType: "JSON",
+                    url: url + "Brummy/views/login/getLastVentas.php",
+                    data: {},
+                })
+                    .done(function (results) {
+                        let success = results.success;
+                        let result = results.result;
+                        let html = "";
+                        switch (success) {
+                            case true:
+                                if (result == "Sin Datos") {
+                                    dataTableDestroy();
+                                    $("#bodyVentasDashbora").html(html);
+                                    dataTableCreate();
+                                } else {
+                                    dataTableDestroy();
+                                    result.forEach((data, index) => {
+                                        html += `
                                         <tr>
                                             <td>${Number(index + 1)}</td>
                                             <td>${data.FlagProducto}</td>
                                             <td>$${Number(data.total).toFixed(2)}</td>
                                         </tr>
                                      `;
-                                });
-                                $("#bodyVentasDashbora").html(html);
-                                dataTableCreate();
-                            }
+                                    });
+                                    $("#bodyVentasDashbora").html(html);
+                                    dataTableCreate();
+                                }
+                                break;
+                            case false:
+                                // preloader.hide();
+                                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                break;
                         }
                     })
-                    .catch(function (error) {
-                        console.log(error);
-                        app.dialog.close();
-                        app.dialog.alert("Algo salió mal", "Aviso");
-                    })
-                    .finally(function () {
-                        // siempre sera ejecutado
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        // preloader.hide();
+                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                        console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
                     });
 
-                axios
-                    .get(url + "Brummy/views/login/topProductos.php", {})
-                    .then(function (response) {
-                        // console.log(response);
-                        if (response.status === 200) {
-                            let result = response.data.result;
-                            let html = "";
-                            let success = result.success;
+                // axios
+                //     .get(url + "Brummy/views/login/topProductos.php", {})
+                //     .then(function (response) {
+                //         // console.log(response);
+                //         if (response.status === 200) {
+                //             let result = response.data.result;
+                //             let html = "";
+                //             let success = result.success;
 
-                            let colores = [];
-                            let sumasProductos = [];
-                            let productos = [];
+                //             let colores = [];
+                //             let sumasProductos = [];
+                //             let productos = [];
 
-                            if (result == "Sin Datos") {
-                            } else {
-                                result.forEach((data, index) => {
-                                    colores = [...colores, "#009071"];
-                                    productos = [...productos, data.FlagProducto];
-                                    sumasProductos = [...sumasProductos, Number(data.suma)];
-                                });
+                //             if (result == "Sin Datos") {
+                //             } else {
+                //                 result.forEach((data, index) => {
+                //                     colores = [...colores, "#009071"];
+                //                     productos = [...productos, data.FlagProducto];
+                //                     sumasProductos = [...sumasProductos, Number(data.suma)];
+                //                 });
 
-                                new Chart(document.getElementById("bar-chart2"), {
-                                    type: "horizontalBar",
-                                    data: {
-                                        labels: productos,
-                                        datasets: [
-                                            {
-                                                label: "Vendidos",
-                                                backgroundColor: colores,
-                                                data: sumasProductos,
-                                            },
-                                        ],
-                                    },
-                                    options: {
-                                        legend: { display: false },
-                                        title: {
-                                            display: true,
-                                            text: "",
-                                        },
-                                        scales: {
-                                            xAxes: [
+                //                 new Chart(document.getElementById("bar-chart2"), {
+                //                     type: "horizontalBar",
+                //                     data: {
+                //                         labels: productos,
+                //                         datasets: [
+                //                             {
+                //                                 label: "Vendidos",
+                //                                 backgroundColor: colores,
+                //                                 data: sumasProductos,
+                //                             },
+                //                         ],
+                //                     },
+                //                     options: {
+                //                         legend: { display: false },
+                //                         title: {
+                //                             display: true,
+                //                             text: "",
+                //                         },
+                //                         scales: {
+                //                             xAxes: [
+                //                                 {
+                //                                     ticks: {
+                //                                         beginAtZero: true,
+                //                                     },
+                //                                 },
+                //                             ],
+                //                         },
+                //                     },
+                //                 });
+                //             }
+                //         }
+                //     })
+                //     .catch(function (error) {
+                //         console.log(error);
+                //         app.dialog.close();
+                //         app.dialog.alert("Algo salió mal", "Aviso");
+                //     })
+                //     .finally(function () {
+                //         // siempre sera ejecutado
+                //     });
+
+                $.ajax({
+                    method: "POST",
+                    dataType: "JSON",
+                    url: url + "Brummy/views/login/topProductos.php",
+                    data: {},
+                })
+                    .done(function (results) {
+                        let success = results.success;
+                        let result = results.result;
+
+                        switch (success) {
+                            case true:
+                                let html = "";
+                                let success = result.success;
+
+                                let colores = [];
+                                let sumasProductos = [];
+                                let productos = [];
+
+                                if (result == "Sin Datos") {
+                                } else {
+                                    result.forEach((data, index) => {
+                                        colores = [...colores, "#009071"];
+                                        productos = [...productos, data.FlagProducto];
+                                        sumasProductos = [...sumasProductos, Number(data.suma)];
+                                    });
+
+                                    new Chart(document.getElementById("bar-chart2"), {
+                                        type: "horizontalBar",
+                                        data: {
+                                            labels: productos,
+                                            datasets: [
                                                 {
-                                                    ticks: {
-                                                        beginAtZero: true,
-                                                    },
+                                                    label: "Vendidos",
+                                                    backgroundColor: colores,
+                                                    data: sumasProductos,
                                                 },
                                             ],
                                         },
-                                    },
-                                });
-                            }
+                                        options: {
+                                            legend: { display: false },
+                                            title: {
+                                                display: true,
+                                                text: "",
+                                            },
+                                            scales: {
+                                                xAxes: [
+                                                    {
+                                                        ticks: {
+                                                            beginAtZero: true,
+                                                        },
+                                                    },
+                                                ],
+                                            },
+                                        },
+                                    });
+                                }
+                                break;
+
+                            case false:
+                                // preloader.hide();
+                                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                break;
                         }
                     })
-                    .catch(function (error) {
-                        console.log(error);
-                        app.dialog.close();
-                        app.dialog.alert("Algo salió mal", "Aviso");
-                    })
-                    .finally(function () {
-                        // siempre sera ejecutado
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        // preloader.hide();
+                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                        console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
                     });
 
                 new Chart(document.getElementById("bar-chart"), {

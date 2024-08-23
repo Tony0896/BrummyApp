@@ -46,13 +46,13 @@ function obtenerCitasFrecuentes() {
                     }
                     break;
                 case false:
-                    preloader.hide();
+                    // preloader.hide();
                     msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
                     break;
             }
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
-            preloader.hide();
+            // preloader.hide();
             msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
             console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
         });
@@ -107,13 +107,13 @@ function obtenerComprasFrecuentes() {
                     }
                     break;
                 case false:
-                    preloader.hide();
+                    // preloader.hide();
                     msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
                     break;
             }
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
-            preloader.hide();
+            // preloader.hide();
             msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
             console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
         });

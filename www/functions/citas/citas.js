@@ -138,14 +138,14 @@ function generarLinkEncuesta(ID) {
                     }, 1500);
                     break;
                 case false:
-                    preloader.hide();
+                    // preloader.hide();
                     // msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
                     app.dialog.alert("Algo salió mal", "Aviso");
                     break;
             }
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
-            preloader.hide();
+            // preloader.hide();
             // msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
             app.dialog.alert("Algo salió mal", "Aviso");
             console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
@@ -235,13 +235,13 @@ function getDireecionCliente(FK_dueno) {
                     }
                     break;
                 case false:
-                    preloader.hide();
+                    // preloader.hide();
                     msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
                     break;
             }
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
-            preloader.hide();
+            // preloader.hide();
             msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
             console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
         });

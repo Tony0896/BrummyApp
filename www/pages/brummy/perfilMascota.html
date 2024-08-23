@@ -6,9 +6,13 @@
                 style="justify-content: space-between; background-color: #009071; flex-direction: column; height: auto; min-height: 50px"
             >
                 <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin-top: 10px">
-                    <div>&nbsp;</div>
-                    <div class="title" style="font-size: 18px; margin-left: 15px">Perfil Mascota</div>
-                    <div>&nbsp;</div>
+                    <div style="width: 33.3%">
+                        <a href="#" data-panel="left" style="font-size: 15px" onclick="globalBack()">
+                            <i class="icon material-icons md-only" style="margin-left: 15px; font-size: 28px"> arrow_back </i>
+                        </a>
+                    </div>
+                    <div class="title" style="font-size: 18px; margin-left: 15px; width: 33.3%; text-align: center">Perfil Mascota</div>
+                    <div style="width: 33.3%">&nbsp;</div>
                 </div>
             </div>
             <div id="marquee_perfilMascota" style="background-color: #009071"></div>
@@ -110,67 +114,183 @@
                 let ID = localStorage.getItem("IDMascota");
                 let btn_edit_mascota;
 
-                axios
-                    .post(url + "Brummy/views/mascotas/obtenerMascota.php", { ID })
-                    .then(function (response) {
-                        console.log(response);
-                        if (response.status === 200) {
-                            let result = response.data.result;
-                            let html = "";
-                            let tdSinData = `<span class='material-icons'> remove </span> &nbsp; <span class='material-icons'> remove </span>`;
-                            let nombreMascota, fechaMascota, relacionEspecie, sexoMascota, colorMascota, rasgosMascota, FK_dueno;
-                            if (result == "Sin Datos") {
-                                // Swal.fire({ icon: "warning", title: "Sin datos.", text: "" });
-                                app.dialog.alert("Sin datos.", "Aviso");
-                            } else {
-                                result.forEach((data, index) => {
-                                    // console.table(data);
-                                    nombreMascota = data.nombre;
-                                    fechaMascota = data.fechaNacimiento;
-                                    relacionEspecie = `${data.especie} - ${data.raza}`;
-                                    sexoMascota = data.sexo;
-                                    colorMascota = data.color ? data.color : tdSinData;
-                                    rasgosMascota = data.rasgosParticulares ? data.rasgosParticulares : tdSinData;
-                                    FK_dueno = data.NombreCliente;
-                                });
-                                // traerHistorialMascota(ID);
-                                $("#nombreMascota").html(nombreMascota);
-                                $("#fechaMascota").html(fechaMascota);
-                                $("#relacionEspecie").html(relacionEspecie);
-                                $("#sexoMascota").html(sexoMascota);
-                                $("#colorMascota").html(colorMascota);
-                                $("#rasgosMascota").html(rasgosMascota);
-                                $("#FK_dueno").html(FK_dueno);
-                                btn_edit_mascota = `<button
+                // axios
+                //     .post(url + "Brummy/views/mascotas/obtenerMascota.php", { ID })
+                //     .then(function (response) {
+                //         console.log(response);
+                //         if (response.status === 200) {
+                //             let result = response.data.result;
+                //             let html = "";
+                //             let tdSinData = `<span class='material-icons'> remove </span> &nbsp; <span class='material-icons'> remove </span>`;
+                //             let nombreMascota, fechaMascota, relacionEspecie, sexoMascota, colorMascota, rasgosMascota, FK_dueno;
+                //             if (result == "Sin Datos") {
+                //                 // Swal.fire({ icon: "warning", title: "Sin datos.", text: "" });
+                //                 app.dialog.alert("Sin datos.", "Aviso");
+                //             } else {
+                //                 result.forEach((data, index) => {
+                //                     // console.table(data);
+                //                     nombreMascota = data.nombre;
+                //                     fechaMascota = data.fechaNacimiento;
+                //                     relacionEspecie = `${data.especie} - ${data.raza}`;
+                //                     sexoMascota = data.sexo;
+                //                     colorMascota = data.color ? data.color : tdSinData;
+                //                     rasgosMascota = data.rasgosParticulares ? data.rasgosParticulares : tdSinData;
+                //                     FK_dueno = data.NombreCliente;
+                //                 });
+                //                 // traerHistorialMascota(ID);
+                //                 $("#nombreMascota").html(nombreMascota);
+                //                 $("#fechaMascota").html(fechaMascota);
+                //                 $("#relacionEspecie").html(relacionEspecie);
+                //                 $("#sexoMascota").html(sexoMascota);
+                //                 $("#colorMascota").html(colorMascota);
+                //                 $("#rasgosMascota").html(rasgosMascota);
+                //                 $("#FK_dueno").html(FK_dueno);
+                //                 btn_edit_mascota = `<button
+                //                         class="button button-outline button-round btnBlue"
+                //                         onclick='editarMascota(${JSON.stringify(result)});'
+                //                     >
+                //                         Editar <span class="material-icons iconBtn"> edit </span>
+                //                     </button>`;
+
+                //                 $("#btn_editar_mascota").html(btn_edit_mascota);
+                //             }
+                //             app.dialog.close();
+                //         }
+                //     })
+                //     .catch(function (error) {
+                //         console.log(error);
+                //         app.dialog.close();
+                //         app.dialog.alert("Algo salió mal", "Aviso");
+                //     })
+                //     .finally(function () {
+                //         // siempre sera ejecutado
+                //     });
+
+                $.ajax({
+                    method: "POST",
+                    dataType: "JSON",
+                    url: url + "Brummy/views/mascotas/obtenerMascota.php",
+                    data: { ID },
+                })
+                    .done(function (results) {
+                        let success = results.success;
+                        let result = results.result;
+
+                        switch (success) {
+                            case true:
+                                let html = "";
+                                let tdSinData = `<span class='material-icons'> remove </span> &nbsp; <span class='material-icons'> remove </span>`;
+                                let nombreMascota, fechaMascota, relacionEspecie, sexoMascota, colorMascota, rasgosMascota, FK_dueno;
+                                if (result == "Sin Datos") {
+                                    // Swal.fire({ icon: "warning", title: "Sin datos.", text: "" });
+                                    app.dialog.alert("Sin datos.", "Aviso");
+                                } else {
+                                    result.forEach((data, index) => {
+                                        // console.table(data);
+                                        nombreMascota = data.nombre;
+                                        fechaMascota = data.fechaNacimiento;
+                                        relacionEspecie = `${data.especie} - ${data.raza}`;
+                                        sexoMascota = data.sexo;
+                                        colorMascota = data.color ? data.color : tdSinData;
+                                        rasgosMascota = data.rasgosParticulares ? data.rasgosParticulares : tdSinData;
+                                        FK_dueno = data.NombreCliente;
+                                    });
+                                    // traerHistorialMascota(ID);
+                                    $("#nombreMascota").html(nombreMascota);
+                                    $("#fechaMascota").html(fechaMascota);
+                                    $("#relacionEspecie").html(relacionEspecie);
+                                    $("#sexoMascota").html(sexoMascota);
+                                    $("#colorMascota").html(colorMascota);
+                                    $("#rasgosMascota").html(rasgosMascota);
+                                    $("#FK_dueno").html(FK_dueno);
+                                    btn_edit_mascota = `<button
                                         class="button button-outline button-round btnBlue"
                                         onclick='editarMascota(${JSON.stringify(result)});'
                                     >
                                         Editar <span class="material-icons iconBtn"> edit </span>
                                     </button>`;
 
-                                $("#btn_editar_mascota").html(btn_edit_mascota);
-                            }
-                            app.dialog.close();
+                                    $("#btn_editar_mascota").html(btn_edit_mascota);
+                                }
+                                app.dialog.close();
+                                break;
+                            case false:
+                                // preloader.hide();
+                                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                break;
                         }
                     })
-                    .catch(function (error) {
-                        console.log(error);
-                        app.dialog.close();
-                        app.dialog.alert("Algo salió mal", "Aviso");
-                    })
-                    .finally(function () {
-                        // siempre sera ejecutado
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        // preloader.hide();
+                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                        console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
                     });
 
-                axios
-                    .post(url + "Brummy/views/mascotas/traerHistorialMascota.php", { ID })
-                    .then(function (response) {
-                        console.log(response);
-                        if (response.status === 200) {
-                            let result = response.data.result;
-                            let html = "";
-                            if (result == "Sin Datos") {
-                                html += `
+                // axios
+                //     .post(url + "Brummy/views/mascotas/traerHistorialMascota.php", { ID })
+                //     .then(function (response) {
+                //         console.log(response);
+                //         if (response.status === 200) {
+                //             let result = response.data.result;
+                //             let html = "";
+                //             if (result == "Sin Datos") {
+                //                 html += `
+                //                 <div class="timeline-item">
+                //                         <div class="timeline-item-divider"></div>
+                //                         <div class="timeline-item-content">
+                //                             <div class="timeline-item-inner">
+                //                                 <strong style="color: #009071;font-weight: bold;font-size: 1rem;">
+                //                                     Sin Historial
+                //                                 </strong>
+                //                             </div>
+                //                         </div>
+                //                     </div>`;
+
+                //                 $("#historialMascotaSpace").html(html);
+                //             } else {
+                //                 result.forEach((data, index) => {
+                //                     html += `<div class="timeline-item">
+                //                         <div class="timeline-item-divider"></div>
+                //                         <div class="timeline-item-content">
+                //                             <div class="timeline-item-inner">
+                //                                 <strong style="color: #5f5f5f;position: relative;font-size: 14px;font-weight: bold;font-style: italic;margin-left: 20px;">
+                //                                     ${volteaFecha(data.fecha, 1)} </strong> <br>
+                //                                 <strong style="color: #009071;font-weight: bold;font-size: 1rem;">
+                //                                     ${data.motivo_movimiento}
+                //                                 </strong>
+                //                             </div>
+                //                         </div>
+                //                     </div>`;
+                //                 });
+
+                //                 $("#historialMascotaSpace").html(html);
+                //             }
+                //             app.dialog.close();
+                //         }
+                //     })
+                //     .catch(function (error) {
+                //         console.log(error);
+                //         app.dialog.close();
+                //         app.dialog.alert("Algo salió mal", "Aviso");
+                //     })
+                //     .finally(function () {
+                //         // siempre sera ejecutado
+                //     });
+
+                $.ajax({
+                    method: "POST",
+                    dataType: "JSON",
+                    url: url + "Brummy/views/mascotas/traerHistorialMascota.php",
+                    data: { ID },
+                })
+                    .done(function (results) {
+                        let success = results.success;
+                        let result = results.result;
+                        let html = "";
+                        switch (success) {
+                            case true:
+                                if (result == "Sin Datos") {
+                                    html += `
                                 <div class="timeline-item">
                                         <div class="timeline-item-divider"></div>
                                         <div class="timeline-item-content">
@@ -182,10 +302,10 @@
                                         </div>
                                     </div>`;
 
-                                $("#historialMascotaSpace").html(html);
-                            } else {
-                                result.forEach((data, index) => {
-                                    html += `<div class="timeline-item">
+                                    $("#historialMascotaSpace").html(html);
+                                } else {
+                                    result.forEach((data, index) => {
+                                        html += `<div class="timeline-item">
                                         <div class="timeline-item-divider"></div>
                                         <div class="timeline-item-content">
                                             <div class="timeline-item-inner">
@@ -197,22 +317,23 @@
                                             </div>
                                         </div>
                                     </div>`;
-                                });
+                                    });
 
-                                $("#historialMascotaSpace").html(html);
-                            }
-                            app.dialog.close();
+                                    $("#historialMascotaSpace").html(html);
+                                }
+                                app.dialog.close();
+                                break;
+                            case false:
+                                // preloader.hide();
+                                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                break;
                         }
                     })
-                    .catch(function (error) {
-                        console.log(error);
-                        app.dialog.close();
-                        app.dialog.alert("Algo salió mal", "Aviso");
-                    })
-                    .finally(function () {
-                        // siempre sera ejecutado
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        // preloader.hide();
+                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                        console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
                     });
-
                 obtenerComentarios();
                 // app.dialog.progress("Cargando...", "#009071");
             },

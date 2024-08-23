@@ -307,8 +307,38 @@ function guardarMascota() {
         rasgosParticulares.replaceAll("'", '"');
         FK_dueno.replaceAll("'", '"');
         let url = localStorage.getItem("url");
-        axios
-            .post(url + "Brummy/views/mascotas/guardarMascota.php", {
+        // axios
+        //     .post(url + "Brummy/views/mascotas/guardarMascota.php", {
+        //         nombre,
+        //         fechaNacimiento,
+        //         FK_especie,
+        //         especie,
+        //         raza,
+        //         FK_raza,
+        //         sexo,
+        //         color,
+        //         rasgosParticulares,
+        //         FK_dueno,
+        //         temperamentoMascota,
+        //     })
+        //     .then(function (response) {
+        //         console.log(response);
+        //         if (response.status === 200) {
+        //             $(".sheet-close").trigger("click");
+        //             app.dialog.alert("Guardado correctamente", "Aviso");
+        //             obtenerMascotas();
+        //         }
+        //     })
+        //     .catch(function (error) {
+        //         app.dialog.alert("Algo salió mal", "Aviso");
+        //         console.log(error);
+        //     });
+
+        $.ajax({
+            method: "POST",
+            dataType: "JSON",
+            url: url + "Brummy/views/mascotas/guardarMascota.php",
+            data: {
                 nombre,
                 fechaNacimiento,
                 FK_especie,
@@ -320,18 +350,28 @@ function guardarMascota() {
                 rasgosParticulares,
                 FK_dueno,
                 temperamentoMascota,
-            })
-            .then(function (response) {
-                console.log(response);
-                if (response.status === 200) {
-                    $(".sheet-close").trigger("click");
-                    app.dialog.alert("Guardado correctamente", "Aviso");
-                    obtenerMascotas();
+            },
+        })
+            .done(function (results) {
+                let success = results.success;
+                let result = results.result;
+
+                switch (success) {
+                    case true:
+                        $(".sheet-close").trigger("click");
+                        app.dialog.alert("Guardado correctamente", "Aviso");
+                        obtenerMascotas();
+                        break;
+                    case false:
+                        // preloader.hide();
+                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                        break;
                 }
             })
-            .catch(function (error) {
-                app.dialog.alert("Algo salió mal", "Aviso");
-                console.log(error);
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                // preloader.hide();
+                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
             });
     } else {
         let html =
@@ -357,10 +397,6 @@ function verMascota(ID, FK_dueno) {
     app.views.main.router.navigate({ name: name });
 }
 
-function regresaMascotas() {
-    app.views.main.router.back();
-}
-
 function eliminarMascota(ID) {
     app.dialog
         .create({
@@ -376,20 +412,46 @@ function eliminarMascota(ID) {
                     text: "OK",
                     onClick: function () {
                         let url = localStorage.getItem("url");
-                        axios
-                            .post(url + "Brummy/views/mascotas/eliminarMascota.php", {
-                                ID,
-                            })
-                            .then(function (response) {
-                                console.log(response);
-                                if (response.status === 200) {
-                                    app.dialog.alert("Eliminado correctamente", "Aviso");
-                                    regresaMascotas();
+                        // axios
+                        //     .post(url + "Brummy/views/mascotas/eliminarMascota.php", {
+                        //         ID,
+                        //     })
+                        //     .then(function (response) {
+                        //         console.log(response);
+                        //         if (response.status === 200) {
+                        //             app.dialog.alert("Eliminado correctamente", "Aviso");
+                        //             regresaMascotas();
+                        //         }
+                        //     })
+                        //     .catch(function (error) {
+                        //         app.dialog.alert("Algo salió mal", "Aviso");
+                        //         console.log(error);
+                        //     });
+                        $.ajax({
+                            method: "POST",
+                            dataType: "JSON",
+                            url: url + "Brummy/views/mascotas/eliminarMascota.php",
+                            data: { ID },
+                        })
+                            .done(function (results) {
+                                let success = results.success;
+                                let result = results.result;
+
+                                switch (success) {
+                                    case true:
+                                        app.dialog.alert("Eliminado correctamente", "Aviso");
+                                        globalBack();
+                                        break;
+                                    case false:
+                                        // preloader.hide();
+                                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                        break;
                                 }
                             })
-                            .catch(function (error) {
-                                app.dialog.alert("Algo salió mal", "Aviso");
-                                console.log(error);
+                            .fail(function (jqXHR, textStatus, errorThrown) {
+                                // preloader.hide();
+                                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
                             });
                     },
                 },
@@ -699,56 +761,114 @@ function guardarEdicionMascota() {
 
 function verPerfilMascota(ID) {
     let url = localStorage.getItem("url");
-    axios
-        .post(url + "Brummy/views/mascotas/obtenerMascota.php", { ID })
-        .then(function (response) {
-            console.log(response);
-            if (response.status === 200) {
-                let result = response.data.result;
-                let html = "";
-                let tdSinData = `<span class='material-icons'> remove </span> &nbsp; <span class='material-icons'> remove </span>`;
-                let nombreMascota, fechaMascota, relacionEspecie, sexoMascota, colorMascota, rasgosMascota, FK_dueno;
-                if (result == "Sin Datos") {
-                    // Swal.fire({ icon: "warning", title: "Sin datos.", text: "" });
-                    app.dialog.alert("Sin datos.", "Aviso");
-                } else {
-                    result.forEach((data, index) => {
-                        // console.table(data);
-                        nombreMascota = data.nombre;
-                        fechaMascota = data.fechaNacimiento;
-                        relacionEspecie = `${data.especie} - ${data.raza}`;
-                        sexoMascota = data.sexo;
-                        colorMascota = data.color ? data.color : tdSinData;
-                        rasgosMascota = data.rasgosParticulares ? data.rasgosParticulares : tdSinData;
-                        FK_dueno = data.NombreCliente;
-                    });
-                    // traerHistorialMascota(ID);
-                    $("#nombreMascota").html(nombreMascota);
-                    $("#fechaMascota").html(fechaMascota);
-                    $("#relacionEspecie").html(relacionEspecie);
-                    $("#sexoMascota").html(sexoMascota);
-                    $("#colorMascota").html(colorMascota);
-                    $("#rasgosMascota").html(rasgosMascota);
-                    $("#FK_dueno").html(FK_dueno);
-                    btn_edit_mascota = `<button
-                                        class="button button-outline button-round btnBlue"
-                                        onclick='editarMascota(${JSON.stringify(result)});'
-                                    >
-                                        Editar <span class="material-icons iconBtn"> edit </span>
-                                    </button>`;
+    // axios
+    //     .post(url + "Brummy/views/mascotas/obtenerMascota.php", { ID })
+    //     .then(function (response) {
+    //         console.log(response);
+    //         if (response.status === 200) {
+    //             let result = response.data.result;
+    //             let html = "";
+    //             let tdSinData = `<span class='material-icons'> remove </span> &nbsp; <span class='material-icons'> remove </span>`;
+    //             let nombreMascota, fechaMascota, relacionEspecie, sexoMascota, colorMascota, rasgosMascota, FK_dueno;
+    //             if (result == "Sin Datos") {
+    //                 // Swal.fire({ icon: "warning", title: "Sin datos.", text: "" });
+    //                 app.dialog.alert("Sin datos.", "Aviso");
+    //             } else {
+    //                 result.forEach((data, index) => {
+    //                     // console.table(data);
+    //                     nombreMascota = data.nombre;
+    //                     fechaMascota = data.fechaNacimiento;
+    //                     relacionEspecie = `${data.especie} - ${data.raza}`;
+    //                     sexoMascota = data.sexo;
+    //                     colorMascota = data.color ? data.color : tdSinData;
+    //                     rasgosMascota = data.rasgosParticulares ? data.rasgosParticulares : tdSinData;
+    //                     FK_dueno = data.NombreCliente;
+    //                 });
+    //                 // traerHistorialMascota(ID);
+    //                 $("#nombreMascota").html(nombreMascota);
+    //                 $("#fechaMascota").html(fechaMascota);
+    //                 $("#relacionEspecie").html(relacionEspecie);
+    //                 $("#sexoMascota").html(sexoMascota);
+    //                 $("#colorMascota").html(colorMascota);
+    //                 $("#rasgosMascota").html(rasgosMascota);
+    //                 $("#FK_dueno").html(FK_dueno);
+    //                 btn_edit_mascota = `<button
+    //                                     class="button button-outline button-round btnBlue"
+    //                                     onclick='editarMascota(${JSON.stringify(result)});'
+    //                                 >
+    //                                     Editar <span class="material-icons iconBtn"> edit </span>
+    //                                 </button>`;
 
-                    $("#btn_editar_mascota").html(btn_edit_mascota);
-                }
-                app.dialog.close();
+    //                 $("#btn_editar_mascota").html(btn_edit_mascota);
+    //             }
+    //             app.dialog.close();
+    //         }
+    //     })
+    //     .catch(function (error) {
+    //         console.log(error);
+    //         app.dialog.close();
+    //         app.dialog.alert("Algo salió mal", "Aviso");
+    //     })
+    //     .finally(function () {
+    //         // siempre sera ejecutado
+    //     });
+
+    $.ajax({
+        method: "POST",
+        dataType: "JSON",
+        url: url + "Brummy/views/mascotas/obtenerMascota.php",
+        data: { ID },
+    })
+        .done(function (results) {
+            let success = results.success;
+            let result = results.result;
+
+            switch (success) {
+                case true:
+                    if (result == "Sin Datos") {
+                        // Swal.fire({ icon: "warning", title: "Sin datos.", text: "" });
+                        app.dialog.alert("Sin datos.", "Aviso");
+                    } else {
+                        let html = "";
+                        let tdSinData = `<span class='material-icons'> remove </span> &nbsp; <span class='material-icons'> remove </span>`;
+                        result.forEach((data, index) => {
+                            // console.table(data);
+                            nombreMascota = data.nombre;
+                            fechaMascota = data.fechaNacimiento;
+                            relacionEspecie = `${data.especie} - ${data.raza}`;
+                            sexoMascota = data.sexo;
+                            colorMascota = data.color ? data.color : tdSinData;
+                            rasgosMascota = data.rasgosParticulares ? data.rasgosParticulares : tdSinData;
+                            FK_dueno = data.NombreCliente;
+                        });
+                        // traerHistorialMascota(ID);
+                        $("#nombreMascota").html(nombreMascota);
+                        $("#fechaMascota").html(fechaMascota);
+                        $("#relacionEspecie").html(relacionEspecie);
+                        $("#sexoMascota").html(sexoMascota);
+                        $("#colorMascota").html(colorMascota);
+                        $("#rasgosMascota").html(rasgosMascota);
+                        $("#FK_dueno").html(FK_dueno);
+                        btn_edit_mascota = `<button class="button button-outline button-round btnBlue"
+                            onclick='editarMascota(${JSON.stringify(result)});'>
+                                Editar <span class="material-icons iconBtn"> edit </span>
+                            </button>`;
+
+                        $("#btn_editar_mascota").html(btn_edit_mascota);
+                    }
+                    app.dialog.close();
+
+                    break;
+                case false:
+                    // preloader.hide();
+                    msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                    break;
             }
         })
-        .catch(function (error) {
-            console.log(error);
-            app.dialog.close();
-            app.dialog.alert("Algo salió mal", "Aviso");
-        })
-        .finally(function () {
-            // siempre sera ejecutado
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            // preloader.hide();
+            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+            console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
         });
 }
 
@@ -871,6 +991,7 @@ function obtenerComentarios() {
                 switch (success) {
                     case true:
                         if (result == "Sin Datos") {
+                            $("#content_comentario").html("");
                         } else {
                             let template_comentario = "";
                             result.forEach((data, index) => {

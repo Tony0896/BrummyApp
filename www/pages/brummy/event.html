@@ -110,9 +110,13 @@
                 style="justify-content: space-between; background-color: #009071; flex-direction: column; height: auto; min-height: 50px"
             >
                 <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin-top: 10px">
-                    <div>&nbsp;</div>
-                    <div class="title" style="font-size: 18px; margin-left: 15px">Citas</div>
-                    <div>&nbsp;</div>
+                    <div style="width: 33.3%">
+                        <a href="#" data-panel="left" style="font-size: 15px" onclick="globalBack()">
+                            <i class="icon material-icons md-only" style="margin-left: 15px; font-size: 28px"> arrow_back </i>
+                        </a>
+                    </div>
+                    <div class="title" style="font-size: 18px; margin-left: 15px; width: 33.3%; text-align: center">Citas</div>
+                    <div style="width: 33.3%">&nbsp;</div>
                 </div>
             </div>
             <div id="marquee_citas" style="background-color: #009071"></div>
@@ -265,36 +269,77 @@
                 function renderMonthEvents(calendar, mes, anio) {
                     let url = localStorage.getItem("url");
 
-                    axios
-                        .post(url + "Brummy/views/citas/obtenerEventosMes.php", {
+                    // axios
+                    //     .post(url + "Brummy/views/citas/obtenerEventosMes.php", {
+                    //         mes,
+                    //         anio,
+                    //     })
+                    //     .then(function (response) {
+                    //         console.log(response);
+                    //         if (response.status === 200) {
+                    //             let result = response.data.result;
+                    //             let html = "";
+                    //             if (result == "Sin Datos") {
+                    //             } else {
+                    //                 result.forEach((data, index) => {
+                    //                     let now = new Date(data.fechaCita + " 09:00:00");
+                    //                     let today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    //                     let currentEvent = events.push({
+                    //                         date: today,
+                    //                         color: "#00A7B5",
+                    //                     });
+                    //                 });
+                    //                 setTimeout(() => {
+                    //                     calendar.update();
+                    //                     // console.log("u=>", events);
+                    //                 }, 1000);
+                    //             }
+                    //         }
+                    //     })
+                    //     .catch(function (error) {
+                    //         app.dialog.alert("Algo salió mal", "Aviso");
+                    //         console.log(error);
+                    //     });
+
+                    $.ajax({
+                        method: "POST",
+                        dataType: "JSON",
+                        url: url + "Brummy/views/citas/obtenerEventosMes.php",
+                        data: {
                             mes,
                             anio,
-                        })
-                        .then(function (response) {
-                            console.log(response);
-                            if (response.status === 200) {
-                                let result = response.data.result;
-                                let html = "";
-                                if (result == "Sin Datos") {
-                                } else {
-                                    result.forEach((data, index) => {
-                                        let now = new Date(data.fechaCita + " 09:00:00");
-                                        let today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                                        let currentEvent = events.push({
-                                            date: today,
-                                            color: "#00A7B5",
+                        },
+                    })
+                        .done(function (results) {
+                            let success = results.success;
+                            let result = results.result;
+
+                            switch (success) {
+                                case true:
+                                    if (result == "Sin Datos") {
+                                    } else {
+                                        result.forEach((data, index) => {
+                                            let now = new Date(data.fechaCita + " 09:00:00");
+                                            let today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                                            let currentEvent = events.push({
+                                                date: today,
+                                                color: "#00A7B5",
+                                            });
                                         });
-                                    });
-                                    setTimeout(() => {
                                         calendar.update();
-                                        // console.log("u=>", events);
-                                    }, 1000);
-                                }
+                                        console.log("a=>", events);
+                                    }
+                                    break;
+                                case false:
+                                    // preloader.hide();
+                                    msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                    break;
                             }
                         })
-                        .catch(function (error) {
-                            app.dialog.alert("Algo salió mal", "Aviso");
-                            console.log(error);
+                        .fail(function (jqXHR, textStatus, errorThrown) {
+                            // preloader.hide();
+                            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                            console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
                         });
                 }
 
@@ -305,38 +350,79 @@
                     let anio = new Date(date).toLocaleDateString("es-MX", { year: "numeric" });
 
                     let url = localStorage.getItem("url");
-                    axios
-                        .post(url + "Brummy/views/citas/obtenerEventosMes.php", {
+                    // axios
+                    //     .post(url + "Brummy/views/citas/obtenerEventosMes.php", {
+                    //         mes,
+                    //         anio,
+                    //     })
+                    //     .then(function (response) {
+                    //         console.log(response);
+                    //         if (response.status === 200) {
+                    //             let result = response.data.result;
+                    //             if (result == "Sin Datos") {
+                    //             } else {
+                    //                 result.forEach((data, index) => {
+                    //                     let now = new Date(data.fechaCita + " 09:00:00");
+                    //                     let today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    //                     let currentEvent = events.push({
+                    //                         date: today,
+                    //                         color: "#00A7B5",
+                    //                     });
+                    //                 });
+                    //                 calendar.update();
+                    //                 console.log("a=>", events);
+                    //             }
+                    //             app.dialog.close();
+                    //         }
+                    //     })
+                    //     .catch(function (error) {
+                    //         console.log(error);
+                    //         app.dialog.close();
+                    //         app.dialog.alert("Algo salió mal", "Aviso");
+                    //     })
+                    //     .finally(function () {
+                    //         // siempre sera ejecutado
+                    //     });
+
+                    $.ajax({
+                        method: "POST",
+                        dataType: "JSON",
+                        url: url + "Brummy/views/citas/obtenerEventosMes.php",
+                        data: {
                             mes,
                             anio,
-                        })
-                        .then(function (response) {
-                            console.log(response);
-                            if (response.status === 200) {
-                                let result = response.data.result;
-                                if (result == "Sin Datos") {
-                                } else {
-                                    result.forEach((data, index) => {
-                                        let now = new Date(data.fechaCita + " 09:00:00");
-                                        let today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                                        let currentEvent = events.push({
-                                            date: today,
-                                            color: "#00A7B5",
+                        },
+                    })
+                        .done(function (results) {
+                            let success = results.success;
+                            let result = results.result;
+
+                            switch (success) {
+                                case true:
+                                    if (result == "Sin Datos") {
+                                    } else {
+                                        result.forEach((data, index) => {
+                                            let now = new Date(data.fechaCita + " 09:00:00");
+                                            let today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                                            let currentEvent = events.push({
+                                                date: today,
+                                                color: "#00A7B5",
+                                            });
                                         });
-                                    });
-                                    calendar.update();
-                                    console.log("a=>", events);
-                                }
-                                app.dialog.close();
+                                        calendar.update();
+                                        console.log("a=>", events);
+                                    }
+                                    break;
+                                case false:
+                                    // preloader.hide();
+                                    msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                    break;
                             }
                         })
-                        .catch(function (error) {
-                            console.log(error);
-                            app.dialog.close();
-                            app.dialog.alert("Algo salió mal", "Aviso");
-                        })
-                        .finally(function () {
-                            // siempre sera ejecutado
+                        .fail(function (jqXHR, textStatus, errorThrown) {
+                            // preloader.hide();
+                            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                            console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
                         });
                 }
 
@@ -359,63 +445,200 @@
 
                     let url = localStorage.getItem("url");
 
-                    axios
-                        .post(url + "Brummy/views/citas/obtenerEventos.php", { fecha })
-                        .then(function (response) {
-                            console.log(response);
-                            if (response.status === 200) {
-                                let result = response.data.result;
-                                if (result == "Sin Datos") {
-                                    $("#divEventos").html(`<div class="row mt-3">
-                                            <div class="col-md-12 mb-0" style="padding: 0;padding-right: 15px;">
-                                                <div class="card">
-                                                    <div class="card-body" style="border-left: 10px solid #009071;border-radius: 10px;">
-                                                        <div>
-                                                            <h4 class="mb-0" style="font-weight: normal;"><small class="text-muted" style="margin-bottom: 0px;"> No hay citas agendadas para este día </small></h4>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>`);
-                                } else {
-                                    let html = "",
-                                        colorText = "",
-                                        TextEstatus = "",
-                                        temperamento = "",
-                                        indicadorCliente = "";
-                                    result.forEach((data, index) => {
-                                        TextEstatus = "";
-                                        if (data.estatus == 1) {
-                                            TextEstatus = `<h4 class="card-title text-success" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
-                                            colorText = "#009071";
-                                        } else if (data.estatus == 2) {
-                                            TextEstatus = `<h4 class="card-title text-primary" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
-                                            colorText = "#0277BD";
-                                        } else if (data.estatus == 3) {
-                                            TextEstatus = `<h4 class="card-title text-danger" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
-                                            colorText = "#F95F53";
-                                        } else if (data.estatus == 4) {
-                                            TextEstatus = `<h4 class="card-title text-warning" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
-                                            colorText = "#FFAF00";
-                                        }
+                    // axios
+                    //     .post(url + "Brummy/views/citas/obtenerEventos.php", { fecha })
+                    //     .then(function (response) {
+                    //         console.log(response);
+                    //         if (response.status === 200) {
+                    //             let result = response.data.result;
+                    //             if (result == "Sin Datos") {
+                    //                 $("#divEventos").html(`<div class="row mt-3">
+                    //                         <div class="col-md-12 mb-0" style="padding: 0;padding-right: 15px;">
+                    //                             <div class="card">
+                    //                                 <div class="card-body" style="border-left: 10px solid #009071;border-radius: 10px;">
+                    //                                     <div>
+                    //                                         <h4 class="mb-0" style="font-weight: normal;"><small class="text-muted" style="margin-bottom: 0px;"> No hay citas agendadas para este día </small></h4>
+                    //                                     </div>
+                    //                                 </div>
+                    //                             </div>
+                    //                         </div>
+                    //                     </div>`);
+                    //             } else {
+                    //                 let html = "",
+                    //                     colorText = "",
+                    //                     TextEstatus = "",
+                    //                     temperamento = "",
+                    //                     indicadorCliente = "";
+                    //                 result.forEach((data, index) => {
+                    //                     TextEstatus = "";
+                    //                     if (data.estatus == 1) {
+                    //                         TextEstatus = `<h4 class="card-title text-success" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
+                    //                         colorText = "#009071";
+                    //                     } else if (data.estatus == 2) {
+                    //                         TextEstatus = `<h4 class="card-title text-primary" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
+                    //                         colorText = "#0277BD";
+                    //                     } else if (data.estatus == 3) {
+                    //                         TextEstatus = `<h4 class="card-title text-danger" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
+                    //                         colorText = "#F95F53";
+                    //                     } else if (data.estatus == 4) {
+                    //                         TextEstatus = `<h4 class="card-title text-warning" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
+                    //                         colorText = "#FFAF00";
+                    //                     }
 
-                                        if (data.temperamento == "verde") {
-                                            temperamento = `#27AE60`;
-                                        } else if (data.temperamento == "amarilo") {
-                                            temperamento = `#ffb02e`;
-                                        } else if (data.temperamento == "rojo") {
-                                            temperamento = `#ff0300`;
-                                        }
+                    //                     if (data.temperamento == "verde") {
+                    //                         temperamento = `#27AE60`;
+                    //                     } else if (data.temperamento == "amarilo") {
+                    //                         temperamento = `#ffb02e`;
+                    //                     } else if (data.temperamento == "rojo") {
+                    //                         temperamento = `#ff0300`;
+                    //                     }
 
-                                        if (data.indicadorCliente == "verde") {
-                                            indicadorCliente = `#27AE60`;
-                                        } else if (data.indicadorCliente == "amarilo") {
-                                            indicadorCliente = `#ffb02e`;
-                                        } else if (data.indicadorCliente == "rojo") {
-                                            indicadorCliente = `#ff0300`;
-                                        }
+                    //                     if (data.indicadorCliente == "verde") {
+                    //                         indicadorCliente = `#27AE60`;
+                    //                     } else if (data.indicadorCliente == "amarilo") {
+                    //                         indicadorCliente = `#ffb02e`;
+                    //                     } else if (data.indicadorCliente == "rojo") {
+                    //                         indicadorCliente = `#ff0300`;
+                    //                     }
 
-                                        html += `
+                    //                     html += `
+                    //                             <div class="row mt-3">
+                    //                                 <div class="col-md-12 mb-0" style="padding: 0;padding-right: 15px;">
+                    //                                     <div class="card" id="card_evt_${data.ID}">
+                    //                                         <div class="card-body" style="border-left: 10px solid ${colorText};border-radius: 10px; padding: 1rem 1.5rem;">
+                    //                                             <div class="row">
+                    //                                                 <div class="col-60">
+                    //                                                     <div class="row">
+                    //                                                         <div class="col-md-12 my-2">
+                    //                                                             <h4 class="card-title" style="display: flex;flex-direction: row;align-items: center;">
+                    //                                                                 <div> <span class="material-icons" style="font-size: 18px;color: ${indicadorCliente}; margin-left: 5px; margin-right: 5px;"> fiber_manual_record </span> </div>
+                    //                                                         ${data.nombreCita} Y ${data.nombreMascota}
+                    //                                                                 <div> <span class="material-icons" style="font-size: 18px;color: ${temperamento}; margin-left: 5px;"> fiber_manual_record </span> </div>
+                    //                                                             </h4> <div id="div_evt_${data.ID}"> ${TextEstatus} </div></div>
+                    //                                                             <div class="col-md-12 my-2">
+                    //                                                                 <span class="capitalize"> ${
+                    //                                                                     String(data.comentariosCita).trim()
+                    //                                                                         ? String(data.comentariosCita).trim()
+                    //                                                                         : "Sin comentarios adicionales"
+                    //                                                                 }</span>
+                    //                                                             </div>
+                    //                                                     </div>
+                    //                                                 </div>
+                    //                                                 <div class="col-40" style="display: flex;flex-direction: column;">
+                    //                                                     <div style="display: flex;margin-bottom: 12px;"> <span class="material-icons" style="margin-right: 15px;color: #0277bd;"> schedule </span> <strong class="capitalize" style="font-weight: 500;"> ${
+                    //                                                         String(data.horaCita).split(":")[0]
+                    //                                                     }:${String(data.horaCita).split(":")[1]} </strong></div>
+                    //                                                     <div style="display: flex;margin-bottom: 12px;"> <span class="material-icons" style="margin-right: 15px;color: #0277bd;"> checklist </span> <strong class="capitalize" style="font-weight: 500;"> ${String(
+                    //                                                         data.motivoCita
+                    //                                                     ).trim()} </strong> </div>
+                    //                                                     <div class="col-md-4 my-0" style="display: flex;">
+                    //                                                         <div class="divButton" style="margin-right: 20px">
+                    //                                                             <button class="button button-outline button-round btnBlue" onclick="marcarCita(${
+                    //                                                                 data.ID
+                    //                                                             })" style="margin-right: 20px;">
+                    //                                                                 <span class="material-icons iconBtn" style="margin-left: 0;"> date_range </span>
+                    //                                                             </button>
+
+                    //                                                             <button class="button button-outline button-round btnGreen" onclick="generarLinkEncuesta(${
+                    //                                                                 data.ID
+                    //                                                             })">
+                    //                                                                 <span class="material-icons iconBtn" style="margin-left: 0;"> link </span>
+                    //                                                             </button>
+                    //                                                         </div>
+                    //                                                         <input id="foo_${data.ID}" value="" style="opacity: 0;height: 0;">
+                    //                                                         <button class="btn" data-clipboard-target="#foo_${data.ID}" id="btn_foo_${
+                    //                         data.ID
+                    //                     }" style="height: 0;padding: 0;opacity: 0;"></button>
+                    //                                                         <input type="hidden" id="input_FK_mascota_${data.ID}" value="${
+                    //                         data.FKnombreMascota
+                    //                     }" />
+                    //                                                         <input type="hidden" id="input_nombre_${data.ID}" value="${
+                    //                         data.nombreMascota
+                    //                     }" />
+                    //                                                     </div>
+                    //                                                 </div>
+                    //                                             </div>
+                    //                                         </div>
+                    //                                     </div>
+                    //                                 </div>
+                    //                             </div>`;
+                    //                 });
+                    //                 $("#divEventos").html(html);
+                    //             }
+                    //         }
+                    //     })
+                    //     .catch(function (error) {
+                    //         console.log(error);
+                    //         app.dialog.close();
+                    //         app.dialog.alert("Algo salió mal", "Aviso");
+                    //     })
+                    //     .finally(function () {
+                    //         // siempre sera ejecutado
+                    //     });
+
+                    $.ajax({
+                        method: "POST",
+                        dataType: "JSON",
+                        url: url + "Brummy/views/citas/obtenerEventos.php",
+                        data: { fecha },
+                    })
+                        .done(function (results) {
+                            let success = results.success;
+                            let result = results.result;
+
+                            switch (success) {
+                                case true:
+                                    if (result == "Sin Datos") {
+                                        $("#divEventos").html(`<div class="row mt-3">
+                                                            <div class="col-md-12 mb-0" style="padding: 0;padding-right: 15px;">
+                                                                <div class="card">
+                                                                    <div class="card-body" style="border-left: 10px solid #009071;border-radius: 10px;">
+                                                                        <div>
+                                                                            <h4 class="mb-0" style="font-weight: normal;"><small class="text-muted" style="margin-bottom: 0px;"> No hay citas agendadas para este día </small></h4>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>`);
+                                    } else {
+                                        let html = "",
+                                            colorText = "",
+                                            TextEstatus = "",
+                                            temperamento = "",
+                                            indicadorCliente = "";
+                                        result.forEach((data, index) => {
+                                            TextEstatus = "";
+                                            if (data.estatus == 1) {
+                                                TextEstatus = `<h4 class="card-title text-success" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
+                                                colorText = "#009071";
+                                            } else if (data.estatus == 2) {
+                                                TextEstatus = `<h4 class="card-title text-primary" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
+                                                colorText = "#0277BD";
+                                            } else if (data.estatus == 3) {
+                                                TextEstatus = `<h4 class="card-title text-danger" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
+                                                colorText = "#F95F53";
+                                            } else if (data.estatus == 4) {
+                                                TextEstatus = `<h4 class="card-title text-warning" style="margin: 0px;"><strong>${data.flagEstatus}</strong></h4>`;
+                                                colorText = "#FFAF00";
+                                            }
+
+                                            if (data.temperamento == "verde") {
+                                                temperamento = `#27AE60`;
+                                            } else if (data.temperamento == "amarilo") {
+                                                temperamento = `#ffb02e`;
+                                            } else if (data.temperamento == "rojo") {
+                                                temperamento = `#ff0300`;
+                                            }
+
+                                            if (data.indicadorCliente == "verde") {
+                                                indicadorCliente = `#27AE60`;
+                                            } else if (data.indicadorCliente == "amarilo") {
+                                                indicadorCliente = `#ffb02e`;
+                                            } else if (data.indicadorCliente == "rojo") {
+                                                indicadorCliente = `#ff0300`;
+                                            }
+
+                                            html += `
                                                 <div class="row mt-3">
                                                     <div class="col-md-12 mb-0" style="padding: 0;padding-right: 15px;">
                                                         <div class="card" id="card_evt_${data.ID}">
@@ -423,13 +646,13 @@
                                                                 <div class="row">
                                                                     <div class="col-60">
                                                                         <div class="row">
-                                                                            <div class="col-md-12 my-2"> 
+                                                                            <div class="col-md-12 my-2">
                                                                                 <h4 class="card-title" style="display: flex;flex-direction: row;align-items: center;">
                                                                                     <div> <span class="material-icons" style="font-size: 18px;color: ${indicadorCliente}; margin-left: 5px; margin-right: 5px;"> fiber_manual_record </span> </div>
-                                                                            ${data.nombreCita} Y ${data.nombreMascota} 
+                                                                            ${data.nombreCita} Y ${data.nombreMascota}
                                                                                     <div> <span class="material-icons" style="font-size: 18px;color: ${temperamento}; margin-left: 5px;"> fiber_manual_record </span> </div>
                                                                                 </h4> <div id="div_evt_${data.ID}"> ${TextEstatus} </div></div>
-                                                                                <div class="col-md-12 my-2"> 
+                                                                                <div class="col-md-12 my-2">
                                                                                     <span class="capitalize"> ${
                                                                                         String(data.comentariosCita).trim()
                                                                                             ? String(data.comentariosCita).trim()
@@ -461,14 +684,14 @@
                                                                             </div>
                                                                             <input id="foo_${data.ID}" value="" style="opacity: 0;height: 0;">
                                                                             <button class="btn" data-clipboard-target="#foo_${data.ID}" id="btn_foo_${
-                                            data.ID
-                                        }" style="height: 0;padding: 0;opacity: 0;"></button>
+                                                data.ID
+                                            }" style="height: 0;padding: 0;opacity: 0;"></button>
                                                                             <input type="hidden" id="input_FK_mascota_${data.ID}" value="${
-                                            data.FKnombreMascota
-                                        }" />
+                                                data.FKnombreMascota
+                                            }" />
                                                                             <input type="hidden" id="input_nombre_${data.ID}" value="${
-                                            data.nombreMascota
-                                        }" />
+                                                data.nombreMascota
+                                            }" />
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -476,18 +699,20 @@
                                                         </div>
                                                     </div>
                                                 </div>`;
-                                    });
-                                    $("#divEventos").html(html);
-                                }
+                                        });
+                                        $("#divEventos").html(html);
+                                    }
+                                    break;
+                                case false:
+                                    // preloader.hide();
+                                    msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                    break;
                             }
                         })
-                        .catch(function (error) {
-                            console.log(error);
-                            app.dialog.close();
-                            app.dialog.alert("Algo salió mal", "Aviso");
-                        })
-                        .finally(function () {
-                            // siempre sera ejecutado
+                        .fail(function (jqXHR, textStatus, errorThrown) {
+                            // preloader.hide();
+                            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                            console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
                         });
                 }
 
@@ -522,7 +747,7 @@
 
                                                 let modalTemplate = app.popup.create({
                                                     content: `<div class="sheet-modal demo-sheet">
-                                                            <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;"> 
+                                                            <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;">
                                                                 <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
                                                             </div>
                                                             <div class="sheet-modal-inner">
@@ -595,7 +820,7 @@
                                                                                             </div>
                                                                                         </div>
                                                                                     </li>
-                                                                                    
+
                                                                                     <div class="checkbox-wrapper-46" style="margin: 22px 0px 12px 8px;padding-left: 15px;">
                                                                                         <input type="checkbox" id="cbx-46" class="inp-cbx" onchange="muestraDomicilio()"/>
                                                                                         <label for="cbx-46" class="cbx">
@@ -618,7 +843,7 @@
                                                                                                 </div>
                                                                                             </div>
                                                                                         </li>
-                                                                                    
+
                                                                                         <li class="item-content item-input item-input-outline" id="LInumeroDomi_input">
                                                                                             <div class="item-inner">
                                                                                                 <div class="item-title item-floating-label">Número</div>
@@ -669,15 +894,15 @@
                                                                                             </div>
                                                                                         </li>
 
-                                                                                    </div>            
+                                                                                    </div>
                                                                                 </ul>
                                                                             </div>
                                                                         </div>
-                                                                
+
                                                                         <button class="button button-outline button-round" id="btnGuardarCita">
                                                                             Guardar <span class="material-icons iconBtn"> save </span>
                                                                         </button>
-                                                
+
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -703,35 +928,80 @@
                                                             $("#nombreCita").change(() => {
                                                                 let FK_dueno = $("#nombreCita").val();
                                                                 if (FK_dueno) {
-                                                                    axios
-                                                                        .post(url + "Brummy/views/mascotas/obtenerMascotasDuenios.php", { FK_dueno })
-                                                                        .then(function (response) {
-                                                                            console.log(response);
-                                                                            if (response.status === 200) {
-                                                                                let result = response.data.result;
-                                                                                let html2 = "<option value=''> - - </option>";
-                                                                                if (result == "Sin Datos") {
-                                                                                    $("#nombreMascota").html(html2);
-                                                                                } else {
-                                                                                    result.forEach((data, index) => {
-                                                                                        html2 += `<option value='${data.ID}'> ${data.nombre} </option>`;
-                                                                                    });
+                                                                    // axios
+                                                                    //     .post(url + "Brummy/views/mascotas/obtenerMascotasDuenios.php", { FK_dueno })
+                                                                    //     .then(function (response) {
+                                                                    //         console.log(response);
+                                                                    //         if (response.status === 200) {
+                                                                    //             let result = response.data.result;
+                                                                    //             let html2 = "<option value=''> - - </option>";
+                                                                    //             if (result == "Sin Datos") {
+                                                                    //                 $("#nombreMascota").html(html2);
+                                                                    //             } else {
+                                                                    //                 result.forEach((data, index) => {
+                                                                    //                     html2 += `<option value='${data.ID}'> ${data.nombre} </option>`;
+                                                                    //                 });
 
-                                                                                    $("#nombreMascota").html(html2);
-                                                                                    controlMascotas.clear();
-                                                                                    controlMascotas.clearOptions();
-                                                                                    controlMascotas.sync();
-                                                                                }
-                                                                                app.dialog.close();
+                                                                    //                 $("#nombreMascota").html(html2);
+                                                                    //                 controlMascotas.clear();
+                                                                    //                 controlMascotas.clearOptions();
+                                                                    //                 controlMascotas.sync();
+                                                                    //             }
+                                                                    //             app.dialog.close();
+                                                                    //         }
+                                                                    //     })
+                                                                    //     .catch(function (error) {
+                                                                    //         console.log(error);
+                                                                    //         app.dialog.close();
+                                                                    //         app.dialog.alert("Algo salió mal", "Aviso");
+                                                                    //     })
+                                                                    //     .finally(function () {
+                                                                    //         // siempre sera ejecutado
+                                                                    //     });
+                                                                    $.ajax({
+                                                                        method: "POST",
+                                                                        dataType: "JSON",
+                                                                        url: url + "Brummy/views/mascotas/obtenerMascotasDuenios.php",
+                                                                        data: { FK_dueno },
+                                                                    })
+                                                                        .done(function (results) {
+                                                                            let success = results.success;
+                                                                            let result = results.result;
+
+                                                                            switch (success) {
+                                                                                case true:
+                                                                                    let html2 = "<option value=''> - - </option>";
+                                                                                    if (result == "Sin Datos") {
+                                                                                        $("#nombreMascota").html(html2);
+                                                                                    } else {
+                                                                                        result.forEach((data, index) => {
+                                                                                            html2 += `<option value='${data.ID}'> ${data.nombre} </option>`;
+                                                                                        });
+
+                                                                                        $("#nombreMascota").html(html2);
+                                                                                        controlMascotas.clear();
+                                                                                        controlMascotas.clearOptions();
+                                                                                        controlMascotas.sync();
+                                                                                    }
+                                                                                    app.dialog.close();
+                                                                                    break;
+                                                                                case false:
+                                                                                    // preloader.hide();
+                                                                                    msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                                                                    break;
                                                                             }
                                                                         })
-                                                                        .catch(function (error) {
-                                                                            console.log(error);
-                                                                            app.dialog.close();
-                                                                            app.dialog.alert("Algo salió mal", "Aviso");
-                                                                        })
-                                                                        .finally(function () {
-                                                                            // siempre sera ejecutado
+                                                                        .fail(function (jqXHR, textStatus, errorThrown) {
+                                                                            // preloader.hide();
+                                                                            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                                                            console.log(
+                                                                                "error: " +
+                                                                                    jqXHR.responseText +
+                                                                                    "\nEstatus: " +
+                                                                                    textStatus +
+                                                                                    "\nError: " +
+                                                                                    errorThrown
+                                                                            );
                                                                         });
                                                                     getDireecionCliente(FK_dueno);
                                                                 } else {
@@ -820,48 +1090,99 @@
                             }
                         }
 
-                        axios
-                            .post(url + "Brummy/views/citas/validaCita.php", { fechaCita, horaCita })
-                            .then(function (response) {
-                                console.log(response);
-                                if (response.status === 200) {
-                                    let result = response.data.result;
-                                    if (result == "Sin Datos") {
-                                        guardarCita();
-                                    } else {
-                                        let Texto = "";
-                                        result.forEach((data, index) => {
-                                            Texto = ` ${data.nombreCita} y ${data.nombreMascota} que podria empalmarse. ¿Deseas continuar?`;
-                                        });
-                                        app.dialog
-                                            .create({
-                                                title: "Hay una cita ya agendada de: " + Texto,
-                                                buttons: [
-                                                    {
-                                                        text: "Cancelar",
-                                                        onClick: function () {
-                                                            console.log("Cancelar");
+                        // axios
+                        //     .post(url + "Brummy/views/citas/validaCita.php", { fechaCita, horaCita })
+                        //     .then(function (response) {
+                        //         console.log(response);
+                        //         if (response.status === 200) {
+                        //             let result = response.data.result;
+                        //             if (result == "Sin Datos") {
+                        //                 guardarCita();
+                        //             } else {
+                        //                 let Texto = "";
+                        //                 result.forEach((data, index) => {
+                        //                     Texto = ` ${data.nombreCita} y ${data.nombreMascota} que podria empalmarse. ¿Deseas continuar?`;
+                        //                 });
+                        //                 app.dialog
+                        //                     .create({
+                        //                         title: "Hay una cita ya agendada de: " + Texto,
+                        //                         buttons: [
+                        //                             {
+                        //                                 text: "Cancelar",
+                        //                                 onClick: function () {
+                        //                                     console.log("Cancelar");
+                        //                                 },
+                        //                             },
+                        //                             {
+                        //                                 text: "OK",
+                        //                                 onClick: function () {
+                        //                                     guardarCita();
+                        //                                 },
+                        //                             },
+                        //                         ],
+                        //                     })
+                        //                     .open();
+                        //             }
+                        //         }
+                        //     })
+                        //     .catch(function (error) {
+                        //         console.log(error);
+                        //         app.dialog.close();
+                        //         app.dialog.alert("Algo salió mal", "Aviso");
+                        //     })
+                        //     .finally(function () {
+                        //         // siempre sera ejecutado
+                        //     });
+                        $.ajax({
+                            method: "POST",
+                            dataType: "JSON",
+                            url: url + "Brummy/views/citas/validaCita.php",
+                            data: { fechaCita, horaCita },
+                        })
+                            .done(function (results) {
+                                let success = results.success;
+                                let result = results.result;
+
+                                switch (success) {
+                                    case true:
+                                        if (result == "Sin Datos") {
+                                            guardarCita();
+                                        } else {
+                                            let Texto = "";
+                                            result.forEach((data, index) => {
+                                                Texto = ` ${data.nombreCita} y ${data.nombreMascota} que podria empalmarse. ¿Deseas continuar?`;
+                                            });
+                                            app.dialog
+                                                .create({
+                                                    title: "Hay una cita ya agendada de: " + Texto,
+                                                    buttons: [
+                                                        {
+                                                            text: "Cancelar",
+                                                            onClick: function () {
+                                                                console.log("Cancelar");
+                                                            },
                                                         },
-                                                    },
-                                                    {
-                                                        text: "OK",
-                                                        onClick: function () {
-                                                            guardarCita();
+                                                        {
+                                                            text: "OK",
+                                                            onClick: function () {
+                                                                guardarCita();
+                                                            },
                                                         },
-                                                    },
-                                                ],
-                                            })
-                                            .open();
-                                    }
+                                                    ],
+                                                })
+                                                .open();
+                                        }
+                                        break;
+                                    case false:
+                                        // preloader.hide();
+                                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                        break;
                                 }
                             })
-                            .catch(function (error) {
-                                console.log(error);
-                                app.dialog.close();
-                                app.dialog.alert("Algo salió mal", "Aviso");
-                            })
-                            .finally(function () {
-                                // siempre sera ejecutado
+                            .fail(function (jqXHR, textStatus, errorThrown) {
+                                // preloader.hide();
+                                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
                             });
                     } else {
                         let html =
@@ -921,8 +1242,47 @@
                         estadoDomi.replaceAll("'", '"');
                     }
 
-                    axios
-                        .post(url + "Brummy/views/citas/guardarCita.php", {
+                    // axios
+                    //     .post(url + "Brummy/views/citas/guardarCita.php", {
+                    //         FKnombreCita,
+                    //         nombreCita,
+                    //         FKnombreMascota,
+                    //         nombreMascota,
+                    //         fechaCita,
+                    //         horaCita,
+                    //         motivoCita,
+                    //         comentariosCita,
+                    //         FKMotivo,
+                    //         calleDomi,
+                    //         numeroDomi,
+                    //         cpDomi,
+                    //         colDomi,
+                    //         municipioDomi,
+                    //         estadoDomi,
+                    //         domicilio,
+                    //     })
+                    //     .then(function (response) {
+                    //         console.log(response);
+                    //         if (response.status === 200) {
+                    //             $(".sheet-close").trigger("click");
+                    //             app.dialog.alert("Guardado correctamente", "Aviso");
+                    //             validaEventos(fechaCita);
+                    //             app.dialog.close();
+                    //         }
+                    //     })
+                    //     .catch(function (error) {
+                    //         console.log(error);
+                    //         app.dialog.close();
+                    //         app.dialog.alert("Algo salió mal", "Aviso");
+                    //     })
+                    //     .finally(function () {
+                    //         // siempre sera ejecutado
+                    //     });
+                    $.ajax({
+                        method: "POST",
+                        dataType: "JSON",
+                        url: url + "Brummy/views/citas/guardarCita.php",
+                        data: {
                             FKnombreCita,
                             nombreCita,
                             FKnombreMascota,
@@ -939,23 +1299,29 @@
                             municipioDomi,
                             estadoDomi,
                             domicilio,
-                        })
-                        .then(function (response) {
-                            console.log(response);
-                            if (response.status === 200) {
-                                $(".sheet-close").trigger("click");
-                                app.dialog.alert("Guardado correctamente", "Aviso");
-                                validaEventos(fechaCita);
-                                app.dialog.close();
+                        },
+                    })
+                        .done(function (results) {
+                            let success = results.success;
+                            let result = results.result;
+
+                            switch (success) {
+                                case true:
+                                    $(".sheet-close").trigger("click");
+                                    app.dialog.alert("Guardado correctamente", "Aviso");
+                                    validaEventos(fechaCita);
+                                    app.dialog.close();
+                                    break;
+                                case false:
+                                    // preloader.hide();
+                                    msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                    break;
                             }
                         })
-                        .catch(function (error) {
-                            console.log(error);
-                            app.dialog.close();
-                            app.dialog.alert("Algo salió mal", "Aviso");
-                        })
-                        .finally(function () {
-                            // siempre sera ejecutado
+                        .fail(function (jqXHR, textStatus, errorThrown) {
+                            // preloader.hide();
+                            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                            console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
                         });
                 }
 

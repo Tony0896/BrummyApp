@@ -6,9 +6,13 @@
                 style="justify-content: space-between; background-color: #009071; flex-direction: column; height: auto; min-height: 50px"
             >
                 <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin-top: 10px">
-                    <div>&nbsp;</div>
-                    <div class="title" style="font-size: 18px; margin-left: 15px">Catálogos</div>
-                    <div>&nbsp;</div>
+                    <div style="width: 33.3%">
+                        <a href="#" data-panel="left" style="font-size: 15px" onclick="globalBack()">
+                            <i class="icon material-icons md-only" style="margin-left: 15px; font-size: 28px"> arrow_back </i>
+                        </a>
+                    </div>
+                    <div class="title" style="font-size: 18px; margin-left: 15px; width: 33.3%; text-align: center">Catálogos</div>
+                    <div style="width: 33.3%">&nbsp;</div>
                 </div>
             </div>
             <div id="marquee_catalogos" style="background-color: #009071"></div>
@@ -128,7 +132,7 @@
                                         <td class="capitalize">${data.nombreEspecie}</td>
                                         <td>
                                             <button class="button button-outline button-round btnEliminar" onclick="deleteEspecie(${data.ID})">
-                                                <span class="material-icons iconBtn"> delete </span>
+                                                <span class="material-icons iconBtn" style="margin-left: 0;"> delete </span>
                                             </button>
                                         </td>
                                     </tr>`;
@@ -158,7 +162,7 @@
                                                 <td class="capitalize">${data.especie}</td>
                                                 <td>
                                                     <button class="button button-outline button-round btnEliminar" onclick="deleteRaza(${data.ID})">
-                                                        <span class="material-icons iconBtn"> delete </span>
+                                                        <span class="material-icons iconBtn" style="margin-left: 0;"> delete </span>
                                                     </button>
                                                 </td>
                                             </tr>`;
@@ -188,7 +192,7 @@
                                                             <button class="button button-outline button-round btnEliminar" onclick="deleteMotivoCita(${
                                                                 data.ID
                                                             })">
-                                                                <span class="material-icons iconBtn"> delete </span>
+                                                                <span class="material-icons iconBtn" style="margin-left: 0;"> delete </span>
                                                             </button>
                                                         </td>
                                                     </tr>`;

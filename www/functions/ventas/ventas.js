@@ -1,184 +1,377 @@
 function obtenerVentas(mes, anio) {
     let url = localStorage.getItem("url");
-    axios
-        .post(url + "Brummy/views/ventas/obtenerVentas.php", {
-            mes,
-            anio,
-        })
-        .then(function (response) {
-            console.log(response);
-            if (response.status === 200) {
-                let result = response.data.result;
-                let html = "";
-                if (result == "Sin Datos") {
-                    dataTableDestroy();
-                    $("#ventasBody").html(html);
-                    dataTableCreate(1);
-                } else {
-                    dataTableDestroy();
-                    let html, codigo, stock;
-                    result.forEach((data, index) => {
-                        codigo = data.codigo;
-                        stock = data.stockReal;
-                        if (data.Flagtipo == "Servicio") {
-                            codigo = String(codigo) + String(data.ID);
-                            stock = "N/A";
-                        }
-                        html += `<tr>
-                            <td class="capitalize">VTA-${data.ID}</td>
-                            <td class="capitalize">${data.nombreCompleto}</td>
-                            <td>${data.cantidad}</td>
-                            <td class="capitalize">${FormatDate(data.Fecha)}</td>
-                            <td class="capitalize">$${data.price}</td>
-                            <td>
-                                <div style="display: flex; flex-direction: row;">
-                                    <button class="button button-outline button-round btnBlue" onclick="verDetalleVenta(${
-                                        data.ID
-                                    })" style="margin-right: 10px;">
-                                        <span class="text-sm mb-0"><i class="material-icons" style="margin: auto;vertical-align: middle;"> shopping_cart </i></span>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>`;
-                    });
-                    $("#ventasBody").html(html);
-                    dataTableCreate(1);
-                }
-                app.dialog.close();
+    // axios
+    //     .post(url + "Brummy/views/ventas/obtenerVentas.php", {
+    //         mes,
+    //         anio,
+    //     })
+    //     .then(function (response) {
+    //         console.log(response);
+    //         if (response.status === 200) {
+    //             let result = response.data.result;
+    //             let html = "";
+    //             if (result == "Sin Datos") {
+    //                 dataTableDestroy();
+    //                 $("#ventasBody").html(html);
+    //                 dataTableCreate(1);
+    //             } else {
+    //                 dataTableDestroy();
+    //                 let html, codigo, stock;
+    //                 result.forEach((data, index) => {
+    //                     codigo = data.codigo;
+    //                     stock = data.stockReal;
+    //                     if (data.Flagtipo == "Servicio") {
+    //                         codigo = String(codigo) + String(data.ID);
+    //                         stock = "N/A";
+    //                     }
+    //                     html += `<tr>
+    //                         <td class="capitalize">VTA-${data.ID}</td>
+    //                         <td class="capitalize">${data.nombreCompleto}</td>
+    //                         <td>${data.cantidad}</td>
+    //                         <td class="capitalize">${FormatDate(data.Fecha)}</td>
+    //                         <td class="capitalize">$${data.price}</td>
+    //                         <td>
+    //                             <div style="display: flex; flex-direction: row;">
+    //                                 <button class="button button-outline button-round btnBlue" onclick="verDetalleVenta(${
+    //                                     data.ID
+    //                                 })" style="margin-right: 10px;">
+    //                                     <span class="text-sm mb-0"><i class="material-icons" style="margin: auto;vertical-align: middle;"> shopping_cart </i></span>
+    //                                 </button>
+    //                             </div>
+    //                         </td>
+    //                     </tr>`;
+    //                 });
+    //                 $("#ventasBody").html(html);
+    //                 dataTableCreate(1);
+    //             }
+    //             app.dialog.close();
+    //         }
+    //     })
+    //     .catch(function (error) {
+    //         app.dialog.alert("Algo salió mal", "Aviso");
+    //         console.log(error);
+    //     });
+    $.ajax({
+        method: "POST",
+        dataType: "JSON",
+        url: url + "Brummy/views/ventas/obtenerVentas.php",
+        data: { mes, anio },
+    })
+        .done(function (results) {
+            let success = results.success;
+            let result = results.result;
+
+            switch (success) {
+                case true:
+                    if (result == "Sin Datos") {
+                        dataTableDestroy();
+                        $("#ventasBody").html(html);
+                        dataTableCreate(1);
+                    } else {
+                        dataTableDestroy();
+                        let html, codigo, stock;
+                        result.forEach((data, index) => {
+                            codigo = data.codigo;
+                            stock = data.stockReal;
+                            if (data.Flagtipo == "Servicio") {
+                                codigo = String(codigo) + String(data.ID);
+                                stock = "N/A";
+                            }
+                            html += `<tr>
+                                <td class="capitalize">VTA-${data.ID}</td>
+                                <td class="capitalize">${data.nombreCompleto}</td>
+                                <td>${data.cantidad}</td>
+                                <td class="capitalize">${FormatDate(data.Fecha)}</td>
+                                <td class="capitalize">$${data.price}</td>
+                                <td>
+                                    <div style="display: flex; flex-direction: row;">
+                                        <button class="button button-outline button-round btnBlue" onclick="verDetalleVenta(${data.ID}, ${
+                                data.cambioVenta
+                            })" style="margin-right: 10px;">
+                                            <span class="text-sm mb-0"><i class="material-icons" style="margin: auto;vertical-align: middle;"> shopping_cart </i></span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>`;
+                        });
+                        $("#ventasBody").html(html);
+                        dataTableCreate(1);
+                    }
+                    break;
+                case false:
+                    // preloader.hide();
+                    msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                    break;
             }
         })
-        .catch(function (error) {
-            app.dialog.alert("Algo salió mal", "Aviso");
-            console.log(error);
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            // preloader.hide();
+            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+            console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
         });
 }
 
-function verDetalleVenta(ID) {
+function verDetalleVenta(ID, cambioVenta) {
     let url = localStorage.getItem("url");
-    axios
-        .post(url + "Brummy/views/ventas/obtenerVenta.php", {
-            ID,
-        })
-        .then(function (response) {
-            console.log(response);
-            if (response.status === 200) {
-                let result = response.data.result;
-                if (result == "Sin Datos") {
-                    app.dialog.alert("No se logró obtener infornmación de la venta.", "Aviso");
-                } else {
-                    let html = "",
-                        codigo,
-                        stock;
-                    result.forEach((data, index) => {
-                        console.log(data);
-                        let random = genRandom();
-                        nombreCliente = data.nombreCliente;
-                        Fecha = data.Fecha;
-                        cambio = data.cambio;
-                        if (Number(cambio) <= 0) {
-                            efectivo = data.price;
-                        } else {
-                            efectivo = data.efectivo;
-                        }
-                        price = data.price;
-                        html += `
-                        <div id="${random}_product">
-                            <div class="product" style="grid-template-columns: 1fr 80px 1fr 100px;">
-                                <div>
-                                    <span class="capitalize" id="${random}_FlagProducto">${data.FlagProducto}</span>
-                                    <p class="capitalize">${data.tipo}</p>
-                                </div>
-                                <div class="quantity">
-                                    <label style="color: #009071;" id="${random}_label">${data.cantidad}</label>
-                                </div>
-                                <label class="price small my-auto" id="${random}_totals">$${data.precioVenta} c/u</label>
-                                <label class="price small my-auto" id="${random}_total">$${data.total}</label>
-                            </div>
-                            <hr>
-                        </div>`;
-                    });
+    // axios
+    //     .post(url + "Brummy/views/ventas/obtenerVenta.php", {
+    //         ID,
+    //     })
+    //     .then(function (response) {
+    //         console.log(response);
+    //         if (response.status === 200) {
+    //             let result = response.data.result;
+    //             if (result == "Sin Datos") {
+    //                 app.dialog.alert("No se logró obtener infornmación de la venta.", "Aviso");
+    //             } else {
+    //                 let html = "",
+    //                     codigo,
+    //                     stock;
+    //                 result.forEach((data, index) => {
+    //                     console.log(data);
+    //                     let random = genRandom();
+    //                     nombreCliente = data.nombreCliente;
+    //                     Fecha = data.Fecha;
+    //                     cambio = data.cambio;
+    //                     if (Number(cambio) <= 0) {
+    //                         efectivo = data.price;
+    //                     } else {
+    //                         efectivo = data.efectivo;
+    //                     }
+    //                     price = data.price;
+    //                     html += `
+    //                     <div id="${random}_product">
+    //                         <div class="product" style="grid-template-columns: 1fr 80px 1fr 100px;">
+    //                             <div>
+    //                                 <span class="capitalize" id="${random}_FlagProducto">${data.FlagProducto}</span>
+    //                                 <p class="capitalize">${data.tipo}</p>
+    //                             </div>
+    //                             <div class="quantity">
+    //                                 <label style="color: #009071;" id="${random}_label">${data.cantidad}</label>
+    //                             </div>
+    //                             <label class="price small my-auto" id="${random}_totals">$${data.precioVenta} c/u</label>
+    //                             <label class="price small my-auto" id="${random}_total">$${data.total}</label>
+    //                         </div>
+    //                         <hr>
+    //                     </div>`;
+    //                 });
 
-                    let modalTemplate = app.popup.create({
-                        content: `<div class="sheet-modal demo-sheet">
-                                        <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;width: fit-content;left: 94%;"> 
-                                            <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
-                                        </div>
-                                        <div class="sheet-modal-inner">
-                                            <div class="page-content">
-                                                <div class="block" style="margin-top: 60px;align-items: center;display: flex;flex-direction: column;">
-                                                    <div class="card" style="padding: 20px">
-                                                        <div style="display: flex;flex-direction: row;">
-                                                            <h4 class="card-title me-3" style="font-weight: 400;">Cliente:</h4>
-                                                            <h4 class="card-title subtitle capitalize">${nombreCliente}</h4>
-                                                        </div>
-                                                        <div style="display: flex;flex-direction: row;">
-                                                            <h4 class="card-title me-3" style="font-weight: 400;">Fecha:</h4>
-                                                            <h4 class="card-title subtitle">${Fecha}</h4>
-                                                        </div>
-                                                        <hr>
-                                                        <h4 class="card-title mt-2">Carrito</h4>
-                                                        <div class="row">
-                                                            <div class="col-md-12 mb-2">
-                                                                <div class="master-container">
-                                                                    <div class="cart">
-                                                                        <div class="products">
-                                                                            ${html}
+    //                 let modalTemplate = app.popup.create({
+    //                     content: `<div class="sheet-modal demo-sheet">
+    //                                     <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;width: fit-content;left: 94%;">
+    //                                         <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
+    //                                     </div>
+    //                                     <div class="sheet-modal-inner">
+    //                                         <div class="page-content">
+    //                                             <div class="block" style="margin-top: 60px;align-items: center;display: flex;flex-direction: column;">
+    //                                                 <div class="card" style="padding: 20px">
+    //                                                     <div style="display: flex;flex-direction: row;">
+    //                                                         <h4 class="card-title me-3" style="font-weight: 400;">Cliente:</h4>
+    //                                                         <h4 class="card-title subtitle capitalize">${nombreCliente}</h4>
+    //                                                     </div>
+    //                                                     <div style="display: flex;flex-direction: row;">
+    //                                                         <h4 class="card-title me-3" style="font-weight: 400;">Fecha:</h4>
+    //                                                         <h4 class="card-title subtitle">${Fecha}</h4>
+    //                                                     </div>
+    //                                                     <hr>
+    //                                                     <h4 class="card-title mt-2">Carrito</h4>
+    //                                                     <div class="row">
+    //                                                         <div class="col-md-12 mb-2">
+    //                                                             <div class="master-container">
+    //                                                                 <div class="cart">
+    //                                                                     <div class="products">
+    //                                                                         ${html}
+    //                                                                     </div>
+    //                                                                 </div>
+    //                                                             </div>
+    //                                                         </div>
+    //                                                     </div>
+
+    //                                                     <div class="row">
+    //                                                         <div class="col-md-12 mb-2">
+    //                                                             <div class="checkout">
+    //                                                                 <div class="details">
+    //                                                                     <span>Subtotal:</span>
+    //                                                                     <span id="totalSubtotal">$${price}</span>
+    //                                                                 </div>
+    //                                                                 <div class="details">
+    //                                                                     <span>Descuentos de productos:</span>
+    //                                                                     <span id="totalDescuentos">$0.00</span>
+    //                                                                 </div>
+    //                                                                 <hr>
+    //                                                                 <div class="checkout--footer">
+    //                                                                     <label class="price" id="priceTotal_text"><sup>$</sup>${price}</label>
+    //                                                                 </div>
+    //                                                                 <hr>
+    //                                                                 <div class="details">
+    //                                                                     <span>Efectivo:</span>
+    //                                                                     <span>$${efectivo}</span>
+    //                                                                 </div>
+    //                                                                 <div class="details">
+    //                                                                     <span>Cabmio:</span>
+    //                                                                     <span id="totalDescuentos">$${cambio}</span>
+    //                                                                 </div>
+    //                                                                 <hr>
+    //                                                             </div>
+    //                                                         </div>
+    //                                                     </div>
+    //                                                 </div>
+    //                                             </div>
+    //                                         </div>
+    //                                     </div>
+    //                                 </div>`,
+    //                     swipeToClose: false,
+    //                     closeByOutsideClick: false,
+    //                     closeByBackdropClick: false,
+    //                     closeOnEscape: false,
+    //                     on: {
+    //                         open: function (popup) {},
+    //                     },
+    //                 });
+
+    //                 modalTemplate.open();
+    //             }
+    //             app.dialog.close();
+    //         }
+    //     })
+    //     .catch(function (error) {
+    //         app.dialog.alert("Algo salió mal", "Aviso");
+    //         console.log(error);
+    //     });
+    $.ajax({
+        method: "POST",
+        dataType: "JSON",
+        url: url + "Brummy/views/ventas/obtenerVenta.php",
+        data: { ID, cambioVenta },
+    })
+        .done(function (results) {
+            let success = results.success;
+            let result = results.result;
+
+            switch (success) {
+                case true:
+                    if (result == "Sin Datos") {
+                        app.dialog.alert("No se logró obtener infornmación de la venta.", "Aviso");
+                    } else {
+                        let html = "",
+                            codigo,
+                            stock;
+                        result.forEach((data, index) => {
+                            console.log(data);
+                            let random = genRandom();
+                            nombreCliente = data.nombreCliente;
+                            Fecha = data.Fecha;
+                            cambio = data.cambio;
+                            if (Number(cambio) <= 0) {
+                                efectivo = data.price;
+                            } else {
+                                efectivo = data.efectivo;
+                            }
+                            price = data.price;
+                            html += `
+                            <div id="${random}_product">
+                                <div class="product" style="grid-template-columns: 1fr 80px 1fr 100px;">
+                                    <div>
+                                        <span class="capitalize" id="${random}_FlagProducto">${data.FlagProducto}</span>
+                                        <p class="capitalize">${data.tipo}</p>
+                                    </div>
+                                    <div class="quantity">
+                                        <label style="color: #009071;" id="${random}_label">${data.cantidad}</label>
+                                    </div>
+                                    <label class="price small my-auto" id="${random}_totals">$${data.precioVenta} c/u</label>
+                                    <label class="price small my-auto" id="${random}_total">$${data.total}</label>
+                                </div>
+                                <hr>
+                            </div>`;
+                        });
+
+                        let modalTemplate = app.popup.create({
+                            content: `<div class="sheet-modal demo-sheet">
+                                            <div class="swipe-handler"> <h1 class="link sheet-close" style="text-align: end;margin-right: 15px;display: block;margin-top: 10px;width: fit-content;left: 94%;">
+                                                <span class="material-icons" style="font-size: 35px; color: #FF0037; "> cancel </span></h1>
+                                            </div>
+                                            <div class="sheet-modal-inner">
+                                                <div class="page-content">
+                                                    <div class="block" style="margin-top: 60px;align-items: center;display: flex;flex-direction: column;">
+                                                        <div class="card" style="padding: 20px">
+                                                            <div style="display: flex;flex-direction: row;">
+                                                                <h4 class="card-title me-3" style="font-weight: 400;">Cliente:</h4>
+                                                                <h4 class="card-title subtitle capitalize">${nombreCliente}</h4>
+                                                            </div>
+                                                            <div style="display: flex;flex-direction: row;">
+                                                                <h4 class="card-title me-3" style="font-weight: 400;">Fecha:</h4>
+                                                                <h4 class="card-title subtitle">${Fecha}</h4>
+                                                            </div>
+                                                            <hr>
+                                                            <h4 class="card-title mt-2">Carrito</h4>
+                                                            <div class="row">
+                                                                <div class="col-md-12 mb-2">
+                                                                    <div class="master-container">
+                                                                        <div class="cart">
+                                                                            <div class="products">
+                                                                                ${html}
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                        
-                                                        <div class="row">
-                                                            <div class="col-md-12 mb-2">
-                                                                <div class="checkout">
-                                                                    <div class="details">
-                                                                        <span>Subtotal:</span>
-                                                                        <span id="totalSubtotal">$${price}</span>
+    
+                                                            <div class="row">
+                                                                <div class="col-md-12 mb-2">
+                                                                    <div class="checkout">
+                                                                        <div class="details">
+                                                                            <span>Subtotal:</span>
+                                                                            <span id="totalSubtotal">$${price}</span>
+                                                                        </div>
+                                                                        <div class="details">
+                                                                            <span>Descuentos de productos:</span>
+                                                                            <span id="totalDescuentos">$0.00</span>
+                                                                        </div>
+                                                                        <hr>
+                                                                        <div class="checkout--footer">
+                                                                            <label class="price" id="priceTotal_text"><sup>$</sup>${price}</label>
+                                                                        </div>
+                                                                        <hr>
+                                                                        <div class="details">
+                                                                            <span>Efectivo:</span>
+                                                                            <span>$${efectivo}</span>
+                                                                        </div>
+                                                                        <div class="details">
+                                                                            <span>Cabmio:</span>
+                                                                            <span id="totalDescuentos">$${cambio}</span>
+                                                                        </div>
+                                                                        <hr>
                                                                     </div>
-                                                                    <div class="details">
-                                                                        <span>Descuentos de productos:</span>
-                                                                        <span id="totalDescuentos">$0.00</span>
-                                                                    </div>
-                                                                    <hr>
-                                                                    <div class="checkout--footer">
-                                                                        <label class="price" id="priceTotal_text"><sup>$</sup>${price}</label>
-                                                                    </div>
-                                                                    <hr>
-                                                                    <div class="details">
-                                                                        <span>Efectivo:</span>
-                                                                        <span>$${efectivo}</span>
-                                                                    </div>
-                                                                    <div class="details">
-                                                                        <span>Cabmio:</span>
-                                                                        <span id="totalDescuentos">$${cambio}</span>
-                                                                    </div>
-                                                                    <hr>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>`,
-                        swipeToClose: false,
-                        closeByOutsideClick: false,
-                        closeByBackdropClick: false,
-                        closeOnEscape: false,
-                        on: {
-                            open: function (popup) {},
-                        },
-                    });
+                                        </div>`,
+                            swipeToClose: false,
+                            closeByOutsideClick: false,
+                            closeByBackdropClick: false,
+                            closeOnEscape: false,
+                            on: {
+                                open: function (popup) {},
+                            },
+                        });
 
-                    modalTemplate.open();
-                }
-                app.dialog.close();
+                        modalTemplate.open();
+                    }
+                    app.dialog.close();
+                    break;
+                case false:
+                    // preloader.hide();
+                    msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                    break;
             }
         })
-        .catch(function (error) {
-            app.dialog.alert("Algo salió mal", "Aviso");
-            console.log(error);
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            // preloader.hide();
+            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+            console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
         });
 }
 
@@ -202,66 +395,176 @@ function guardarVenta() {
     }
     let nameCliente = $("#clientes").find("option:selected").text();
     let url = localStorage.getItem("url");
-    axios
-        .post(url + "Brummy/views/ventas/guardarHeaderVenta.php", {
+    // axios
+    //     .post(url + "Brummy/views/ventas/guardarHeaderVenta.php", {
+    //         cliente,
+    //         price,
+    //         FlagExacto,
+    //         efectivo,
+    //         cambio,
+    //         nameCliente,
+    //     })
+    //     .then(function (response) {
+    //         console.log(response);
+    //         if (response.status === 200) {
+    //             let result = response.data.result;
+    //             if (result == "Sin Datos") {
+    //             } else {
+    //                 result.forEach((data, index) => {
+    //                     let dataID = data.IDHeader;
+    //                     let campos;
+    //                     campos = document.querySelectorAll(".products div.productoDetail");
+    //                     let random = 0;
+    //                     campos.forEach((campos) => {
+    //                         if (campos.id) {
+    //                             random = String(campos.id).replace("_product", "");
+    //                             let FlagProducto = $("#" + random + "_FlagProducto").text();
+    //                             let FKProducto = $("#" + random + "_FKProducto").val();
+    //                             let label = $("#" + random + "_label").text();
+    //                             let total = Number(String($("#" + random + "_total").text()).replace("$", ""));
+    //                             let stock = $("#" + random + "_stock").val();
+    //                             let newStock = Number(stock) - Number(label);
+    //                             let url = localStorage.getItem("url");
+    //                             axios
+    //                                 .post(url + "Brummy/views/ventas/guardarDetalleVenta.php", {
+    //                                     dataID,
+    //                                     FlagProducto,
+    //                                     FKProducto,
+    //                                     label,
+    //                                     total,
+    //                                     newStock,
+    //                                 })
+    //                                 .then(function (response) {
+    //                                     console.log(response);
+    //                                     if (response.status === 200) {
+    //                                         $(".sheet-close").trigger("click");
+    //                                         app.dialog.alert("Venta guardada correctamente", "Aviso");
+    //                                         app.views.main.router.back();
+    //                                     }
+    //                                 })
+    //                                 .catch(function (error) {
+    //                                     app.dialog.alert("Algo salió mal", "Aviso");
+    //                                     console.log(error);
+    //                                 });
+    //                         }
+    //                     });
+    //                 });
+    //             }
+    //         }
+    //     })
+    //     .catch(function (error) {
+    //         app.dialog.alert("Algo salió mal", "Aviso");
+    //         console.log(error);
+    //     });
+    $.ajax({
+        method: "POST",
+        dataType: "JSON",
+        url: url + "Brummy/views/ventas/guardarHeaderVenta.php",
+        data: {
             cliente,
             price,
             FlagExacto,
             efectivo,
             cambio,
             nameCliente,
-        })
-        .then(function (response) {
-            console.log(response);
-            if (response.status === 200) {
-                let result = response.data.result;
-                if (result == "Sin Datos") {
-                } else {
-                    result.forEach((data, index) => {
-                        let dataID = data.IDHeader;
-                        let campos;
-                        campos = document.querySelectorAll(".products div.productoDetail");
-                        let random = 0;
-                        campos.forEach((campos) => {
-                            if (campos.id) {
-                                random = String(campos.id).replace("_product", "");
-                                let FlagProducto = $("#" + random + "_FlagProducto").text();
-                                let FKProducto = $("#" + random + "_FKProducto").val();
-                                let label = $("#" + random + "_label").text();
-                                let total = Number(String($("#" + random + "_total").text()).replace("$", ""));
-                                let stock = $("#" + random + "_stock").val();
-                                let newStock = Number(stock) - Number(label);
-                                let url = localStorage.getItem("url");
-                                axios
-                                    .post(url + "Brummy/views/ventas/guardarDetalleVenta.php", {
-                                        dataID,
-                                        FlagProducto,
-                                        FKProducto,
-                                        label,
-                                        total,
-                                        newStock,
+        },
+    })
+        .done(function (results) {
+            let success = results.success;
+            let result = results.result;
+
+            switch (success) {
+                case true:
+                    if (result == "Sin Datos") {
+                    } else {
+                        result.forEach((data, index) => {
+                            let dataID = data.IDHeader;
+                            let campos;
+                            campos = document.querySelectorAll(".products div.productoDetail");
+                            let random = 0;
+                            campos.forEach((campos) => {
+                                if (campos.id) {
+                                    random = String(campos.id).replace("_product", "");
+                                    let FlagProducto = $("#" + random + "_FlagProducto").text();
+                                    let FKProducto = $("#" + random + "_FKProducto").val();
+                                    let label = $("#" + random + "_label").text();
+                                    let total = Number(String($("#" + random + "_total").text()).replace("$", ""));
+                                    let stock = $("#" + random + "_stock").val();
+                                    let newStock = Number(stock) - Number(label);
+                                    let url = localStorage.getItem("url");
+                                    // axios
+                                    //     .post(url + "Brummy/views/ventas/guardarDetalleVenta.php", {
+                                    //         dataID,
+                                    //         FlagProducto,
+                                    //         FKProducto,
+                                    //         label,
+                                    //         total,
+                                    //         newStock,
+                                    //     })
+                                    //     .then(function (response) {
+                                    //         console.log(response);
+                                    //         if (response.status === 200) {
+                                    //             $(".sheet-close").trigger("click");
+                                    //             app.dialog.alert("Venta guardada correctamente", "Aviso");
+                                    //             app.views.main.router.back();
+                                    //         }
+                                    //     })
+                                    //     .catch(function (error) {
+                                    //         app.dialog.alert("Algo salió mal", "Aviso");
+                                    //         console.log(error);
+                                    //     });
+                                    $.ajax({
+                                        method: "POST",
+                                        dataType: "JSON",
+                                        url: url + "Brummy/views/ventas/guardarDetalleVenta.php",
+                                        data: {
+                                            dataID,
+                                            FlagProducto,
+                                            FKProducto,
+                                            label,
+                                            total,
+                                            newStock,
+                                        },
                                     })
-                                    .then(function (response) {
-                                        console.log(response);
-                                        if (response.status === 200) {
-                                            $(".sheet-close").trigger("click");
-                                            app.dialog.alert("Venta guardada correctamente", "Aviso");
-                                            app.views.main.router.back();
-                                        }
-                                    })
-                                    .catch(function (error) {
-                                        app.dialog.alert("Algo salió mal", "Aviso");
-                                        console.log(error);
-                                    });
-                            }
+                                        .done(function (results) {
+                                            let success = results.success;
+                                            let result = results.result;
+
+                                            switch (success) {
+                                                case true:
+                                                    $(".sheet-close").trigger("click");
+                                                    // app.dialog.alert("Venta guardada correctamente", "Aviso");
+                                                    // app.views.main.router.back();
+                                                    break;
+                                                case false:
+                                                    // preloader.hide();
+                                                    msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                                    break;
+                                            }
+                                        })
+                                        .fail(function (jqXHR, textStatus, errorThrown) {
+                                            // preloader.hide();
+                                            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                                            console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+                                        });
+                                }
+                            });
+                            app.dialog.alert("Venta guardada correctamente", "Aviso");
+                            app.views.main.router.back();
+                            globalBack();
                         });
-                    });
-                }
+                    }
+                    break;
+                case false:
+                    // preloader.hide();
+                    msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                    break;
             }
         })
-        .catch(function (error) {
-            app.dialog.alert("Algo salió mal", "Aviso");
-            console.log(error);
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            // preloader.hide();
+            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+            console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
         });
 }
 

@@ -4,16 +4,54 @@ function onDeviceReady() {
     document.addEventListener("offline", onOffline, false);
     document.addEventListener("online", onOnline, false);
 
-    document.addEventListener("backbutton", function (e) {
-        app.views.main.router.back();
-    });
+    document.addEventListener(
+        "backbutton",
+        function (e) {
+            try {
+                let length = app.views.main.router.history.length;
+                if (length > 1) {
+                    app.views.main.router.history.pop();
+                    let path = app.views.main.router.history.pop();
+                    if (path) {
+                        if (path == "/android_asset/www/index.html") {
+                            window.location.href = "index.html";
+                        } else {
+                            app.views.main.router.navigate(path);
+                        }
+                    }
+                } else {
+                    e.preventDefault();
+                    app.dialog
+                        .create({
+                            title: "¿Deseas salir de la aplicación?",
+                            buttons: [
+                                {
+                                    text: "Cancelar",
+                                    onClick: function () {
+                                        console.log("Cancelar");
+                                    },
+                                },
+                                {
+                                    text: "OK",
+                                    onClick: function () {
+                                        navigator.app.exitApp();
+                                    },
+                                },
+                            ],
+                        })
+                        .open();
+                }
+            } catch (error) {}
+        },
+        false
+    );
 
     // console.log("Running cordova-" + cordova.platformId + "@" + cordova.version);
     // document.getElementById("deviceready").classList.add("ready");
     StatusBar.styleLightContent();
     let Usuario = localStorage.getItem("Usuario");
     localStorage.setItem("version", "1.0.0");
-    let url = "http://192.168.100.8:8080/";
+    let url = "http://192.168.100.4:8080/";
     localStorage.setItem("url", url);
     if (Usuario) {
         pintaMenu();
@@ -60,6 +98,21 @@ function onDeviceReady() {
     }
 }
 
+function globalBack() {
+    let length = app.views.main.router.history.length;
+    if (length > 1) {
+        app.views.main.router.history.pop();
+        let path = app.views.main.router.history.pop();
+        if (path) {
+            if (path == "/android_asset/www/index.html") {
+                window.location.href = "index.html";
+            } else {
+                app.views.main.router.navigate(path);
+            }
+        }
+    }
+}
+
 function cerrarSesion() {
     localStorage.removeItem("Usuario");
     window.location.href = "index.html";
@@ -70,7 +123,6 @@ function pintaMenu() {
     $("#app").html(`
         <div class="panel panel-right panel-cover panel-resizable">
             <div class="block">
-                <p>Right Panel content here</p>
                 <p style="text-align: center;"><a href="#" onclick="return: false;"> Versión ${version} </a></p>
                 <p style="text-align: center;"><a href="#" onclick="cerrarSesion();" style="color: #FF0037;"> Cerrar Sesión </a></p>
             </div>
@@ -80,9 +132,9 @@ function pintaMenu() {
                 <div class="navbar" style="height: 5px">
                     <div class="left top-left" style="justify-content: space-between;background-color: #009071;flex-direction: column;height: auto;min-height: 50px;">
                         <div style="display: flex;flex-direction: row;justify-content: space-between;width: 100%;margin-top: 10px;">
-                            <div> &nbsp; </div>
-                            <div class="title" style="font-size: 18px;margin-left: 15px;">Bienvenido</div>
-                            <div>
+                            <div style="width: 33.3%"> &nbsp; </div>
+                            <div class="title" style="font-size: 18px;margin-left: 15px;width: 33.3%;text-align: center">Bienvenido</div>
+                            <div style="width: 33.3%;text-align: end;">
                                 <a class="panel-open" href="#" data-panel="right">
                                     <i class="icon material-icons md-only" style="margin-right: 15px;"> menu </i>
                                 </a>
@@ -182,7 +234,7 @@ function pintaLogin() {
             <div class="container-login100" id="bodyLogin">
                 <div class="wrap-login100">
                     <div style="text-align: center; padding-bottom: 25px; width: 100%; padding-top: 25px">
-                        <img src="img/logo.png" height="150px" alt="Logo CISA" id="img_logo" />
+                        <img src="img/logoLogin.png" height="150px" alt="Logo CISA" id="img_logo" />
                     </div>
                     <form method="post" class="login100-form validate-form" id="formulario">
                         <div class="wrap-input100 validate-input m-b-18">
@@ -340,8 +392,15 @@ function genRandom() {
 }
 
 function FormatDate(fecha) {
-    let n = new Date(fecha);
+    let n = "";
+    if (String(fecha).includes("00:00:00")) {
+        n = new Date(fecha);
+    } else {
+        n = new Date(fecha + " 00:00:00");
+    }
+
     n = String(n.toLocaleString("es-CL")).split(",")[0];
+    console.log(n);
     return n;
 }
 
