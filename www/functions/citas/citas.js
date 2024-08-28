@@ -246,3 +246,11 @@ function getDireecionCliente(FK_dueno) {
             console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
         });
 }
+
+function muestraRecurrencia() {
+    if ($("#cbx-47").prop("checked")) {
+        $("#div_Recurrencia").css("display", "block");
+    } else {
+        $("#div_Recurrencia").css("display", "none");
+    }
+}

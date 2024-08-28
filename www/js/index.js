@@ -544,3 +544,555 @@ function CantidadConCommas(valor) {
 function numberWithCommas(num) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+function getCitasPorConfirmar() {
+    let url = localStorage.getItem("url");
+    $.ajax({
+        method: "POST",
+        dataType: "json",
+        url: url + "Brummy/views/login/getCitasPorConfirmar.php",
+        data: {},
+    })
+        .done(function (result) {
+            let success = result.success;
+            let results = result.result;
+            let html = "";
+            switch (success) {
+                case true:
+                    if (results == "Sin Datos") {
+                        $("#bodyCitasConfirmarDashbora").html(html);
+                        getCitasPorConfirmarMes();
+                    } else {
+                        results.forEach((data, index) => {
+                            // console.log(data);
+                            html += `
+                                <tr>
+                                    <td>${data.nombreCliente}</td>
+                                    <td>${data.nombreMascota}</td>
+                                    <td>${volteaFecha(data.fechaRecurrenca, 1)}</td>
+                                    <td>
+                                        <div class="my-0" style="display: flex;"> 
+                                            <button class="button button-outline button-round btnGreen" onclick="generarCitaPropuesta(${data.ID_mov}, 
+                                                '${volteaFecha(data.fechaRecurrenca, 1)}', 
+                                                '${data.fechaRecurrenca}', 
+                                                '${data.tipoRecurrencia}',
+                                                ${data.ID})" >
+                                                <span class="material-icons iconBtn" style="margin: auto;vertical-align: middle;"> date_range </span>
+                                            </button>
+
+                                            <button class="button button-outline button-round btnRed" onclick="EliminarCitaPropuesta(${
+                                                data.ID
+                                            })" style="margin-left: 15px;margin-right: 10px;">
+                                                    <span class="material-icons iconBtn" style="margin: auto;vertical-align: middle;"> delete </span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        $("#bodyCitasConfirmarDashbora").html(html);
+                        getCitasPorConfirmarMes();
+                    }
+
+                    break;
+                case false:
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Aviso",
+                        text: "Algo salió mal.",
+                    });
+
+                    break;
+            }
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            console.log("accesoUsuarioView  - Server: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+        });
+}
+
+function getCitasPorConfirmarMes() {
+    let url = localStorage.getItem("url");
+    let fecha = getDateActual();
+    fecha = moment(fecha).add(Number(5), "days").format("YYYY-MM-DD");
+    $.ajax({
+        method: "POST",
+        dataType: "json",
+        url: url + "Brummy/views/login/getCitasPorConfirmarMes.php",
+        data: { fecha },
+    })
+        .done(function (result) {
+            let success = result.success;
+            let results = result.result;
+            let html = "";
+            switch (success) {
+                case true:
+                    if (results == "Sin Datos") {
+                        // $("#bodyCitasConfirmarDashbora").html(html);
+                        dataTableDestroy();
+                        dataTableCreate();
+                    } else {
+                        results.forEach((data, index) => {
+                            let fecha = data.fechaRecurrenca;
+                            let nombreCliente = data.nombreCliente;
+                            let nombreMascota = data.nombreMascota;
+                            let ID_mov = data.ID_mov;
+                            let fechaRecurrenca = data.fechaRecurrenca;
+                            let tipoRecurrencia = data.tipoRecurrencia;
+                            let ID = data.ID;
+
+                            validaFechasConfirmar(fecha, nombreCliente, nombreMascota, ID_mov, fechaRecurrenca, tipoRecurrencia, ID);
+                        });
+                        // $("#bodyCitasConfirmarDashbora").append(html);
+                    }
+
+                    break;
+                case false:
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Aviso",
+                        text: "Algo salió mal.",
+                    });
+
+                    break;
+            }
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            console.log("accesoUsuarioView  - Server: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+        });
+}
+
+function validaFechasConfirmar(fecha, nombreCliente, nombreMascota, ID_mov, fechaRecurrenca, tipoRecurrencia, ID) {
+    console.log(fecha, nombreCliente, nombreMascota, ID_mov, fechaRecurrenca, tipoRecurrencia, ID);
+    // let html = "";
+    // // console.log(tipoRecurrencia);
+    // if (tipoRecurrencia == 30) {
+    //     fecha = moment(fecha).add(Number(1), "months").format("YYYY-MM-DD");
+    // } else if (tipoRecurrencia == 14) {
+    //     fecha = moment(fecha).add(Number(2), "weeks").format("YYYY-MM-DD");
+    // } else if (tipoRecurrencia == 7) {
+    //     fecha = moment(fecha).add(Number(1), "weeks").format("YYYY-MM-DD");
+    // } else {
+    //     fecha = moment(fecha).add(Number(1), "years").format("YYYY-MM-DD");
+    // }
+
+    // // console.log(fecha);
+    // if (fecha >= getDateActual()) {
+    //     // console.log("gg1");
+    //     let start = moment(getDateActual(), "YYYY-MM-DD");
+    //     let end = moment(fecha, "YYYY-MM-DD");
+
+    //     //Difference in number of days
+    //     let days = moment.duration(end.diff(start)).asDays();
+    //     // console.log(days);
+    //     if (days >= 0 && days <= 3) {
+    //         // console.log("mostrar");
+    //         dataTableDestroy();
+    //         html = `
+    //             <tr>
+    //                 <td>${nombreCliente}</td>
+    //                 <td>${nombreMascota}</td>
+    //                 <td>${volteaFecha(fecha, 1)}</td>
+    //                 <td>
+    //                     <div class="my-0" style="display: flex;">
+    //                         <button class="button button-outline button-round btnGreen" onclick="generarCitaPropuesta(${ID_mov},
+    //                             '${volteaFecha(fechaRecurrenca, 1)}',
+    //                             '${fechaRecurrenca}',
+    //                             '${tipoRecurrencia}',
+    //                             ${ID})" >
+    //                             <span class="material-icons iconBtn" style="margin: auto;vertical-align: middle;"> date_range </span>
+    //                         </button>
+
+    //                         <button class="button button-outline button-round btnRed" onclick="EliminarCitaPropuesta(${ID})" style="margin-left: 15px;margin-right: 10px;">
+    //                                 <span class="material-icons iconBtn" style="margin: auto;vertical-align: middle;"> delete </span>
+    //                         </button>
+    //                     </div>
+    //                 </td>
+    //             </tr>
+    //         `;
+    //         $("#bodyCitasConfirmarDashbora").append(html);
+    //         dataTableCreate();
+    //     } else {
+    //         // console.log("no mostrar");
+    //     }
+    // } else {
+    //     // console.log("gg2");
+    //     let start = moment(getDateActual(), "YYYY-MM-DD");
+    //     let end = moment(fecha, "YYYY-MM-DD");
+
+    //     //Difference in number of days
+    //     let days = moment.duration(end.diff(start)).asDays();
+    //     // console.log(days);
+    //     validaFechasConfirmar(end, nombreCliente, nombreMascota, ID_mov, fechaRecurrenca, tipoRecurrencia, ID);
+    // }
+}
+
+function getDateActual() {
+    let fecha_actual_val = new Date();
+
+    const year = fecha_actual_val.getFullYear();
+    const month = String(fecha_actual_val.getMonth() + 1).padStart(2, "0");
+    const day = String(fecha_actual_val.getDate()).padStart(2, "0");
+
+    let fecha_actual_format = `${year}-${month}-${day}`;
+    return fecha_actual_format;
+}
+
+function generarCitaPropuesta(ID, fechaPropuesta, fechaRecurrenca, tipoRecurrencia, IDRec) {
+    let url = localStorage.getItem("url");
+    $.ajax({
+        method: "POST",
+        dataType: "JSON",
+        url: url + "Brummy/views/citas/generarCitaPropuesta.php",
+        data: { ID },
+    })
+        .done(function (results) {
+            let success = results.success;
+            let result = results.result;
+            let html = "";
+            switch (success) {
+                case true:
+                    if (result == "Sin Datos") {
+                        msj.show("Aviso", "No se encontró información para generar la cita.", [{ text1: "OK" }]);
+                        // preloader.hide();
+                    } else {
+                        let nombreCita = "",
+                            nombreMascota = "",
+                            motivoCita = "",
+                            domicilio = "",
+                            FKnombreCita = "",
+                            FKMascota = "",
+                            FKMotivoCita = "";
+                        result.forEach((data, index) => {
+                            console.log(data);
+                            nombreCita = data.nombreCita;
+                            nombreMascota = data.nombreMascota;
+                            motivoCita = data.motivoCita;
+                            domicilio = data.Flagdomicilio;
+                            FKnombreCita = data.FKnombreCita;
+                            FKMascota = data.FKnombreMascota;
+                            FKMotivoCita = data.FKMotivo;
+                        });
+
+                        $("#labelModal").html(`Crear Nueva Cita`);
+
+                        $("#body_modal").html(`<br>
+                            <div id="nuevaCita">
+                                <div class="coolinput">
+                                    <label for="nombreCitainput" class="text">Cliente: </label>
+                                    <input name="Cliente" type="text" class="input obligatorio" id="nombreCitainput" autocomplete="off" readonly/>
+                                    <input type="hidden" id="nombreCita">
+                                </div>
+
+                                <div class="coolinput">
+                                    <label for="nombreMascota" class="text">Mascota: </label>
+                                    <input name="Mascota" type="text" class="input obligatorio" id="nombreMascotaInput" autocomplete="off" readonly/>
+                                    <input type="hidden" id="nombreMascota">
+                                </div>
+
+                                <div class="coolinput">
+                                    <label for="fechaCita" class="text">Fecha:</label>
+                                    <!-- <input name="Fecha" type="date" class="input obligatorio" id="fechaCita" autocomplete="off" maxlength"50"/> -->
+                                    <input name="Fecha" type="text" class="input obligatorio" id="fechaCita" autocomplete="off" />
+                                </div>
+
+                                <div class="coolinput">
+                                    <label for="horaCita" class="text">Hora:</label>
+                                    <!-- <input name="Hora" type="time" class="input obligatorio" id="horaCita" autocomplete="off" maxlength"50"/> -->
+                                    <input type="text" name="Hora" class="input obligatorio" id="horaCita" autocomplete="off"/>
+                                </div>
+
+                                <div class="coolinput">
+                                    <label for="motivoCita" class="text">Motivo de Cita:</label>
+                                    <input name="Motivo Cita" type="text" class="input obligatorio" id="motivoCitaInput" autocomplete="off" readonly/>
+                                    <input type="hidden" id="motivoCita">
+                                </div>
+
+                                <div class="coolinput">
+                                    <label for="comentariosCita" class="text">Comentarios:</label>
+                                    <input name="Comentarios" type="text" class="input capitalize" id="comentariosCita" autocomplete="off" maxlength"50"/>
+                                </div>
+
+                                <div class="checkbox-wrapper-46" style="margin: 22px 0px 12px 8px;">
+                                    <input type="checkbox" id="cbx-46" class="inp-cbx" onchange="muestraDomicilio1()"/>
+                                    <label for="cbx-46" class="cbx">
+                                        <span style="transform: scale(1.3);">
+                                            <svg viewBox="0 0 12 10" height="10px" width="12px">
+                                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                            </svg>
+                                        </span>
+                                        <span>¿Es Servicio a domicilio?</span>
+                                    </label>
+                                </div>
+
+                                <div id="div_servicioDomicilio" style="display: none;padding: 15px 10px 25px;margin: 10px 0px;" class="card2">
+                                    <div class="coolinput">
+                                        <label name="Calle" for="direccionVete" class="text">Calle</label>
+                                        <input name="Calle" type="text" class="input capitalize" id="calleDomi_input" autocomplete="off" />
+                                    </div>
+                                    <div style="display:flex; flex-direction: row;">
+                                        <div class="coolinput">
+                                            <label name="Número" for="direccionVete" class="text">Número</label>
+                                            <input name="Número" type="text" class="input capitalize" id="numeroDomi_input" autocomplete="off" />
+                                        </div>
+                                        <div class="coolinput" style="margin-left: 20px;">
+                                            <label name="C.P." for="direccionVete" class="text">C.P.</label>
+                                            <input name="C.P." type="text" class="input capitalize" id="cpDomi_input" autocomplete="off" />
+                                        </div>
+                                    </div>
+                                    <div class="coolinput">
+                                        <label name="Col." for="direccionVete" class="text">Col.</label>
+                                        <input name="Col." type="text" class="input capitalize" id="colDomi_input" autocomplete="off" />
+                                    </div>
+                                    <div class="coolinput">
+                                        <label name="Municipio" for="direccionVete" class="text">Municipio/Alcaldía</label>
+                                        <input name="Municipio" type="text" class="input capitalize" id="municipioDomi_input" autocomplete="off" />
+                                    </div>
+                                    <div class="coolinput">
+                                        <label name="Estado" for="direccionVete" class="text">Estado</label>
+                                        <input name="Estado" type="text" class="input capitalize" id="estadoDomi_input" autocomplete="off" />
+                                    </div>
+                                </div>
+
+                                <input type="hidden" id="fechaRecurrenca">
+                                <input type="hidden" id="eachRecurrencia">
+                            </div>
+
+                            <div class="center-fitcomponent" style="width: 100%;">
+                                <div class="buttom-blue buttom" style="margin-left: auto;margin-right: auto;" id="btnGuardarCita">
+                                    <span class="text-sm mb-0 span-buttom"> 
+                                        Guardar
+                                        <i class="material-icons"> save </i>
+                                    </span>
+                                </div>
+                            </div>
+                        `);
+
+                        $("#modalTemplate").modal({
+                            backdrop: "static",
+                            keyboard: false,
+                        });
+
+                        $("#modalTemplate").modal("show");
+
+                        $("#btnClose").on("click", () => {
+                            $("#modalTemplate").modal("hide");
+                            $("#btnClose").off("click");
+                        });
+
+                        $("#nombreCitainput").val(nombreCita);
+                        $("#nombreMascota").val(FKMascota);
+                        $("#nombreMascotaInput").val(nombreMascota);
+                        $("#motivoCitaInput").val(motivoCita);
+                        $("#motivoCita").val(FKMotivoCita);
+                        $("#nombreCita").val(FKnombreCita);
+                        $("#fechaRecurrenca").val(fechaRecurrenca);
+                        $("#eachRecurrencia").val(tipoRecurrencia);
+
+                        if (domicilio == 1) {
+                            $("#cbx-46").prop("checked", true);
+                            muestraDomicilio1();
+                        }
+
+                        $("#horaCita").mdtimepicker({
+                            timeFormat: "hh:mm:ss", // format of the time value (data-time attribute)
+                            format: "hh:mm", // format of the input value
+                            theme: "blue", // theme of the timepicker
+                            clearBtn: true, // determines if clear button is visible
+                            is24hour: true, // determines if the clock will use 24-hour format in the UI; format config will be forced to `hh:mm` if not specified
+                        });
+
+                        $("#fechaCita").val(fechaPropuesta);
+                        $("#fechaCita").duDatepicker({ format: "dd-mm-yyyy", clearBtn: true, cancelBtn: true });
+
+                        $("#btnGuardarCita").click(() => {
+                            validacioesCita1(IDRec);
+                        });
+
+                        // preloader.hide();
+                    }
+                    break;
+                case false:
+                    // preloader.hide();
+                    msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                    break;
+            }
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            // preloader.hide();
+            msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+            console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+        });
+}
+
+function EliminarCitaPropuesta(IDRec) {
+    app.dialog
+        .create({
+            title: "¿Estás seguro de querer eliminar las propuestas de citas recurrentes definitivamente de este ciiente?",
+            buttons: [
+                {
+                    text: "Cancelar",
+                    onClick: function () {
+                        console.log("Cancelar");
+                    },
+                },
+                {
+                    text: "OK",
+                    onClick: function () {
+                        cambiaEstatusCitaRecurente(IDRec, 0, 0);
+                    },
+                },
+            ],
+        })
+        .open();
+}
+
+function cambiaEstatusCitaRecurente(IDRec, agendada, tipoRecurrencia) {
+    let url = localStorage.getItem("url");
+    $.ajax({
+        method: "POST",
+        dataType: "JSON",
+        url: url + "Brummy/views/citas/cambiaEstatusCitaRecurente.php",
+        data: {
+            IDRec,
+            agendada,
+            tipoRecurrencia,
+        },
+    })
+        .done(function (results) {
+            let success = results.success;
+            let result = results.result;
+            switch (success) {
+                case true:
+                    // preloader.hide();
+                    getCitasPorConfirmar();
+                    break;
+                case false:
+                    // preloader.hide();
+                    // msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                    break;
+            }
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            // preloader.hide();
+            // msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+            console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+        });
+}
+
+function muestraDomicilio1() {
+    if ($("#cbx-46").prop("checked")) {
+        $("#div_servicioDomicilio").css("display", "block");
+        getDireecionCliente($("#nombreCita").val());
+    } else {
+        $("#div_servicioDomicilio").css("display", "none");
+    }
+}
+function validacioesCita1(IDRec) {
+    let valido = true;
+    let fecha_actual_val = new Date();
+
+    const year = fecha_actual_val.getFullYear();
+    const month = String(fecha_actual_val.getMonth() + 1).padStart(2, "0");
+    const day = String(fecha_actual_val.getDate()).padStart(2, "0");
+
+    let fecha_actual_format = `${year}-${month}-${day}`;
+
+    if (valido) {
+        // preloader.show();
+        let fechaCita = volteaFecha($("#fechaCita").val(), 2);
+        let horaCita = $("#horaCita").val();
+
+        if (fechaCita < fecha_actual_format) {
+            console.log("La fecha seleccionada es menor a la actual");
+            msj.show("Aviso", "La fecha de la cita no puede ser menor a la actual", [{ text1: "OK" }]);
+            // preloader.hide();
+            return false;
+        }
+
+        if (!horaCita) {
+            msj.show("Aviso", "Debes indicar la hora de la cita", [{ text1: "OK" }]);
+            // preloader.hide();
+            return false;
+        }
+
+        if ($("#cbx-46").prop("checked")) {
+            let calleDomi = String($("#calleDomi_input").val()).trim();
+            let numeroDomi = String($("#numeroDomi_input").val()).trim();
+            let cpDomi = String($("#cpDomi_input").val()).trim();
+            let colDomi = String($("#colDomi_input").val()).trim();
+            let municipioDomi = String($("#municipioDomi_input").val()).trim();
+            let estadoDomi = String($("#estadoDomi_input").val()).trim();
+
+            calleDomi.replaceAll("'", '"');
+            numeroDomi.replaceAll("'", '"');
+            cpDomi.replaceAll("'", '"');
+            colDomi.replaceAll("'", '"');
+            municipioDomi.replaceAll("'", '"');
+            estadoDomi.replaceAll("'", '"');
+
+            if (!calleDomi || !numeroDomi || !cpDomi || !colDomi || !municipioDomi || !estadoDomi) {
+                msj.show("Aviso", "El domicilio esta incompleto", [{ text1: "OK" }]);
+                return false;
+            }
+        }
+
+        let url = localStorage.getItem("url");
+        $.ajax({
+            method: "POST",
+            dataType: "JSON",
+            url: url + "Brummy/views/citas/validaCita.php",
+            data: { fechaCita, horaCita },
+        })
+            .done(function (results) {
+                let success = results.success;
+                let result = results.result;
+                let disponible = true;
+                switch (success) {
+                    case true:
+                        if (result == "Sin Datos") {
+                            guardarCita1(IDRec);
+                        } else {
+                            disponible = false;
+                            let Texto = "";
+                            result.forEach((data, index) => {
+                                Texto += ` ${data.nombreCita} y ${data.nombreMascota} que podria empalmarse. ¿Deseas continuar?`;
+                            });
+                            Swal.fire({
+                                title: "Hay una cita ya agendada de:",
+                                text: Texto,
+                                icon: "question",
+                                showCancelButton: true,
+                                confirmButtonColor: "#7066e0",
+                                cancelButtonColor: "#FF0037",
+                                confirmButtonText: "OK",
+                                cancelButtonText: "Cancelar",
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    guardarCita1(IDRec);
+                                }
+                            });
+                            // preloader.hide();
+                        }
+
+                        break;
+                    case false:
+                        // preloader.hide();
+                        msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                        break;
+                }
+            })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                // preloader.hide();
+                msj.show("Aviso", "Algo salió mal", [{ text1: "OK" }]);
+                console.log("error: " + jqXHR.responseText + "\nEstatus: " + textStatus + "\nError: " + errorThrown);
+            });
+    } else {
+        let html =
+            '<span style="font-weight: 900;">Debes llenar estos campos para poder guardar:</span> <br> <ul style="text-align: left; margin-left: 15px; font-style: italic;"> ';
+        response.forEach((data) => {
+            html += `<li style="list-style: disc;">${data}.</li> `;
+        });
+        html += `</ul>`;
+        Swal.fire({ icon: "warning", title: "", html: html });
+    }
+}

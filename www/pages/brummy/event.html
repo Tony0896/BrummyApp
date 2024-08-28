@@ -895,6 +895,43 @@
                                                                                         </li>
 
                                                                                     </div>
+                                                                                    <div class="checkbox-wrapper-46" style="margin: 22px 0px 12px 8px;padding-left: 15px;">
+                                                                                        <input type="checkbox" id="cbx-47" class="inp-cbx" onchange="muestraRecurrencia()"/>
+                                                                                        <label for="cbx-47" class="cbx">
+                                                                                            <span style="transform: scale(1.3);">
+                                                                                                <svg viewBox="0 0 12 10" height="10px" width="12px">
+                                                                                                    <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                                                                                </svg>
+                                                                                            </span>
+                                                                                            <span>¿El cliente pide recordar?</span>
+                                                                                        </label>
+                                                                                    </div>
+
+                                                                                    <div id="div_Recurrencia" style="display: none;padding: 15px 10px 25px;margin: 10px 0px;" class="card2">
+                                                                                        <li class="item-content item-input item-input-outline" id="LIeachRecurrencia_input">
+                                                                                            <div class="item-inner">
+                                                                                                <div class="item-title item-floating-label">Recurrencia: </div>
+                                                                                                <div class="item-input-wrap">
+                                                                                                    <select class="floating input-focused" name="¿Cada cuánto?" placeholder="¿Cada cuánto?" id="eachRecurrencia_input" style="background-color: rgb(255, 255, 255);width:100%;padding-top: 0 !important;padding-bottom: 0 !important;">
+                                                                                                        <option value=""> - - </option>
+                                                                                                        <option value="1">Única ocasión</option>
+                                                                                                        <option value="7">Cada semana</option><!--  -->
+                                                                                                        <option value="14">Cada 2 semanas</option><!--  -->
+                                                                                                        <option value="30">Cada mes</option>
+                                                                                                    </select>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </li>
+
+                                                                                        <li class="item-content item-input item-input-outline" id="div_fechaRecurrencia" style="display:none;">
+                                                                                            <div class="item-inner">
+                                                                                                <div class="item-title item-floating-label">Fecha: </div>
+                                                                                                <div class="item-input-wrap">
+                                                                                                   <input name="Fecha" type="date" class="floating input-focused" id="fechaCitaRecurrencia" autocomplete="off" />
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </li>
+                                                                                    </div>
                                                                                 </ul>
                                                                             </div>
                                                                         </div>
@@ -1015,6 +1052,14 @@
                                                             $("#btnGuardarCita").click(() => {
                                                                 validacioesCita();
                                                             });
+
+                                                            $("#eachRecurrencia_input").change(() => {
+                                                                if ($("#eachRecurrencia_input").val() == 1) {
+                                                                    $("#div_fechaRecurrencia").css("display", "flex");
+                                                                } else {
+                                                                    $("#div_fechaRecurrencia").css("display", "none");
+                                                                }
+                                                            });
                                                         },
                                                     },
                                                 });
@@ -1133,6 +1178,21 @@
                         //     .finally(function () {
                         //         // siempre sera ejecutado
                         //     });
+
+                        if ($("#cbx-47").prop("checked")) {
+                            if (!$("#eachRecurrencia_input").val()) {
+                                msj.show("Aviso", "Debes indicar la recurrencia", [{ text1: "OK" }]);
+                                return false;
+                            }
+
+                            if ($("#eachRecurrencia_input").val() == 1) {
+                                if (!$("#fechaCitaRecurrencia").val()) {
+                                    msj.show("Aviso", "Debes indicar la fecha para recordar", [{ text1: "OK" }]);
+                                    return false;
+                                }
+                            }
+                        }
+
                         $.ajax({
                             method: "POST",
                             dataType: "JSON",
@@ -1278,6 +1338,26 @@
                     //     .finally(function () {
                     //         // siempre sera ejecutado
                     //     });
+
+                    if ($("#cbx-47").prop("checked")) {
+                        Recurrencia = 1;
+                        tipoRecurrencia = $("#eachRecurrencia_input").val();
+                        if (tipoRecurrencia == 1) {
+                            fechaRecurrenca = $("#fechaCitaRecurrencia").val();
+                        } else {
+                            fechaRecurrenca = volteaFecha($("#fechaCita").val(), 2);
+                            if (tipoRecurrencia == 7 || tipoRecurrencia == 14) {
+                                moment(fechaRecurrenca).add(Number(tipoRecurrencia), "days").format("YYYY-MM-DD");
+                            } else if (tipoRecurrencia == 30) {
+                                moment(fechaRecurrenca).add(Number(1), "month").format("YYYY-MM-DD");
+                            }
+                        }
+                    }
+
+                    nombreCita.replaceAll("'", '"');
+                    nombreMascota.replaceAll("'", '"');
+                    motivoCita.replaceAll("'", '"');
+                    comentariosCita.replaceAll("'", '"');
                     $.ajax({
                         method: "POST",
                         dataType: "JSON",
@@ -1299,6 +1379,9 @@
                             municipioDomi,
                             estadoDomi,
                             domicilio,
+                            Recurrencia,
+                            tipoRecurrencia,
+                            fechaRecurrenca,
                         },
                     })
                         .done(function (results) {

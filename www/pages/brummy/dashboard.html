@@ -80,6 +80,23 @@
                 </div>
 
                 <div class="card">
+                    <div class="card-header">Citas Recurrentes</div>
+                    <div class="card-content">
+                        <table class="mdl-data-table table responsive table-bordered table-striped dashTable datatable" style="width: 100%">
+                            <thead>
+                                <tr>
+                                    <th class="thDataTable">Cliente</th>
+                                    <th class="thDataTable">Mascota</th>
+                                    <th class="thDataTable">Fecha Propuesta</th>
+                                    <th class="thDataTable">&nbsp;</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bodyCitasConfirmarDashbora"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
                     <div class="card-header">Satisfacción cliente</div>
                     <div class="card-content">
                         <canvas id="bar-chart" width="800" height="450"></canvas>
@@ -485,6 +502,8 @@
                         },
                     },
                 });
+
+                getCitasPorConfirmar();
             },
         },
     };
